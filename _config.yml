@@ -8,3 +8,4 @@ minima:
     - title: GitHub
       icon: github
       url: "https://github.com/fsaltunyuva"
+  show_excerpts: true
