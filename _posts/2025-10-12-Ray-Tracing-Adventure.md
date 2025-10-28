@@ -259,9 +259,9 @@ You can see the rendering times in the following table:
 | trex_smooth           | PLY      |
 | windmill_smooth       | 171.286  |
 | lobster               | PLY      |
-| David                 | —        |
+| David (100x100 Resolution to speed up)                 | —        |
 | raven                 | 230.513  |
-| UtahTeapotMugCENG     | —        |
+| UtahTeapotMugCENG (100x100 Resolution to speed up)     | —        |
 
 *Used CPU: AMD Ryzen 5 5600X 6-Core Processor (3.70 GHz)*
 
@@ -318,7 +318,7 @@ _Time: 43.5769 s_
 
 ### ScienceTree_glass  
 _Time: 63.807 s_
-<img width="1440" height="720" alt="scienceTree_glass" src="https://github.com/user-attachments/assets/39efbef9-9dcd-44e6-9b43-c3854aa0a393" />
+<img alt="scienceTree_glass" src="https://github.com/user-attachments/assets/39efbef9-9dcd-44e6-9b43-c3854aa0a393" />
 
 ---
 
@@ -342,7 +342,7 @@ _Time: 0.31197 s_
 
 ### Spheres_with_plane  
 _Time: 0.220229 s_
-<img width="720" height="720" alt="spheres_with_plane" src="https://github.com/user-attachments/assets/7979d72c-e57d-4410-b94b-6ee664799de1" />
+<img alt="spheres_with_plane" src="https://github.com/user-attachments/assets/7979d72c-e57d-4410-b94b-6ee664799de1" />
 
 ---
 
@@ -388,7 +388,7 @@ _Time: 171.286 s_
 
 ---
 
-### David  
+### David (100x100 Resolution to speed up)   
 _Time: —_
 
 ---
@@ -399,5 +399,5 @@ _Time: 230.513 s_
 
 ---
 
-### UtahTeapotMugCENG  
+### UtahTeapotMugCENG (100x100 Resolution to speed up)  
 _Time: —_
