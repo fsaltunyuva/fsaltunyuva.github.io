@@ -239,7 +239,7 @@ You can see the rendering times in the following table:
 | --------------------- | -------- |
 | bunny                 | 18.0517  |
 | bunny_with_plane      | 229.144  |
-| chinese_dragon        | ???      |
+| chinese_dragon        | 457.066  |
 | cornellbox            | 0.399039 |
 | cornellbox_recursive  | 0.588336 |
 | other_dragon          | PLY      |
@@ -265,12 +265,18 @@ You can see the rendering times in the following table:
 
 *Used CPU: AMD Ryzen 5 5600X 6-Core Processor (3.70 GHz)*
 
-
 I could not manage to import and render PLY files yet, so those are marked as PLY.
+
+Back Face Culling Experiments on Bunny With Plane Scene:
+- Without Back Face Culling and Parallelization: 2329.69 seconds
+- With Wrong Back Face Culling (after intersection test) and Without Parallelization: 3469.64 seconds
+- With Correct Back Face Culling (before intersection test) and Without Parallelization: 2104.23 seconds
+- With Correct Back Face Culling and With Parallelization: 254.837 seconds
+
+# Outputs:
 
 Other than having some issues in chinese_dragon and raven inputs, my ray tracer worked perfectly for all other scenes.
 
-Outputs:
 ### Bunny  
 _Time: 18.0517 s_
 
