@@ -207,7 +207,7 @@ For the reflection calculations, I relied on the Fresnel equations we covered in
 The goal was to make light interactions more physically accurate: dielectric materials (like glass or water) both reflect and refract light depending on the viewing angle, while metals reflect light with color and intensity determined by their complex refractive indices. Simple mirrors, on the other hand, follow the ideal reflection rule without any refraction or absorption.
 
 <p align="center">
-<img width="1024" height="1024" alt="bunny_with_plane_fresnel" src="https://github.com/user-attachments/assets/513f98ab-8397-43b5-a051-7a0e3ef683cd" />
+<img alt="bunny_with_plane_fresnel" src="https://github.com/user-attachments/assets/513f98ab-8397-43b5-a051-7a0e3ef683cd" />
 </p>
 
 For dielectric materials, I also implemented light attenuation using Beer's Law, as discussed in class.
