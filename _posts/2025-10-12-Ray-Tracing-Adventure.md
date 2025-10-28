@@ -28,14 +28,18 @@ To parse JSON files, I used the most famous library for this task in C++, the [j
 
 And yes, it's finally time for ray tracing. And the ingredients we need for a ray tracer are a camera, an image plane, and objects. Let's start with the camera.
 
-[CAMERA IMAGE] from Fundamentals of Computer Graphics Book by Stephen Marschner and Peter Shirley
+<p align="center">
+  <img width="209" height="177" alt="camera" src="https://github.com/user-attachments/assets/b3583edf-6f0f-475a-b4e0-d3edfed71525"/>
+  <br/>
+  <em>From <strong>Fundamentals of Computer Graphics</strong> by Stephen Marschner and Peter Shirley</em>
+</p>
 
 I set w to be the exact opposite of gaze (it is given in JSON file), because w should be the exact opposite of the direction the camera is looking. Then I set u to be the cross product of up and w, because the u vector should point to the right of the camera, and the cross product of these two vectors gives exactly that direction. Then I made the vector v the cross product of w and u, because the cross product of these two vectors should give the upward direction.
 
 ```cpp
-        Vec3 w = gaze.scale(-1.0f); // -gaze
-        Vec3 u_vec = (up.cross(w)).normalize();
-        Vec3 v_vec = w.cross(u_vec);
+Vec3 w = gaze.scale(-1.0f); // -gaze
+Vec3 u_vec = (up.cross(w)).normalize();
+Vec3 v_vec = w.cross(u_vec);
 ```
 
 Then we entered two nested for loops where everything will be calculated, everything I will talk about from now on will be inside these nested for loops, in short, we will calculate the calculations I will talk about by sending rays to each pixel.
@@ -69,11 +73,13 @@ Vec3 P = camPos
     .add(v_vec.scale(sv));         // + v * sv
 ```
 
-In short, this P value is d value in the ray equation R(t) = O + tD, where O is the origin (camPos in our case) and D is the direction (P - camPos).
+In short, this P value is the D value in the ray equation R(t) = O + tD, where O is the origin (camPos in our case) and D is the direction (P - camPos).
 
 I'll fast forward a little bit and come back shortly. After this step, I sent the rays and made my calculations and got the following result in my first attempt (since I forgot to save the result I got at that time, I will show a similar scenario with the output I got from the latest version of my ray tracer).
 
-[FLIPPED SPHERES IMAGE]
+<p align="center">
+<img width="720" height="720" alt="flipped_spheres" src="https://github.com/user-attachments/assets/d34549f7-21a2-45a7-bbb7-20a8d8306b87" />
+</p>
 
 Although the first thing that came to my mind when I saw it was a wrong origin or a wrong calculation, I later realized that in PNG files, the point (0,0) is the upper left corner. So I flipped my bottom left corner (0,0) by doing:
 
@@ -84,7 +90,9 @@ int index = (flippedY * width + x) * 3; // This value will be used as index to s
 
 Then I was able to get the correct result.
 
-[SPHERES IMAGE]
+<p align="center">
+<img width="720" height="720" alt="spheres" src="https://github.com/user-attachments/assets/c4d04551-1a95-4aad-bc42-7fae8bebc31b" />
+</p>
 
 Okay, let's continue where we left off. After completing the project to this point, I thought the first thing I needed to do was intersection tests. So, I directly adapted the formulas of sphere, triangle and plane intersections that we learned in class into the code.
 
@@ -92,7 +100,9 @@ Even though I struggled a bit with small syntax errors here and there, I eventua
 
 At that moment, I realized I could actually render *everything*, and of course, to make things harder for myself, I decided to start with the famous Stanford Bunny. When I saw the output image (after 57 minutes :)), a smile appeared on my face.
 
-[BUNNY2 IMAGE]
+<p align="center">
+<img width="512" height="512" alt="bunny2" src="https://github.com/user-attachments/assets/d7d97b94-98be-4ceb-ac8f-c5e56b966bc4" />
+</p>
 
 For a while, I kept thinking: *“I just told the program where the camera and the objects should be, and it did all the necessary calculations to produce an image for me. What could possibly be more exciting than that?”* 
 
@@ -100,11 +110,15 @@ But of course, it was only just beginning :). After the sweet smell of success, 
 
 If the ray I threw intersected with an object and that object had a material, I first started by adding ambient color to the color of that pixel.
 
-[BUNNY_AMBIENT IMAGE]
+<p align="center">
+<img width="512" height="512" alt="bunny_ambient" src="https://github.com/user-attachments/assets/de44a631-3bfe-496c-9c0f-b89fe8843987" />
+</p>
 
 Then I added diffuse and specular for each light source.
 
-[bunny_diffuse_specular IMAGE]
+<p align="center">
+<img width="512" height="512" alt="bunny_diffuse_specular" src="https://github.com/user-attachments/assets/46f98a85-aac2-486c-a99f-8eb749e75cf9" />
+</p>
 
 Although seeing the results was really satisfying, the render times (which could easily exceed 50 minutes) were becoming a bit of a problem. Sure, I could have tried simpler scenes, but once my eyes had been captivated by the Stanford Bunny, a few basic shapes just wouldn’t cut it anymore :).
 
@@ -184,13 +198,17 @@ static bool isInShadow(const Scene& scene,
 
 With all these changes, I rendered the Stanford Bunny again, and this time, the shadows added a nice touch of realism to the scene.
 
-[bunny_with_plane_shadow IMAGE]
+<p align="center">
+<img width="1024" height="1024" alt="bunny_with_plane_shadow" src="https://github.com/user-attachments/assets/74eefbca-549f-4a6b-9d6c-eb3a5df220d9" />
+</p>
 
 For the reflection calculations, I relied on the Fresnel equations we covered in class. Using those formulas, I implemented separate reflection behaviors for dielectrics, conductors, and simple mirrors.
 
 The goal was to make light interactions more physically accurate: dielectric materials (like glass or water) both reflect and refract light depending on the viewing angle, while metals reflect light with color and intensity determined by their complex refractive indices. Simple mirrors, on the other hand, follow the ideal reflection rule without any refraction or absorption.
 
-[bunny_with_plane_fresnel.png IMAGE]
+<p align="center">
+<img width="1024" height="1024" alt="bunny_with_plane_fresnel" src="https://github.com/user-attachments/assets/513f98ab-8397-43b5-a051-7a0e3ef683cd" />
+</p>
 
 For dielectric materials, I also implemented light attenuation using Beer's Law, as discussed in class.
 This law models how light intensity decreases as it travels through a transparent medium, depending on the material’s absorption coefficient and the distance the light travels inside it.
@@ -201,13 +219,15 @@ In my ray tracer, this means that when a ray refracts through materials like gla
 
 The difference that beer's law makes can be seen in the following GIF, Beer's law is not applied when the top black bar is full, beer's law is applied when the top bar is empty (white).
 
- [beer's law GIF]
+![beers law](https://github.com/user-attachments/assets/e4651326-5bbd-4e88-9158-4662e92908c6)
 
- After implementing flat shading for each triangle, I added smooth shading to make curved surfaces look continuous and natural.
+After implementing flat shading for each triangle, I added smooth shading to make curved surfaces look continuous and natural.
 
 Instead of using a single face normal for the entire triangle, I compute the interpolated normal at the intersection point using the triangle’s vertex normals and their barycentric coordinates.
 
-[smooth shading.png IMAGE]
+<p align="center">
+<img width="1182" height="749" alt="smooth shading" src="https://github.com/user-attachments/assets/955bbf95-71fb-4748-b9cb-dec3d14af299" />
+</p>
 
 With this, I successfully completed all the required features for the assignment. For the upcoming ones, I designed my code to follow object-oriented principles, so that I can easily extend or modify it later. I also organized the logic into dedicated functions for each operation.
 
