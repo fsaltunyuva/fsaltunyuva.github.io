@@ -232,3 +232,164 @@ Instead of using a single face normal for the entire triangle, I compute the int
 With this, I successfully completed all the required features for the assignment. For the upcoming ones, I designed my code to follow object-oriented principles, so that I can easily extend or modify it later. I also organized the logic into dedicated functions for each operation.
 
 I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Akif Uslu and Deniz Sayın for their contributions to the 3D models.
+
+You can see the rendering times in the following table:
+
+| Scene                 | Time (seconds) |
+| --------------------- | -------- |
+| bunny                 | 18.0517  |
+| bunny_with_plane      | 229.144  |
+| chinese_dragon        | ???      |
+| cornellbox            | 0.399039 |
+| cornellbox_recursive  | 0.588336 |
+| other_dragon          | PLY      |
+| scienceTree           | 43.5769  |
+| scienceTree_glass     | 63.807   |
+| simple                | 0.217648 |
+| spheres               | 0.254147 |
+| spheres_mirror        | 0.31197  |
+| spheres_with_plane    | 0.220229 |
+| two_spheres           | 0.142726 |
+| berserker_smooth      | 44.4589  |
+| Car_front_smooth      | 632.8    |
+| Car_smooth            | 314.33   |
+| low_poly_scene_smooth | 139.563  |
+| ton_Roosendaal_smooth | PLY      |
+| tower_smooth          | 165.598  |
+| trex_smooth           | PLY      |
+| windmill_smooth       | 171.286  |
+| lobster               | PLY      |
+| David                 | —        |
+| raven                 | 230.513  |
+| UtahTeapotMugCENG     | —        |
+
+*Used CPU: AMD Ryzen 5 5600X 6-Core Processor (3.70 GHz)*
+
+
+I could not manage to import and render PLY files yet, so those are marked as PLY.
+
+Other than having some issues in chinese_dragon and raven inputs, my ray tracer worked perfectly for all other scenes.
+
+Outputs:
+### Bunny  
+_Time: 18.0517 s_
+
+---
+
+### Bunny_with_plane  
+_Time: 229.144 s_
+
+---
+
+### Chinese_dragon  
+_Time: ???_
+
+---
+
+### Cornellbox  
+_Time: 0.399039 s_
+
+---
+
+### Cornellbox_recursive  
+_Time: 0.588336 s_
+
+---
+
+### Other_dragon  
+_Time: PLY_
+
+---
+
+### ScienceTree  
+_Time: 43.5769 s_
+
+---
+
+### ScienceTree_glass  
+_Time: 63.807 s_
+
+---
+
+### Simple  
+_Time: 0.217648 s_
+
+---
+
+### Spheres  
+_Time: 0.254147 s_
+
+---
+
+### Spheres_mirror  
+_Time: 0.31197 s_
+
+---
+
+### Spheres_with_plane  
+_Time: 0.220229 s_
+
+---
+
+### Two_spheres  
+_Time: 0.142726 s_
+
+---
+
+### Berserker_smooth  
+_Time: 44.4589 s_
+
+---
+
+### Car_front_smooth  
+_Time: 632.8 s_
+
+---
+
+### Car_smooth  
+_Time: 314.33 s_
+
+---
+
+### Low_poly_scene_smooth  
+_Time: 139.563 s_
+
+---
+
+### Ton_Roosendaal_smooth  
+_Time: PLY_
+
+---
+
+### Tower_smooth  
+_Time: 165.598 s_
+
+---
+
+### Trex_smooth  
+_Time: PLY_
+
+---
+
+### Windmill_smooth  
+_Time: 171.286 s_
+
+---
+
+### Lobster  
+_Time: PLY_
+
+---
+
+### David  
+_Time: —_
+
+---
+
+### Raven  
+_Time: 230.513 s_
+
+---
+
+### UtahTeapotMugCENG  
+_Time: —_
