@@ -277,9 +277,13 @@ Back Face Culling Experiments on Bunny With Plane Scene:
 
 Other than having some issues in chinese_dragon and raven inputs, my ray tracer worked perfectly for all other scenes.
 
+---
+
 ### Bunny  
 _Time: 18.0517 s_
+<p align="center">
 <img alt="bunny" src="https://github.com/user-attachments/assets/89f932af-5554-4523-9eb5-ff0999cd154a" />
+</p>
 
 ---
 
