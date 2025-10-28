@@ -239,7 +239,7 @@ You can see the rendering times in the following table:
 | --------------------- | -------- |
 | bunny                 | 18.0517  |
 | bunny_with_plane      | 229.144  |
-| chinese_dragon        | 457.066  |
+| chinese_dragon        | 3321.37  |
 | cornellbox            | 0.399039 |
 | cornellbox_recursive  | 0.588336 |
 | other_dragon          | PLY      |
@@ -259,9 +259,9 @@ You can see the rendering times in the following table:
 | trex_smooth           | PLY      |
 | windmill_smooth       | 171.286  |
 | lobster               | PLY      |
-| David                 | —        |
+| David (150x150 Resolution to speed up)                 | 100.123 |
 | raven                 | 230.513  |
-| UtahTeapotMugCENG     | —        |
+| UtahTeapotMugCENG (200x200 Resolution to speed up)     | 73.5209 |
 
 *Used CPU: AMD Ryzen 5 5600X 6-Core Processor (3.70 GHz)*
 
@@ -275,127 +275,170 @@ Back Face Culling Experiments on Bunny With Plane Scene:
 
 # Outputs:
 
-Other than having some issues in chinese_dragon and raven inputs, my ray tracer worked perfectly for all other scenes.
+Other than having some issues in rt_raven and chinese_dragon inputs, my ray tracer worked perfectly for all other scenes.
+
+---
 
 ### Bunny  
 _Time: 18.0517 s_
+<p align="center">
+<img alt="bunny" src="https://github.com/user-attachments/assets/89f932af-5554-4523-9eb5-ff0999cd154a" />
+</p>
 
 ---
 
 ### Bunny_with_plane  
 _Time: 229.144 s_
+<p align="center">
+<img alt="bunny_with_plane" src="https://github.com/user-attachments/assets/98858d36-843e-4641-8968-01acb18e14b7" />
+</p>
 
 ---
 
 ### Chinese_dragon  
-_Time: ???_
+_Time: 3321.37 s.
+<p align="center">
+<img alt="chinese_dragon" src="https://github.com/user-attachments/assets/62d442dc-9e98-4ebf-be23-78d9a0724ddf" />
+</p>
 
 ---
 
 ### Cornellbox  
 _Time: 0.399039 s_
+<p align="center">
+<img alt="cornellbox" src="https://github.com/user-attachments/assets/d4f780e7-b3cf-4ba1-b00c-03bb46646f04" />
+</p>
 
 ---
 
 ### Cornellbox_recursive  
 _Time: 0.588336 s_
-
----
-
-### Other_dragon  
-_Time: PLY_
+<p align="center">
+<img alt="cornellbox_recursive" src="https://github.com/user-attachments/assets/3f0411b1-8fd2-4eb3-af2c-1a56979b08be" />
+</p>
 
 ---
 
 ### ScienceTree  
 _Time: 43.5769 s_
+<p align="center">
+<img alt="scienceTree" src="https://github.com/user-attachments/assets/80b28a05-5825-4068-9313-8c9ff1fe1d4e" />
+</p>
 
 ---
 
 ### ScienceTree_glass  
 _Time: 63.807 s_
+<p align="center">
+<img alt="scienceTree_glass" src="https://github.com/user-attachments/assets/39efbef9-9dcd-44e6-9b43-c3854aa0a393" />
+</p>
 
 ---
 
 ### Simple  
 _Time: 0.217648 s_
+<p align="center">
+<img alt="simple" src="https://github.com/user-attachments/assets/93675a27-0667-4117-8478-0e2b437500cc" />
+</p>
 
 ---
 
 ### Spheres  
 _Time: 0.254147 s_
+<p align="center">
+<img alt="spheres" src="https://github.com/user-attachments/assets/aba0d8c1-4f70-421c-b989-9a4bd53b78d5" />
+</p>
 
 ---
 
 ### Spheres_mirror  
 _Time: 0.31197 s_
+<p align="center">
+<img alt="spheres_mirror" src="https://github.com/user-attachments/assets/f21e24e5-8cb2-4b08-bf6e-bae84cbc8c21" />
+</p>
 
 ---
 
 ### Spheres_with_plane  
 _Time: 0.220229 s_
+<p align="center">
+<img alt="spheres_with_plane" src="https://github.com/user-attachments/assets/7979d72c-e57d-4410-b94b-6ee664799de1" />
+</p>
 
 ---
 
 ### Two_spheres  
 _Time: 0.142726 s_
+<p align="center">
+<img alt="two_spheres" src="https://github.com/user-attachments/assets/dc96e70c-c1b7-4c98-ae6a-0134010f8f95" />
+</p>
 
 ---
 
 ### Berserker_smooth  
 _Time: 44.4589 s_
+<p align="center">
+<img  alt="berserker_smooth" src="https://github.com/user-attachments/assets/d5183262-d503-47a0-884e-af6527e3b3f4" />
+</p>
 
 ---
 
 ### Car_front_smooth  
 _Time: 632.8 s_
+<p align="center">
+<img alt="Car_front_smooth" src="https://github.com/user-attachments/assets/31cf4660-ec37-45de-b3b8-b43e71834adc" />
+</p>
 
 ---
 
 ### Car_smooth  
 _Time: 314.33 s_
+<p align="center">
+<img alt="Car_smooth" src="https://github.com/user-attachments/assets/4ce46bd0-d710-4640-9220-7b6d97c27781" />
+</p>
 
 ---
 
 ### Low_poly_scene_smooth  
 _Time: 139.563 s_
-
----
-
-### Ton_Roosendaal_smooth  
-_Time: PLY_
+<p align="center">
+<img alt="low_poly_scene_smooth" src="https://github.com/user-attachments/assets/523f65b3-6ca3-4b22-8b89-036bb3693cf2" />
+</p>
 
 ---
 
 ### Tower_smooth  
 _Time: 165.598 s_
-
----
-
-### Trex_smooth  
-_Time: PLY_
+<p align="center">
+<img alt="tower_smooth" src="https://github.com/user-attachments/assets/3a9e108c-bc27-4b1d-bbfb-6ebf5dddaa6a" />
+</p>
 
 ---
 
 ### Windmill_smooth  
 _Time: 171.286 s_
+<p align="center">
+<img alt="windmill_smooth" src="https://github.com/user-attachments/assets/5f59163f-a16a-4455-b4d7-26e82897e7b5" />
+</p>
 
 ---
 
-### Lobster  
-_Time: PLY_
-
----
-
-### David  
-_Time: —_
+### David (150x150 Resolution to speed up)   
+_Time: 100.123 s_
+<p align="center">
+<img width="150" height="150" alt="David" src="https://github.com/user-attachments/assets/d116190c-e6fd-4cd9-a44a-7c92c111f766" />
+</p>
 
 ---
 
 ### Raven  
 _Time: 230.513 s_
+<img alt="raven" src="https://github.com/user-attachments/assets/5d27a28a-f741-43ab-98b0-6517bf7388db" />
 
 ---
 
-### UtahTeapotMugCENG  
-_Time: —_
+### UtahTeapotMugCENG (50x50 Resolution to speed up)  
+_Time: 73.5209 s._
+<p align="center">
+<img alt="UtahTeapotMugCENG" src="https://github.com/user-attachments/assets/a9ef7566-dbb2-48b7-9de9-048372895a2e" />
+</p>
