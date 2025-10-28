@@ -275,7 +275,7 @@ Back Face Culling Experiments on Bunny With Plane Scene:
 
 # Outputs:
 
-Other than having some issues in rt_raven and raven inputs, my ray tracer worked perfectly for all other scenes.
+Other than having some issues in rt_raven and chinese_dragon inputs, my ray tracer worked perfectly for all other scenes.
 
 ---
 
