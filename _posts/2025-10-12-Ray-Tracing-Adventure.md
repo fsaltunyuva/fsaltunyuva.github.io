@@ -242,7 +242,7 @@ You can see the rendering times in the following table:
 | chinese_dragon        | 3321.37  |
 | cornellbox            | 0.399039 |
 | cornellbox_recursive  | 0.588336 |
-| other_dragon          | PLY      |
+| other_dragon (80x48 Resolution to speed up)           | 281.962 s.      |
 | scienceTree           | 43.5769  |
 | scienceTree_glass     | 63.807   |
 | simple                | 0.217648 |
@@ -258,7 +258,7 @@ You can see the rendering times in the following table:
 | tower_smooth          | 165.598  |
 | trex_smooth (75x75 Resolution to speed up)             | 328.145 s. |
 | windmill_smooth       | 171.286  |
-| lobster (75x75 Resolution to speed up)               | PLY      |
+| lobster (75x75 Resolution to speed up)               | 823.37 s.     |
 | David (150x150 Resolution to speed up)                 | 100.123 |
 | raven                 | 230.513  |
 | UtahTeapotMugCENG (200x200 Resolution to speed up)     | 73.5209 |
@@ -273,7 +273,7 @@ Back Face Culling Experiments on Bunny With Plane Scene:
 
 # Outputs:
 
-Other than having some issues in chinese_dragon, tonRoosendaal_smooth (scary output) and some changes in rt_raven, my ray tracer worked perfectly for all other scenes.
+Other than having some issues in chinese_dragon, tonRoosendaal_smooth (scary output), lobster and some changes in rt_raven, my ray tracer worked perfectly for all other scenes. For the problems in tonRoosendaal_smooth and lobster, I think it is due to the PLY import process, I will investigate it further in the next parts of the adventure.
 
 ---
 
@@ -313,6 +313,14 @@ _Time: 0.399039 s_
 _Time: 0.588336 s_
 <p align="center">
 <img alt="cornellbox_recursive" src="https://github.com/user-attachments/assets/3f0411b1-8fd2-4eb3-af2c-1a56979b08be" />
+</p>
+
+---
+
+### other_dragon (80x48 Resolution to speed up) 
+_Time: 0.588336 s_
+<p align="center">
+
 </p>
 
 ---
@@ -438,7 +446,7 @@ _Time: 171.286 s_
 ---
 
 ### Lobster (75x75 Resolution to speed up) 
-_Time:  s_
+_Time: 823.37 s_
 <p align="center">
 
 </p>
