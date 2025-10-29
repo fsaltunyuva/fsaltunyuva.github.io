@@ -254,11 +254,11 @@ You can see the rendering times in the following table:
 | Car_front_smooth      | 632.8    |
 | Car_smooth            | 314.33   |
 | low_poly_scene_smooth | 139.563  |
-| ton_Roosendaal_smooth (540x540 Resolution to speed up)  | PLY      |
+| ton_Roosendaal_smooth (540x540 Resolution to speed up)  | 549.885 s. |
 | tower_smooth          | 165.598  |
 | trex_smooth (75x75 Resolution to speed up)             | 328.145 s. |
 | windmill_smooth       | 171.286  |
-| lobster               | PLY      |
+| lobster (75x75 Resolution to speed up)               | PLY      |
 | David (150x150 Resolution to speed up)                 | 100.123 |
 | raven                 | 230.513  |
 | UtahTeapotMugCENG (200x200 Resolution to speed up)     | 73.5209 |
@@ -273,7 +273,7 @@ Back Face Culling Experiments on Bunny With Plane Scene:
 
 # Outputs:
 
-Other than having some issues in chinese_dragon and some changes in rt_raven, my ray tracer worked perfectly for all other scenes.
+Other than having some issues in chinese_dragon, tonRoosendaal_smooth (scary output) and some changes in rt_raven, my ray tracer worked perfectly for all other scenes.
 
 ---
 
@@ -406,7 +406,7 @@ _Time: 139.563 s_
 ---
 
 ### Ton_Roosendaal_smooth (540x540 Resolution to speed up) 
-_Time:  s_
+_Time: 549.885 s_
 <p align="center">
 
 </p>
@@ -437,7 +437,7 @@ _Time: 171.286 s_
 
 ---
 
-### Lobster  
+### Lobster (75x75 Resolution to speed up) 
 _Time:  s_
 <p align="center">
 
