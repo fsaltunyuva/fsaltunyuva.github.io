@@ -24,7 +24,7 @@ If I were to briefly mention what the first assignment required of us:
 
 I will briefly talk about the first two items (JSON parsing and PNG saving), because both parts are mostly done by certain libraries and are not very related to the ray tracing process itself.
 
-To parse JSON files, I used the most famous library for this task in C++, the [json library](https://github.com/nlohmann/json?tab=readme-ov-file#license) developed by Niels Lohmann. Similarly, I used another popular library, [stb](https://github.com/nothings/stb), to write the calculated results to a PNG file.
+To parse JSON files, I used the most famous library for this task in C++, the [json library](https://github.com/nlohmann/json?tab=readme-ov-file#license) developed by Niels Lohmann. Similarly, I used another popular library, [stb](https://github.com/nothings/stb), to write the calculated results to a PNG file. Also I used [Happly library](https://github.com/nmwsharp/happly) to load PLY files.
 
 And yes, it's finally time for ray tracing. And the ingredients we need for a ray tracer are a camera, an image plane, and objects. Let's start with the camera.
 
@@ -254,9 +254,9 @@ You can see the rendering times in the following table:
 | Car_front_smooth      | 632.8    |
 | Car_smooth            | 314.33   |
 | low_poly_scene_smooth | 139.563  |
-| ton_Roosendaal_smooth | PLY      |
+| ton_Roosendaal_smooth (540x540 Resolution to speed up)  | PLY      |
 | tower_smooth          | 165.598  |
-| trex_smooth           | PLY      |
+| trex_smooth (75x75 Resolution to speed up)             | 328.145 s. |
 | windmill_smooth       | 171.286  |
 | lobster               | PLY      |
 | David (150x150 Resolution to speed up)                 | 100.123 |
@@ -264,8 +264,6 @@ You can see the rendering times in the following table:
 | UtahTeapotMugCENG (200x200 Resolution to speed up)     | 73.5209 |
 
 *Used CPU: AMD Ryzen 5 5600X 6-Core Processor (3.70 GHz)*
-
-I could not manage to import and render PLY files yet, so those are marked as PLY.
 
 Back Face Culling Experiments on Bunny With Plane Scene:
 - Without Back Face Culling and Parallelization: 2329.69 seconds
@@ -275,7 +273,7 @@ Back Face Culling Experiments on Bunny With Plane Scene:
 
 # Outputs:
 
-Other than having some issues in rt_raven and chinese_dragon inputs, my ray tracer worked perfectly for all other scenes.
+Other than having some issues in chinese_dragon and some changes in rt_raven, my ray tracer worked perfectly for all other scenes.
 
 ---
 
@@ -407,6 +405,14 @@ _Time: 139.563 s_
 
 ---
 
+### Ton_Roosendaal_smooth (540x540 Resolution to speed up) 
+_Time:  s_
+<p align="center">
+
+</p>
+
+---
+
 ### Tower_smooth  
 _Time: 165.598 s_
 <p align="center">
@@ -415,10 +421,26 @@ _Time: 165.598 s_
 
 ---
 
+### Trex_Smooth (75x75 Resolution to speed up) 
+_Time: 328.145 s_
+<p align="center">
+
+</p>
+
+---
+
 ### Windmill_smooth  
 _Time: 171.286 s_
 <p align="center">
 <img alt="windmill_smooth" src="https://github.com/user-attachments/assets/5f59163f-a16a-4455-b4d7-26e82897e7b5" />
+</p>
+
+---
+
+### Lobster  
+_Time:  s_
+<p align="center">
+
 </p>
 
 ---
