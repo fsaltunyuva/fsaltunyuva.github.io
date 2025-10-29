@@ -273,7 +273,7 @@ Back Face Culling Experiments on Bunny With Plane Scene:
 
 # Outputs:
 
-Other than having some issues in chinese_dragon, tonRoosendaal_smooth (scary output), lobster, other_dragon and some changes in rt_raven, my ray tracer worked perfectly for all other scenes. For the problems in tonRoosendaal_smooth, lobster, and other_dragon, I think it is due to the PLY import process, I will investigate it further in the next parts of the adventure.
+Other than having some issues in chinese_dragon, tonRoosendaal_smooth (scary output), lobster, other_dragon, and some changes in rt_raven, my ray tracer worked perfectly for all other scenes. For the problems in tonRoosendaal_smooth, lobster, and other_dragon, I think it is due to the PLY import process. I will investigate it further in the next parts of the adventure.
 
 ---
 
@@ -320,7 +320,7 @@ _Time: 0.588336 s_
 ### other_dragon (80x48 Resolution to speed up) 
 _Time: 281.962 s_
 <p align="center">
-
+<img alt="other_dragon" src="https://github.com/user-attachments/assets/b08c0f2a-198a-4a7f-89b2-ae0c834a6841" />
 </p>
 
 ---
@@ -416,6 +416,7 @@ _Time: 139.563 s_
 ### Ton_Roosendaal_smooth (540x540 Resolution to speed up) 
 _Time: 549.885 s_
 <p align="center">
+<img alt="ton_Roosendaal_smooth" src="https://github.com/user-attachments/assets/879ac3b4-75c1-411b-9e43-f544a9905a44" />
 
 </p>
 
@@ -448,7 +449,7 @@ _Time: 171.286 s_
 ### Lobster (75x75 Resolution to speed up) 
 _Time: 823.37 s_
 <p align="center">
-
+<img alt="lobster" src="https://github.com/user-attachments/assets/a847041e-e67d-46a7-bbdb-2e9eec219c48" />
 </p>
 
 ---
