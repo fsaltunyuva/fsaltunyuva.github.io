@@ -273,7 +273,7 @@ Back Face Culling Experiments on Bunny With Plane Scene:
 
 # Outputs:
 
-Other than having some issues in chinese_dragon, tonRoosendaal_smooth (scary output), lobster and some changes in rt_raven, my ray tracer worked perfectly for all other scenes. For the problems in tonRoosendaal_smooth and lobster, I think it is due to the PLY import process, I will investigate it further in the next parts of the adventure.
+Other than having some issues in chinese_dragon, tonRoosendaal_smooth (scary output), lobster, other_dragon and some changes in rt_raven, my ray tracer worked perfectly for all other scenes. For the problems in tonRoosendaal_smooth, lobster, and other_dragon, I think it is due to the PLY import process, I will investigate it further in the next parts of the adventure.
 
 ---
 
@@ -318,7 +318,7 @@ _Time: 0.588336 s_
 ---
 
 ### other_dragon (80x48 Resolution to speed up) 
-_Time: 0.588336 s_
+_Time: 281.962 s_
 <p align="center">
 
 </p>
