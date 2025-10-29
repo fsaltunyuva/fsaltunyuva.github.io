@@ -424,7 +424,7 @@ _Time: 165.598 s_
 ### Trex_Smooth (75x75 Resolution to speed up) 
 _Time: 328.145 s_
 <p align="center">
-
+<img alt="trex_smooth" src="https://github.com/user-attachments/assets/256d8dbe-311e-48d9-aae9-99ff0a7b65cf" />
 </p>
 
 ---
