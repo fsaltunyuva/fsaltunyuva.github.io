@@ -125,7 +125,7 @@ static bool isInShadow(const Scene& scene, const Vec3& shadowRayOrigin, const Ve
 ```
 
 The problem was caused by floating-point precision near the light and surface intersection points. When the shadow ray started exactly on a surface, it could re-intersect the same geometry due to numerical error, producing random noise on surfaces.
-In my code I was already adding a small epsilon offset to the shadow ray origin inside findClosestIntersection, but I forgot to include the same epsilon in the distance comparison inside isInShadow. As a result, even with the offset origin, hits with t ≈ 0 or t ≈ lightDistance were still being counted as occluders.
+In my code I was already adding a small epsilon offset to the shadow ray origin inside findClosestIntersection, but I forgot to include the same epsilon in the distance comparison inside isInShadow.
 To fix this, I added shadow ray epsilon both at the origin and in the comparison.
 
 ```cpp
