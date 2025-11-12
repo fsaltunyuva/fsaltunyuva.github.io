@@ -350,7 +350,7 @@ Also, I merged raven input json files' render into a .mp4 video (using [FFmpeg](
 </p>
 
 <video>
-  <source src="https://github.com/fsaltunyuva/fsaltunyuva.github.io/blob/main/videos/output.mp4">
+  <source src="videos/output.mp4">
 </video>
 ---
 
