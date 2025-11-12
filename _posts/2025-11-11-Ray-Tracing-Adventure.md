@@ -75,12 +75,12 @@ Of course, there had to be a *better* approach.
 During the lectures, we discussed the idea of transforming rays instead of objects, which cleanly solves this problem.
 While I understood the core concept in class, I grasped it much more clearly after reading [Eric Arnebäck’s excellent blog post](https://erkaman.github.io/posts/ray_trace_inverse_ray.html). His visual explanations helped me to understand how inverse transformations can be used to bring rays into an object’s local space.
 
-Given a ray \( r(t) = O + tD \) in world space,  
+Given a ray $$r(t) = o + tD$$ in world space,  
 we can transform it into object space using the inverse of the object’s model matrix:
 
-\[
-O' = M^{-1} O, \quad D' = M^{-1} D
-\]
+
+$$o' = M^{-1} o, \quad D' = M^{-1} D $$
+
 
 ```cpp
 glm::mat4 invModel = glm::inverse(object.modelMatrix);
@@ -195,14 +195,14 @@ Then I remembered something we discussed during the lectures: the mirror scaling
 Just like in the lecture example, imagine a triangle with vertices a, b, and c, where a is the top vertex, b is the bottom-left, and c is the bottom-right.
 Normally, we compute the triangle’s normal using:
 
-N=(b−a)×(c−a)
+$$N=(b−a)×(c−a)$$
 
 In this case, the triangle is defined in counter-clockwise (CCW) order, so the normal correctly points outward (towards the viewer).
 
 However, if we apply a mirror scaling for example, scaling by -1 along the Y-axis, the vertex order effectively flips to clockwise (CW).
 Now, the same cross product 
 
-(b−a)×(c−a) produces a normal pointing in the opposite direction.
+$$(b−a)×(c−a)$$ produces a normal pointing in the opposite direction.
 
 Here is my (not so well :)) drawing to illustrate this:
 
@@ -235,7 +235,7 @@ Look at camera is a common camera model that allows you to specify a target poin
 
 Given the distance from the camera to the near plane (nearDist), the top edge of the near plane can be computed as:
 
-top = nearDist * tan(fovY / 2)
+$$top = nearDist * tan(fovY / 2)$$
 
 Since the camera's frustum is symmetric:
 bottom = -top, right = top * aspect, left = -right
@@ -337,6 +337,7 @@ You can see the rendering times of this part below:
 | glaring_davids                 | 1.60047  |
 | two_berserkers                 | 1.20802  |
 | grass_desert                 | 41.2385  |
+
 *Used CPU: AMD Ryzen 5 5600X 6-Core Processor (3.70 GHz)*
 
 Also, I merged raven input json files' render into a .mp4 video (using [FFmpeg](https://www.ffmpeg.org/)). Each frame nearly took 2 seconds to render.
