@@ -73,7 +73,7 @@ After applying a transformation, the modified vertex positions must be stored in
 Of course, there had to be a *better* approach.
 
 During the lectures, we discussed the idea of transforming rays instead of objects, which cleanly solves this problem.
-While I understood the core concept in class, I grasped it much more clearly after reading [Eric Arnebäck’s excellent blog post](https://erkaman.github.io/posts/ray_trace_inverse_ray.html). His visual explanations helped me to understand how inverse transformations can be used to bring rays into an object’s local space.
+While I understood the core concept in class, I understood it much more clearly after reading [Eric Arnebäck’s excellent blog post](https://erkaman.github.io/posts/ray_trace_inverse_ray.html). His visual explanations helped me to understand how inverse transformations can be used to bring rays into an object’s local space.
 
 Given a ray $r(t) = o + tD$ in world space, we can transform it into object space using the inverse of the object’s model matrix:
 
@@ -83,7 +83,7 @@ $$o' = M^{-1} o, \quad D' = M^{-1} D $$
 ```cpp
 glm::mat4 invModel = glm::inverse(object.modelMatrix);
 glm::vec4 localOrigin = invModel * glm::vec4(ray.origin.x, ray.origin.y, ray.origin.z, 1.0f);
-glm::vec4 localDir    = invModel * glm::vec4(ray.direction.x, ray.direction.y, ray.direction.z, 0.0f);
+glm::vec4 localDir = invModel * glm::vec4(ray.direction.x, ray.direction.y, ray.direction.z, 0.0f);
 ```
 
 After finding the intersection point in the object’s local space, I needed to transform the surface normal back into world space.
@@ -92,8 +92,7 @@ This part is subtle but essential, normals cannot be transformed with the same m
 ```cpp
 glm::vec3 localN = glm::normalize(localHit - glm::vec3(centerWorld));
 glm::vec3 worldN = glm::normalize(
-    glm::vec3(glm::transpose(glm::inverse(M)) * glm::vec4(localN, 0.0f))
-);
+    glm::vec3(glm::transpose(glm::inverse(M)) * glm::vec4(localN, 0.0f)));
 ```
 
 This was a small but crucial step to maintain accurate shading and lighting calculations.
@@ -160,7 +159,7 @@ Basically, mesh instancing process was looking like this:
 ```cpp
 for (const auto& instance : scene.objects.meshInstances) {
     const Mesh* baseMesh = instance.resolvedBaseMesh; // Get the base mesh
-    glm::mat4 M = instance.modelMatrix; // Instance transformation matrix of instance
+    glm::mat4 M = instance.modelMatrix; // Transformation matrix of instance
 
     // Transform vertex positions into world space
     Vec3 v0 = Vec3(M * glm::vec4(baseMesh->vertices[i0], 1.0f));
@@ -296,6 +295,8 @@ for (const auto& mesh : scene.objects.meshes) {
         }
         continue; // Skip per-triangle tests if BVH is present
     }
+
+    // Continue with per-triangle intersection tests
 }
 ```
 
