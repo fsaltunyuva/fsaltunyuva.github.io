@@ -12,6 +12,8 @@ Hello again, I will continue my ray tracing adventure with Part 2, focusing on i
 - **Bounding Volume Hierarchies (BVH)**
 - **Look At Camera**
 
+Before I begin, I should mention that this blog and project are part of the [Advanced Ray Tracing](https://catalog.metu.edu.tr/course.php?prog=571&course_code=5710795) course given by my professor Ahmet Oğuz Akyüz at Middle East Technical University.
+
 ### Bugs on Part 1
 But, talking about new features, I would like to mention about the bugs I have encountered on Part 1 and understood some of them. Let's start with PLY import bug. 
 
@@ -251,3 +253,166 @@ if (cam.hasFovY) { // look-at camera
 Bounding Volume Hierarchies (BVH) are the most popular acceleration structure used in ray tracing to speed up intersection tests. By organizing the scene's geometry into a tree of bounding volumes, we can quickly eliminate large portions of the scene from consideration when tracing rays. [Sebastian Lague's this video](https://www.youtube.com/watch?v=C1H4zIiCOaI) about BVH construction and traversal was very helpful in understanding the concept visually.
 
 Basic idea is to recursively divide the scene's geometry into two groups, creating a binary tree where each node contains a bounding box that encloses all the geometry in its subtree. Before ray tracing begins, we build the BVH by partitioning the objects based on their spatial distribution. When tracing a ray, we first test for intersection with the bounding boxes, and only if the ray intersects a box do we proceed to test the actual geometry inside.
+
+During BVH construction, I recursively split the set of triangles along the longest axis of their bounding box:
+
+```cpp    
+// Compute bounding box for this node
+for (int triIdx : tris) {
+    // Getting vertex indices i0, i1, i2 for the triangle
+    // ...
+
+    // Expand the bounding box to include the triangle vertices
+    node->bbox.expand(vertices[i0]);
+    node->bbox.expand(vertices[i1]);
+    node->bbox.expand(vertices[i2]);
+}
+
+// Base case: if few triangles or max depth reached, make leaf
+if (tris.size() <= 4 || depth > 25) { // 25 is arbitrary max depth
+    node->triangleIndices = tris;
+    return node;
+}
+
+// Then split along the longest axis 
+// ...
+```
+
+When tracing a ray, I first test it against the node’s bounding box. If it intersects, the ray is tested against the BVH instead of every triangle individually:
+
+```cpp
+for (const auto& mesh : scene.objects.meshes) {
+    if (mesh.bvh) {
+        if (mesh.bvh->intersect(rayOrigin, rayDir, tCandidate, info)) {
+            // Necessary setting of intersection info
+            // ...
+        }
+        continue; // Skip per-triangle tests if BVH is present
+    }
+}
+```
+
+Without BVH, I was checking each ray against every triangle in the scene, which resulted in O(n) complexity per ray. With BVH, the average complexity drops to roughly O(log n), so when triangle counts are high, the performance improvement becomes more and more significant. Performance gains can be seen in the following table:
+    
+| Scene | Time Without BVH (sec) | Time With BVH (sec) |
+|-------|------------------|----------------|
+| bunny_with_plane      | 229.144  | 4.05434     |
+| Car_front_smooth      | 632.8    | 4.59678     |
+| Car_smooth            | 314.33   | 6.93229     |
+| two_berserkers          | 822.561    | 1.438    |
+
+*Used CPU: AMD Ryzen 5 5600X 6-Core Processor (3.70 GHz)*
+
+Although render times are decreased with BVH, in some complex scenes like marching_dragons, BVH construction time itself becomes significant. It is still nothing compared no BVH case, but it also comes with a cost. For example, in marching_dragons scene, BVH construction took around 21.2038 seconds, while the actual rendering took only 5.67193 seconds. In the rendering time table below, I also included the BVH construction times for better comparison between other parts.
+
+Even though BVH works, I could not manage to share BVH structures between mesh instances yet. So each instance still has to build its own BVH, which is not optimal. I will try to improve this in the future parts.
+
+### Outputs
+As I mentioned in the beginning, chinese dragon model had very small vertex coordinates, which caused intersection issues. I could not find a proper solution for this yet, therefore results for marching_dragons is still not perfect. Also, in dragon_new_ply.json input, I could not get a result after 45 minutes of rendering even though I confirmed it creates BVH correctly. I will investigate these issues further in the next part. Other than that, everything else seems to be working fine now.
+
+As in previous part, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Akif Uslu for contributions to the 3D models.
+
+You can see the rendering times of this part below:
+
+| Scene                 | Time (seconds) |
+| --------------------- | -------- |
+| dragon_metal                 | 15.0101  |
+| ellipsoids                 | 2.13959  |
+| marching_dragons                 | 26.2038  |
+| metal_glass_plates                 | 7.52798  |
+| mirror_room                 | 25.5161  |
+| simple_transform                 | 0.454879  |
+| spheres                 | 1.39373  |
+| glaring_davids                 | 1.60047  |
+| two_berserkers                 | 1.20802  |
+| grass_desert                 | 41.2385  |
+
+Here are some renders from test scenes:
+
+---
+
+### Dragon Metal
+_Time: 15.0101 s_
+<p align="center">
+
+</p>
+
+---
+
+### Ellipsoids
+_Time: 2.13959 s_
+<p align="center">
+
+</p>
+
+---
+
+### Marching Dragons
+_Time: 26.2038 s_
+<p align="center">
+
+</p>
+
+---
+
+### Metal Glass Plates
+_Time: 7.52798 s_
+<p align="center">
+
+</p>
+
+---
+
+### Mirror Room
+_Time: 25.5161 s_
+<p align="center">
+
+</p>
+
+---
+
+### Simple Transform
+_Time: 0.454879 s_
+<p align="center">
+
+</p>
+
+---
+
+### Spheres
+_Time: 1.39373 s_
+<p align="center">
+
+</p>
+
+---
+
+### Glaring Davids
+_Time: 1.60047 s_
+<p align="center">
+
+</p>
+
+---
+
+### Two Berserkers
+_Time: 1.20802 s_
+<p align="center">
+
+</p>
+
+---
+
+### Grass Desert
+_Time:  s_
+<p align="center">
+
+</p>
+
+---
+
+### Dragon
+_Time:  s_
+<p align="center">
+
+</p>
