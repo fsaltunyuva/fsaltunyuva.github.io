@@ -319,7 +319,7 @@ Even though BVH works, I could not manage to share BVH structures between mesh i
 ### Outputs
 As I mentioned in the beginning, chinese dragon model had very small vertex coordinates, which caused intersection issues. I could not find a proper solution for this yet, therefore results for marching_dragons is still not perfect. Also, in dragon_new_ply.json input, I could not get a result after 45 minutes of rendering even though I confirmed it creates BVH correctly. I will investigate these issues further in the next part. And in mirror_room.json I get an additional light in compared to the reference image, it is fixed when I remove one of the point lights.
 
- Other than that, everything else seems to be working fine now.
+Other than that, everything else seems to be working fine now.
 
 As in previous part, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Akif Uslu for contributions to the 3D models.
 
@@ -415,11 +415,9 @@ _Time: 1.20802 s_
 ---
 
 ### Grass Desert
-_Time:  s_
+_Time: 41.2385 s_
 <p align="center">
 <img alt="grass_desert" src="https://github.com/user-attachments/assets/006820bc-e684-4bcb-ad98-60bb7b706015" />
 </p>
 
 ---
-
-</p>
