@@ -317,7 +317,9 @@ Although render times are decreased with BVH, in some complex scenes like marchi
 Even though BVH works, I could not manage to share BVH structures between mesh instances yet. So each instance still has to build its own BVH, which is not optimal. I will try to improve this in the future parts.
 
 ### Outputs
-As I mentioned in the beginning, chinese dragon model had very small vertex coordinates, which caused intersection issues. I could not find a proper solution for this yet, therefore results for marching_dragons is still not perfect. Also, in dragon_new_ply.json input, I could not get a result after 45 minutes of rendering even though I confirmed it creates BVH correctly. I will investigate these issues further in the next part. Other than that, everything else seems to be working fine now.
+As I mentioned in the beginning, chinese dragon model had very small vertex coordinates, which caused intersection issues. I could not find a proper solution for this yet, therefore results for marching_dragons is still not perfect. Also, in dragon_new_ply.json input, I could not get a result after 45 minutes of rendering even though I confirmed it creates BVH correctly. I will investigate these issues further in the next part. And in mirror_room.json I get an additional light in compared to the reference image, it is fixed when I remove one of the point lights.
+
+ Other than that, everything else seems to be working fine now.
 
 As in previous part, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Akif Uslu for contributions to the 3D models.
 
