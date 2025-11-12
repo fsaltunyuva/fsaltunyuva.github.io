@@ -345,21 +345,15 @@ Also, I merged raven input json files' render into a .mp4 video (using [FFmpeg](
 ---
 
 ### Camera Around David
-<p align="center">
-<img alt="output1" src="https://github.com/fsaltunyuva/fsaltunyuva.github.io/blob/main/videos/output.mp4" />
-</p>
-
 <video width="100%" controls autoplay muted loop playsinline>
-  
-  <source src="{{ site.baseurl }}/videos/output.mp4" type="video/mp4">
+  <source src="{{ site.baseurl }}/videos/output2.mp4" type="video/mp4">
 </video>
-
 ---
 
 ### Light Around David
-<p align="center">
-<img alt="output2" src="https://github.com/fsaltunyuva/fsaltunyuva.github.io/blob/main/videos/output2.mp4" />
-</p>
+<video width="100%" controls autoplay muted loop playsinline>
+  <source src="{{ site.baseurl }}/videos/output.mp4" type="video/mp4">
+</video>
 ---
 
 Here are some renders from test scenes:
