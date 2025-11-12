@@ -75,12 +75,9 @@ Of course, there had to be a *better* approach.
 During the lectures, we discussed the idea of transforming rays instead of objects, which cleanly solves this problem.
 While I understood the core concept in class, I grasped it much more clearly after reading [Eric Arnebäck’s excellent blog post](https://erkaman.github.io/posts/ray_trace_inverse_ray.html). His visual explanations helped me to understand how inverse transformations can be used to bring rays into an object’s local space.
 
-Given a ray $$r(t) = o + tD$$ in world space,  
-we can transform it into object space using the inverse of the object’s model matrix:
-
+Given a ray $r(t) = o + tD$ in world space, we can transform it into object space using the inverse of the object’s model matrix:
 
 $$o' = M^{-1} o, \quad D' = M^{-1} D $$
-
 
 ```cpp
 glm::mat4 invModel = glm::inverse(object.modelMatrix);
