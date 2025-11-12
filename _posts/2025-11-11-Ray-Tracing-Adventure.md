@@ -346,13 +346,13 @@ Also, I merged raven input json files' render into a .mp4 video (using [FFmpeg](
 
 ### Camera Around David
 <p align="center">
-https://github.com/user-attachments/assets/5fb13b9f-ef10-4bc7-8d45-3fefd09a4e40
+<img alt="output1" src="https://github.com/user-attachments/assets/5fb13b9f-ef10-4bc7-8d45-3fefd09a4e40" />
 </p>
 ---
 
 ### Light Around David
 <p align="center">
-https://github.com/user-attachments/assets/3c5ddafa-356b-452b-9b5e-2e7366d4d863
+<img alt="output2" src="https://github.com/user-attachments/assets/3c5ddafa-356b-452b-9b5e-2e7366d4d863" />
 </p>
 ---
 
@@ -363,7 +363,7 @@ Here are some renders from test scenes:
 ### Dragon Metal
 _Time: 15.0101 s_
 <p align="center">
-<img  alt="dragon_metal" src="https://github.com/user-attachments/assets/18cabe23-5584-494a-b279-a929197088d2" />
+<img alt="dragon_metal" src="https://github.com/user-attachments/assets/18cabe23-5584-494a-b279-a929197088d2" />
 </p>
 
 ---
