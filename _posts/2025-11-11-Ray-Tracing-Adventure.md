@@ -345,7 +345,7 @@ Here are some renders from test scenes:
 ### Dragon Metal
 _Time: 15.0101 s_
 <p align="center">
-
+<img  alt="dragon_metal" src="https://github.com/user-attachments/assets/18cabe23-5584-494a-b279-a929197088d2" />
 </p>
 
 ---
@@ -353,7 +353,7 @@ _Time: 15.0101 s_
 ### Ellipsoids
 _Time: 2.13959 s_
 <p align="center">
-
+<img alt="ellipsoids" src="https://github.com/user-attachments/assets/7a4cf67e-78c0-46cd-aeb8-14f9d9dcd98b" />
 </p>
 
 ---
@@ -361,7 +361,7 @@ _Time: 2.13959 s_
 ### Marching Dragons
 _Time: 26.2038 s_
 <p align="center">
-
+<img alt="marching_dragons" src="https://github.com/user-attachments/assets/921bc7da-f1d8-4b0d-b63c-66242e73c768" />
 </p>
 
 ---
@@ -369,7 +369,7 @@ _Time: 26.2038 s_
 ### Metal Glass Plates
 _Time: 7.52798 s_
 <p align="center">
-
+<img alt="metal_glass_plates" src="https://github.com/user-attachments/assets/97f70f62-65c0-438c-9def-2576096ded8b" />
 </p>
 
 ---
@@ -377,7 +377,7 @@ _Time: 7.52798 s_
 ### Mirror Room
 _Time: 25.5161 s_
 <p align="center">
-
+<img alt="mirror_room" src="https://github.com/user-attachments/assets/f6ac9dcc-f734-4773-8459-943f407280b2" />
 </p>
 
 ---
@@ -385,7 +385,7 @@ _Time: 25.5161 s_
 ### Simple Transform
 _Time: 0.454879 s_
 <p align="center">
-
+<img alt="simple_transform" src="https://github.com/user-attachments/assets/4457a564-dcec-4e4d-bb93-2c331083f274" />
 </p>
 
 ---
@@ -393,7 +393,7 @@ _Time: 0.454879 s_
 ### Spheres
 _Time: 1.39373 s_
 <p align="center">
-
+<img alt="spheres" src="https://github.com/user-attachments/assets/1ae73c89-2038-4f14-9989-c9932a8060b3" />
 </p>
 
 ---
@@ -401,7 +401,7 @@ _Time: 1.39373 s_
 ### Glaring Davids
 _Time: 1.60047 s_
 <p align="center">
-
+<img alt="glaring_davids" src="https://github.com/user-attachments/assets/e948810f-aba6-4556-969c-732fb972f586" />
 </p>
 
 ---
@@ -409,7 +409,7 @@ _Time: 1.60047 s_
 ### Two Berserkers
 _Time: 1.20802 s_
 <p align="center">
-
+<img alt="two_berserkers" src="https://github.com/user-attachments/assets/d047c863-9015-4f23-b739-affc13b9104f" />
 </p>
 
 ---
@@ -417,13 +417,9 @@ _Time: 1.20802 s_
 ### Grass Desert
 _Time:  s_
 <p align="center">
-
+<img alt="grass_desert" src="https://github.com/user-attachments/assets/006820bc-e684-4bcb-ad98-60bb7b706015" />
 </p>
 
 ---
-
-### Dragon
-_Time:  s_
-<p align="center">
 
 </p>
