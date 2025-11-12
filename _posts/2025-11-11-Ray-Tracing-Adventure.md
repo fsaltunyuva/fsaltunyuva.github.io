@@ -337,6 +337,23 @@ You can see the rendering times of this part below:
 | glaring_davids                 | 1.60047  |
 | two_berserkers                 | 1.20802  |
 | grass_desert                 | 41.2385  |
+*Used CPU: AMD Ryzen 5 5600X 6-Core Processor (3.70 GHz)*
+
+Also, I merged raven input json files' render into a .mp4 video (using [FFmpeg](https://www.ffmpeg.org/)). Each frame nearly took 2 seconds to render.
+
+---
+
+### Camera Around David
+<p align="center">
+
+</p>
+---
+
+### Light Around David
+<p align="center">
+
+</p>
+---
 
 Here are some renders from test scenes:
 
