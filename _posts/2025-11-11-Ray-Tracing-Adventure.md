@@ -17,19 +17,21 @@ Before I begin, I should mention that this blog and project are part of the [Adv
 ### Bugs on Part 1
 But, talking about new features, I would like to mention the bugs I have encountered on Part 1 and understand some of them. Let's start with the PLY import bug. 
 
-<img width="540" height="540" alt="ton_roosendal_scary" src="https://github.com/user-attachments/assets/f2769745-6945-406c-ab0d-a9c8a6eaac4d" />
+<p align="center">
+<img alt="ton_roosendal_scary" src="https://github.com/user-attachments/assets/f2769745-6945-406c-ab0d-a9c8a6eaac4d" />
+</p>
 
 I had been suspecting that the strange results I was getting with the PLY models were due to incorrectly computed normals or the vertex data being interpreted differently than I expected. However, it turned out the issue was much simpler than that: in the JSON scenes we use, the vertex indices start from 1 rather than 0, so I had been adding +1 when indexing the vertex data. But when importing PLY files, I forgot to apply this adjustment, meaning every vertex was shifted by one position.
 
 So that’s why my ton_Roosendaal_smooth result ended up looking unintentionally artistic (and terrifying) :).
-
-<img width="1080" height="1080" alt="ton_Roosendaal_smooth" src="https://github.com/user-attachments/assets/b01e97a9-fc6b-41f3-a756-583a9d2b9461" />
-
+<p align="center">
+<img alt="ton_Roosendaal_smooth" src="https://github.com/user-attachments/assets/b01e97a9-fc6b-41f3-a756-583a9d2b9461" />
+</p>
 
 Another issue, as shown below, was with the Chinese dragon model. The potential cause for this problem actually came to my mind while Oğuz Hoca was explaining multisampling in class. Before starting the topic, he mentioned that since we shoot only a single ray per pixel, and we cast it directly through the center, we can miss intersections when there is a very small triangle or object located within that pixel.
-
-<img width="800" height="800" alt="chinese dragon bug" src="https://github.com/user-attachments/assets/8eb29623-5e2f-463d-8507-d6b27c3c4704" />
-
+<p align="center">
+<img alt="chinese dragon bug" src="https://github.com/user-attachments/assets/8eb29623-5e2f-463d-8507-d6b27c3c4704" />
+</p>
 
 At that moment, I remembered that the Chinese dragon model has extremely small vertex coordinates, and I realized that this was most likely the reason behind the issue I was seeing. I haven’t found a proper solution yet, other than the brute-force approach of simply scaling up the coordinate values, but at least now I understand the root cause of the problem.
 
@@ -102,8 +104,9 @@ In my implementation, I applied this inverse ray method only to spheres, since i
 
 After adding the transformation support, I tested the scene with the mirror_room.json input and got the following result:
 
-<img width="800" height="800" alt="mirror_room_noise" src="https://github.com/user-attachments/assets/b7e16376-1dbc-4844-b04d-871b1a589fa4" />
-
+<p align="center">
+<img alt="mirror_room_noise" src="https://github.com/user-attachments/assets/b7e16376-1dbc-4844-b04d-871b1a589fa4" />
+</p>
 
 The noise immediately hinted that something was wrong with my shadow rays. Because it was looking like self-intersection noise. To confirm this, I temporarily disabled shadow ray computations and the noise disappeared. This clearly meant that the issue was somewhere inside my isInShadow() function.
 
@@ -141,8 +144,9 @@ static bool isInShadow(const Scene& scene, const Vec3& shadowRayOrigin, const Ve
 
 After this change, the noise completely disappeared, and the reflection looked clean and correct:
 
-<img width="800" height="800" alt="mirror_room_fixed" src="https://github.com/user-attachments/assets/7582c115-a49e-4710-99d5-1321c72b4a2f" />
-
+<p align="center">
+<img alt="mirror_room_fixed" src="https://github.com/user-attachments/assets/7582c115-a49e-4710-99d5-1321c72b4a2f" />
+</p>
 
 ### Mesh Instancing
 A mesh instance is not a new mesh, it’s simply a reference to an existing base mesh that can have its own transformation and material. Instead of duplicating the same vertex data multiple times in memory, each instance stores only a transformation matrix and an optional material, allowing the same geometry to appear multiple times in the scene at different positions, orientations, or scales.
@@ -180,8 +184,9 @@ It was the perfect test case to verify whether my normal interpolation and trans
 
 However, the result wasn’t quite what I expected:
 
-<img width="768" height="1024" alt="two_berserkers_strange_smoothing" src="https://github.com/user-attachments/assets/8c1a0d81-35bb-459a-bd22-885b0897f48b" />
-
+<p align="center">
+<img alt="two_berserkers_strange_smoothing" src="https://github.com/user-attachments/assets/8c1a0d81-35bb-459a-bd22-885b0897f48b" />
+</p>
 At first, I spent a long time searching for the cause of the issue inside the smooth shading logic.
 Everything seemed correct, also the base mesh rendered perfectly with smooth shading, and the interpolated normals looked fine.
 
@@ -208,8 +213,9 @@ As a result, the normal vectors were inverted, which led to incorrect results in
 
 To confirm this, I temporarily disabled back-face culling, and as expected, the result immediately made sense:
 
-<img width="768" height="1024" alt="two_berserkers" src="https://github.com/user-attachments/assets/c700aaa1-ac39-48e7-8857-af521bfecc6d" />
-
+<p align="center">
+<img alt="two_berserkers" src="https://github.com/user-attachments/assets/c700aaa1-ac39-48e7-8857-af521bfecc6d" />
+</p>
 Since back-face culling improves performance in most cases, disabling it globally wasn’t a good solution.
 Instead, I added a small check to automatically detect when an object is mirrored and selectively disable culling only in those cases:
 
