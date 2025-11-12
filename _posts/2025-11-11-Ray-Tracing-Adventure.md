@@ -348,6 +348,10 @@ Also, I merged raven input json files' render into a .mp4 video (using [FFmpeg](
 <p align="center">
 <img alt="output1" src="https://github.com/fsaltunyuva/fsaltunyuva.github.io/blob/main/videos/output.mp4" />
 </p>
+
+<video>
+  <source src="https://github.com/fsaltunyuva/fsaltunyuva.github.io/blob/main/videos/output.mp4">
+</video>
 ---
 
 ### Light Around David
