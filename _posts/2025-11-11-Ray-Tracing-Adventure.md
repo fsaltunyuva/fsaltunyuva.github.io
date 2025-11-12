@@ -346,13 +346,13 @@ Also, I merged raven input json files' render into a .mp4 video (using [FFmpeg](
 
 ### Camera Around David
 <p align="center">
-<img alt="output1" src="https://github.com/user-attachments/assets/5fb13b9f-ef10-4bc7-8d45-3fefd09a4e40" />
+<img alt="output1" src="https://github.com/fsaltunyuva/fsaltunyuva.github.io/blob/main/videos/output.mp4" />
 </p>
 ---
 
 ### Light Around David
 <p align="center">
-<img alt="output2" src="https://github.com/user-attachments/assets/3c5ddafa-356b-452b-9b5e-2e7366d4d863" />
+<img alt="output2" src="https://github.com/fsaltunyuva/fsaltunyuva.github.io/blob/main/videos/output2.mp4" />
 </p>
 ---
 
