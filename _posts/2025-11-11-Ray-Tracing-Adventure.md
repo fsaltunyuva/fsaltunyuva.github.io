@@ -79,6 +79,7 @@ Given a ray $r(t) = o + tD$ in world space, we can transform it into object spac
 
 $$o' = M^{-1} o, \quad D' = M^{-1} D $$
 
+
 ```cpp
 glm::mat4 invModel = glm::inverse(object.modelMatrix);
 glm::vec4 localOrigin = invModel * glm::vec4(ray.origin.x, ray.origin.y, ray.origin.z, 1.0f);
