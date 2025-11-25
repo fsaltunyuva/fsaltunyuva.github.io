@@ -111,6 +111,56 @@ float geom = (A * cosLight) / (d2 * numSamples);
 Vec3 eff = light.radiance * geom;
 ```
 
+After implementing area lights, I tested with chessboard_arealight and wine_glass scenes, but results were not as expected. 
+
+[my outputstaki renderlar]
+
+Firstly, I tried to change the number of samples for the area light but nothing changed. This indicated that the issue was probably not related to sampling, but to the lighting logic itself.
+
+Then I noticed the following lines inside the area-light shading loop:
+
+```cpp
+// ...
+float cosLight = std::max(0.0f, light.normal.normalize().dot(wi.scale(-1.0f)));
+
+if (cosLight <= 0.0f) continue;
+// ...
+```
+
+That means, if the angle between the light normal and the direction toward the shading point is negative, skip this sample. At first glance, this seems correct because light sources are usually one-sided. However, when I checked the input json file for chessboard_arealight, I saw that the area light normal was actually pointing away from the scene:
+
+```
+"AreaLight": {
+  "_id": "1",
+  "Position": "3.263 -9.2106 5.90386",
+  "Normal": "0.591 -0.010 0.806",
+  "Size": "1",
+  "Radiance": "10000 10000 10000"
+}
+```
+
+Light is above the scene but normal has a positive z component, meaning it points upwards, away from the scene. Therefore, all samples were being skipped because dot(light.normal, -wi) becomes negative almost everywhere.
+
+To check this , I rewrote cosLight calculation as follows:
+
+```cpp
+float cosLight = std::max(0.0f, -light.normal.normalize().dot(wi.scale(-1.0f)));
+```
+
+It fixed the issue and produced correct lighting results, but it broke the area light in cornellbox_area.
+
+[bugged cornellbox_area]
+
+Before this issue, cornellbox_area area light was working correctly but the white area light surface on upper plane was not visible. After this change, the area light surface became visible but the lighting effect was incorrect. So I realized that I should treat the light as double-sided ignoring the normal direction.
+
+```cpp
+float cosLight = std::max(0.0f, std::fabs(light.normal.normalize().dot(wi.scale(-1.0f)))); // Use absolute value to treat light as double-sided
+
+if (cosLight <= 0.0f) continue;
+```
+
+This change produced correct results (can be found in Outputs section) in both scenes.
+
 ### Motion Blur
 
 Motion blur is a technique used to simulate the effect of objects moving during the exposure time of a camera. In a ray tracer, this is achieved by letting each ray carry a random time parameter t ∈ [0,1]. My tracer will be assume only translational movements for simplicity.
