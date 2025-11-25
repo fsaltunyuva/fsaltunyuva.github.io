@@ -13,18 +13,18 @@ Hello again, I will continue my ray tracing adventure with Part 3, focusing on i
 - **Motion Blur**
 - **Material Roughness**
 
-Before I begin, I should mention that this blog and project are part of the [Advanced Ray Tracing](https://catalog.metu.edu.tr/course.php?prog=571&course_code=5710795) course given by my professor Ahmet Oğuz Akyüz at Middle East Technical University.
+Before I begin, I should mention that this blog and project are part of the [Advanced Ray Tracing](https://catalog.metu.edu.tr/course.php?prog=571&course_code=5710795) course given by my professor Ahmet Oğuz Akyüz, at Middle East Technical University.
 
 ### Bugs on Part 2 
-To start with the chinese dragon model, as I mentioned in my previous post, the problem was the very small coordinates of the model. Therefore, I thought that multisampling would help. However, after implementing multisampling (and trying 100 samples), I could not see any difference. I will continue to investigate this issue in the future using higher samples or different techniques.
+To start with the chinese dragon model, as I mentioned in my previous post, the problem was the very small coordinates of the model. Therefore, I thought that multisampling would help. However, after implementing multisampling (and trying 100 samples), I could not see any difference. I will continue to investigate this issue in the future using larger samples or different techniques.
 
 <p align="center">
 <img alt="chinese dragon bug" src="https://github.com/user-attachments/assets/8eb29623-5e2f-463d-8507-d6b27c3c4704" />
 </p>
 
-Also, as I mentioned in first part, this project also contributes my C++ skills so I want to mention a small (but surprisingly effective) optimization I did in the intersection code.
+Also, as I mentioned in the first part, this project also contributes to my C++ skills, so I want to mention a small (but surprisingly effective) optimization I did in the intersection code.
 
-I was initializing Intersector for both isInShadow and traceRay functions separately. I knew that this was not optimal but I thought the performance gain would be negligible.
+I was initializing Intersector for both the isInShadow and traceRay functions separately. I knew that this was not optimal, but I thought the performance gain would be negligible.
 
 ```cpp
 static bool isInShadow(const Scene& scene, const Vec3& shadowRayOrigin, const Vec3& shadowRayDir, float lightDistance) {
@@ -42,7 +42,7 @@ Vec3 traceRay(const Scene& scene, const Vec3& rayOrigin, const Vec3& rayDir, int
 }
 ```
 
-Instead of this, I created Intersector once in the main rendering loop and passed it as a reference to these functions. Of course I should also consider the thread-safety when doing this in a parallel program, so I created one Intersector instance per thread.
+Instead of this, I created Intersector once in the main rendering loop and passed it as a reference to these functions. Of course, I should also consider the thread-safety when doing this in a parallel program, so I created one Intersector instance per thread.
 
 ```cpp
 #pragma omp parallel
@@ -60,18 +60,18 @@ Even though I did not expect a big performance gain, rendering time decreased fr
 ### Multisampling
 Multisampling is a technique used to reduce aliasing artifacts in computer graphics. It works by taking multiple samples per pixel and averaging the results to produce a smoother final image. In ray tracing, we can implement multisampling by sending multiple rays per pixel, each with a slightly different direction. This helps to capture more detail and reduces jagged edges. For my implementation, I used a simple jittered grid sampling method, where I divided each pixel into a grid and randomly sampled within each grid cell. 
 
-Here are some results with different sample sizes (36 vs 100 samples per pixel) on the scene metal_glass_plates, noise reduce can be clearly seen (even though GIF itself has some compression artifacts):
+Here are some results with different sample sizes (36 vs 100 samples per pixel) on the scene metal_glass_plates, noise reduction can be clearly seen (even though the GIF itself has some compression artifacts):
 
 ![multisampling GIF](https://github.com/user-attachments/assets/3b5d5781-e24a-44a8-a3d1-e98add70bd13)
 
-For each grid cell, I generated jittered offsets. Shortly, I divided the pixel into SxS grid, then for each cell (sx, sy), I generated random offsets using a uniform distribution in the range [0, 1). Finally, I calculated the jittered coordinates (jx, jy) as follows:
+For each grid cell, I generated jittered offsets. Shortly, I divided the pixel into an SxS grid, then for each cell (sx, sy), I generated random offsets using a uniform distribution in the range [0, 1). Finally, I calculated the jittered coordinates (jx, jy) as follows:
 
 ```cpp
 float jx = (sx + dist(rng)) / S;
 float jy = (sy + dist(rng)) / S;
 ```
 
-As we discussed in the class, I shuffled the samples to avoid correlation between samples.
+As we discussed in class, I shuffled the samples to avoid correlation between samples.
 
 ```cpp
 shuffle(jitterSamples.begin(), jitterSamples.end(), rng);
@@ -80,10 +80,10 @@ shuffle(jitterSamples.begin(), jitterSamples.end(), rng);
 ### Depth of Field
 Depth of Field is a technique used to simulate the effect of a camera lens focusing on a specific distance, causing objects closer or farther away to appear blurred. In ray tracing, we can implement this by simulating a lens aperture and generating rays that originate from different points on the lens.
 
-The input scene gives us two values "ApertureSize" for the size of the square lens and "FocusDistance" for the distance from the camera where the image should be in focus. In pinhole rendering, all primary rays originate from a single point.
-With depth of field, rays originate from random points on the aperture, and pass through a focal point.
+The input scene gives us two values: "ApertureSize" for the size of the square lens and "FocusDistance" for the distance from the camera where the image should be in focus. In pinhole rendering, all primary rays originate from a single point.
+With depth of field, rays originate from random points on the aperture and pass through a focal point.
 
-I generated two random numbers and mapped them to square lens and calculated the lens point as follows:
+I generated two random numbers and mapped them to a square lens and calculated the lens point as follows:
 
 ```cpp
 float e1 = dist(rng);
@@ -136,11 +136,11 @@ float sy = (dist(rng) * 2.0f - 1.0f) * half;
 Vec3 lightPoint = light.position + u * sx + v * sy; // Sampled point on the area light
 ```
 
-Even though radiance itself does not decrease with distance, the received energy still depends on solid angle. Formula for the geometry term is as follows:
+Even though radiance itself does not decrease with distance, the received energy still depends on solid angle. The formula for the geometry term is as follows:
 
 $$E(x)=L\frac{area⋅cosα​}{d^{2}}dω$$
 
-where α is the angle between the light normal and the direction toward the shading point and d is the distance between them.
+where α is the angle between the light normal and the direction toward the shading point, and d is the distance between them.
 
 ```cpp
 float cosLight = std::max(0.0f, light.normal.normalize().dot(-wi));
@@ -148,7 +148,7 @@ float geom = (A * cosLight) / (d2 * numSamples);
 Vec3 eff = light.radiance * geom;
 ```
 
-After implementing area lights, I tested with chessboard_arealight and wine_glass scenes, but results were not as expected. 
+After implementing area lights, I tested with chessboard_arealight and wine_glass scenes, but the results were not as expected. 
 
 <p align="center">
 <img alt="chessboard_arealight" src="https://github.com/user-attachments/assets/409b3921-ddfa-4173-b9f7-a25d4f262355" />
@@ -158,7 +158,7 @@ After implementing area lights, I tested with chessboard_arealight and wine_glas
 <img  alt="wine_glass" src="https://github.com/user-attachments/assets/90a8e170-4106-4b5c-add2-2ce41ffe2337" />
 </p>
 
-Firstly, I tried to change the number of samples for the area light but nothing changed. This indicated that the issue was probably not related to sampling, but to the lighting logic itself.
+Firstly, I tried to change the number of samples for the area light, but nothing changed. This indicated that the issue was probably not related to sampling, but to the lighting logic itself.
 
 Then I noticed the following lines inside the area-light shading loop:
 
@@ -182,21 +182,21 @@ That means, if the angle between the light normal and the direction toward the s
 }
 ```
 
-Light is above the scene but normal has a positive z component, meaning it points upwards, away from the scene. Therefore, all samples were being skipped because dot(light.normal, -wi) becomes negative almost everywhere.
+Light is above the scene, but normal has a positive z component, meaning it points upwards, away from the scene. Therefore, all samples were being skipped because dot(light.normal, -wi) becomes negative almost everywhere.
 
-To check this , I rewrote cosLight calculation as follows:
+To check this, I rewrote the cosLight calculation as follows:
 
 ```cpp
 float cosLight = std::max(0.0f, -light.normal.normalize().dot(wi.scale(-1.0f)));
 ```
 
-It fixed the issue and produced correct lighting results, but it broke the area light in cornellbox_area.
+It fixed the issue and produced correct lighting results, but it broke the area light in the cornellbox_area.
 
 <p align="center">
 <img alt="cornellbox_area_bugged" src="https://github.com/user-attachments/assets/edc16074-4160-4f15-9ada-51ac9439bcd3" />
 </p>
 
-Before this issue, cornellbox_area area light was working correctly but the white area light surface on upper plane was not visible. After this change, the area light surface became visible but the lighting effect was incorrect. So I realized that I should treat the light as double-sided ignoring the normal direction.
+Before this issue, the cornellbox_area area light was working correctly, but the white area light surface on the upper plane was not visible. After this change, the area light surface became visible, but the lighting effect was incorrect. So I realized that I should treat the light as double-sided, ignoring the normal direction.
 
 ```cpp
 float cosLight = std::max(0.0f, std::fabs(light.normal.normalize().dot(wi.scale(-1.0f)))); // Use absolute value to treat light as double-sided
@@ -204,11 +204,11 @@ float cosLight = std::max(0.0f, std::fabs(light.normal.normalize().dot(wi.scale(
 if (cosLight <= 0.0f) continue;
 ```
 
-This change produced correct results (can be found in Outputs section) in both scenes.
+This change produced correct results (can be found in the Outputs section) in both scenes.
 
 ### Motion Blur
 
-Motion blur is a technique used to simulate the effect of objects moving during the exposure time of a camera. In a ray tracer, this is achieved by letting each ray carry a random time parameter t ∈ [0,1]. My tracer will be assume only translational movements for simplicity.
+Motion blur is a technique used to simulate the effect of objects moving during the exposure time of a camera. In a ray tracer, this is achieved by letting each ray carry a random time parameter t ∈ [0,1]. My tracer will assume only translational movements for simplicity.
 
 When shooting primary rays, I generate a random time value per ray:
 
@@ -226,7 +226,7 @@ static bool isInShadow(const Scene& scene, const Vec3& shadowRayOrigin, const Ve
 IntersectionInfo Intersector::findClosestIntersection(const Vec3& rayOrigin,const Vec3& rayDir, bool isShadowRay, float rayTime);
 ```
 
-I basically created a blur offset for each moving object based on its velocity and the ray time and subtracted it from the original ray position as can be seen in plane example below:
+I basically created a blur offset for each moving object based on its velocity and the ray time and subtracted it from the original ray position, as can be seen in the plane example below:
 
 ```cpp
 // Motion blur
@@ -282,14 +282,14 @@ Some results with different roughness values for the scene cornellbox_brushed_me
 <img alt="roughness5left15right" src="https://github.com/user-attachments/assets/db9241d9-08c5-495f-9a61-5ed17ece92f8" />
 </p>
 
-And difference between roughness 5 and 15:
+And the difference between roughness 5 and 15:
 
 <p align="center">
 <img alt="roughnes5left diff" src="https://github.com/user-attachments/assets/cb850832-3708-4c97-9d55-3d921f85cb37" />
 </p>
 
 ### Outputs
-Chinese dragon still produces wrong results (which is strange with multisampling, it should have improved a little bit), therefore focusing_dragons scene is also affected. Also I encountered with a strange black screen render issue on cornellbox_boxes_dynamic scene. It is fixed when I turned off the BVH acceleration structure. I suspect there is a bug in my BVH construction code that causes this issue. To investigate this issue later on, I added a line that uses BVH on larger models only (more than 300 triangles), then I was rendering the other scenes, I realized that mirror reflection from the scene metal_glass_plates changed. I again tested with and without BVH, and confirmed that with BVH, reflections were correct but without BVH, reflections were wrong. Then I rechecked my brute force mesh intersection code and found a bug in the reflection calculation.
+Chinese dragon still produces wrong results (which is strange with multisampling, it should have improved a little bit), therefore focusing_dragons scene is also affected. Also, I encountered a strange black screen render issue on the cornellbox_boxes_dynamic scene. It is fixed when I turned off the BVH acceleration structure. I suspect there is a bug in my BVH construction code that causes this issue. To investigate this issue later on, I added a line that uses BVH on larger models only (more than 300 triangles), then I was rendering the other scenes, I realized that the mirror reflection from the scene metal_glass_plates had changed. I again tested with and without BVH, and confirmed that with BVH, reflections were correct, but without BVH, reflections were wrong. Then I rechecked my brute force mesh intersection code and found a bug in the reflection calculation.
 
 Left reflection is the correct one, right reflection is wrong.
 
@@ -325,7 +325,7 @@ if (RayTriangle(rayOriginBlur, rayDir, v0, v1, v2, t, performCulling, triN)) {
             info.hitNormal = info.hitNormal.scale(-1.0f);
 ```
 
-Also, I am getting more reflective results than expected results since the first part (as can be seen in chessboard_arealight, there is no reflection in the original image) as in the case of some of my friends, I am suspecting that I am calculating an additional reflection term somewhere in the code, I am investigating this issue as well.
+Also, I am getting more reflective results than expected results since the first part (as can be seen in chessboard_arealight, there is no reflection in the original image) as in the case of some of my friends, I am suspecting that I am calculating an additional reflection term somewhere in the code. I am investigating this issue as well.
 
 As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Ramazan Tokay for contributions to the 3D models.
 
@@ -350,7 +350,7 @@ You can see the rendering times of this part below:
 
 **Used CPU: AMD Ryzen 5 7640HS 6-Core Processor (4.30 GHz)*
 
-Also, I merged tap water input json files' render into a .mp4 video (using [FFmpeg](https://www.ffmpeg.org/)). I downscaled the resolution to 500x500 for faster rendering. Each frame nearly took 16 seconds to render on Ryzen 5 7640HS 4.30 GHz.
+Also, I merged tap water input json files' render into an .mp4 video (using [FFmpeg](https://www.ffmpeg.org/)). I downscaled the resolution to 500x500 for faster rendering. Each frame nearly took 16 seconds to render on Ryzen 5 7640HS 4.30 GHz.
 
 ---
 
@@ -361,42 +361,42 @@ Also, I merged tap water input json files' render into a .mp4 video (using [FFmp
 
 ---
 ### cornellbox_area
-_Time: 41.2385 s_
+_Time: 260.282 s_
 <p align="center">
 <img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
 </p>
 
 ---
-### cornellbox_boxes_dynamic
-_Time: 41.2385 s_
+### cornellbox_boxes_dynamic (500x400 resolution to speed up)
+_Time: 1691.55 s_
 <p align="center">
 <img alt="cornellbox_boxes_dynamic" src="https://github.com/user-attachments/assets/2393c821-a141-4bea-98d3-0b149fa138f2" />
 </p>
 
 ---
 ### cornellbox_brushed_metal
-_Time: 41.2385 s_
+_Time: 425.659 s_
 <p align="center">
 <img alt="cornellbox_brushed_metal" src="https://github.com/user-attachments/assets/6db4f3de-d65f-4568-a0ae-25c2a11cfa85" />
 </p>
 
 ---
 ### dragon_dynamic
-_Time: 41.2385 s_
+_Time: 1322.23 s_
 <p align="center">
 <img alt="dragon_dynamic" src="https://github.com/user-attachments/assets/f760b6c5-5ffc-4db9-9ccf-bd361f69e753" />
 </p>
 
 ---
 ### focusing_dragons
-_Time: 41.2385 s_
+_Time: 169.435 s_
 <p align="center">
 <img alt="focusing_dragons" src="https://github.com/user-attachments/assets/8eaef1f8-4a64-4ae3-b7e1-c085a7ec4207" />
 </p>
 
 ---
 ### metal_glass_plates
-_Time: 41.2385 s_
+_Time: 206.233 s_
 <p align="center">
 <img alt="metal_glass_plates" src="https://github.com/user-attachments/assets/9f2e21ea-e416-4018-a266-7cab9628402c" />
 </p>
@@ -404,28 +404,28 @@ _Time: 41.2385 s_
 ---
 
 ### spheres_dof
-_Time: 41.2385 s_
+_Time: 129.346 s_
 <p align="center">
     <img alt="spheres_dof" src="https://github.com/user-attachments/assets/f39b1a8d-0eb4-4bee-8496-a25797c8480e" />
 </p>
 
 ---
 ### chessboard_arealight
-_Time: 41.2385 s_
+_Time: 441.501 s_
 <p align="center">
 <img alt="chessboard_arealight" src="https://github.com/user-attachments/assets/aa246bdf-9015-4148-bb05-14717e6f5274" />
 </p>
 
 ---
 ### chessboard_arealight_dof
-_Time: 41.2385 s_
+_Time: 458.703 s_
 <p align="center">
 <img alt="chessboard_arealight_dof" src="https://github.com/user-attachments/assets/191f2b5f-17c6-4173-ab9e-1f36f8890849" />
 </p>
 
 ---
 ### chessboard_arealight_dof_glass_queen
-_Time: 41.2385 s_
+_Time: 948.822 s_
 <p align="center">
 <img alt="chessboard_arealight_dof_glass_queen" src="https://github.com/user-attachments/assets/5f229211-ecad-4c07-8a4c-a4cbf52694e9" />
 </p>
@@ -433,7 +433,7 @@ _Time: 41.2385 s_
 ---
 
 ### deadmau5
-_Time: 41.2385 s_
+_Time: 1187.27 s_
 <p align="center">
 <img alt="deadmau5" src="https://github.com/user-attachments/assets/4d22cf6b-778b-4bb1-ad56-4181530819cf" />
 </p>
@@ -441,7 +441,7 @@ _Time: 41.2385 s_
 ---
 
 ### wine_glass
-_Time: 41.2385 s_
+_Time: 7955.46* s_
 <p align="center">
  <img alt="wine_glass" src="https://github.com/user-attachments/assets/37fa4a15-0147-43a5-971a-636d26f947f1" />
 </p>
