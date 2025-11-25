@@ -111,7 +111,7 @@ Which matches the final ray equation, $r(t)=a+t(p−a)$.
 </p>
 
 ### Area Lights
-Area lights are light sources that have a defined shape and size, as opposed to point lights which emit light from a single point. Area lights produce softer shadows and more realistic lighting effects. In input files, area lights are defined by their position, normal, size, and radiance. To simulate area lights, instead of evaluating a single lighting direction, we must sample many random points on the square surface.
+Area lights are light sources that have a defined shape and size, as opposed to point lights which emit light from a single point. Area lights produce softer shadows and more realistic lighting effects. To simulate area lights, instead of evaluating a single lighting direction, we must sample many random points on the square surface.
 
 To sample a square area light, I first build an orthonormal basis (u,v) on the light’s surface using its normal:
 
@@ -160,7 +160,7 @@ After implementing area lights, I tested with chessboard_arealight and wine_glas
 
 Firstly, I tried to change the number of samples for the area light, but nothing changed. This indicated that the issue was probably not related to sampling, but to the lighting logic itself.
 
-Then I noticed the following lines inside the area-light shading loop:
+Then I noticed the following lines inside the area light shading loop:
 
 ```cpp
 // ...
