@@ -62,7 +62,7 @@ Multisampling is a technique used to reduce aliasing artifacts in computer graph
 
 Here are some results with different sample sizes (36 vs 100 samples per pixel) on the scene metal_glass_plates, noise reduce can be clearly seen (even though GIF itself has some compression artifacts):
 
-[ÖRNEK MULTISAMPLING GÖRSELLERİ]
+![multisampling GIF](https://github.com/user-attachments/assets/3b5d5781-e24a-44a8-a3d1-e98add70bd13)
 
 For each grid cell, I generated jittered offsets. Shortly, I divided the pixel into SxS grid, then for each cell (sx, sy), I generated random offsets using a uniform distribution in the range [0, 1). Finally, I calculated the jittered coordinates (jx, jy) as follows:
 
@@ -106,7 +106,9 @@ rayDir = (p_focal - lensPoint).normalize();
 
 Which matches the final ray equation, $r(t)=a+t(p−a)$.
 
-[ÖRNEK DEPTH OF FIELD GÖRSELLERİ]
+<p align="center">
+<img alt="spheres_dof" src="https://github.com/user-attachments/assets/f9628780-ce81-4321-8801-ed3c2c1941d9" />
+</p>
 
 ### Area Lights
 Area lights are light sources that have a defined shape and size, as opposed to point lights which emit light from a single point. Area lights produce softer shadows and more realistic lighting effects. In input files, area lights are defined by their position, normal, size, and radiance. To simulate area lights, instead of evaluating a single lighting direction, we must sample many random points on the square surface.
@@ -148,7 +150,13 @@ Vec3 eff = light.radiance * geom;
 
 After implementing area lights, I tested with chessboard_arealight and wine_glass scenes, but results were not as expected. 
 
-[my outputstaki renderlar]
+<p align="center">
+<img alt="chessboard_arealight" src="https://github.com/user-attachments/assets/409b3921-ddfa-4173-b9f7-a25d4f262355" />
+</p>
+
+<p align="center">
+<img  alt="wine_glass" src="https://github.com/user-attachments/assets/90a8e170-4106-4b5c-add2-2ce41ffe2337" />
+</p>
 
 Firstly, I tried to change the number of samples for the area light but nothing changed. This indicated that the issue was probably not related to sampling, but to the lighting logic itself.
 
@@ -252,7 +260,9 @@ The line `float r = std::min(roughness, 1.0f);` ensures that the roughness value
 
 Here is the difference in the scene metal_glass_plates with `float r = std::min(roughness, 1.0f);` instead of `float r = roughness;`:
 
-[ROUGHNESS DIFFereNCE]
+<p align="center">
+<img alt="roughness difference" src="https://github.com/user-attachments/assets/83487702-8a9a-4ce3-95d1-e6fd9abfe390" />
+</p>
 
 In the shading part, I used this function to perturb the reflection and refraction directions:
 
@@ -261,13 +271,17 @@ Vec3 idealReflectDir = reflect(rayDir, hitNormal).normalize();
 Vec3 reflectDir = perturbDirection(idealReflectDir, material.roughness);
 ```
 
-Some results with different roughness values for the scene cornellbox_brushed_metal:
+Some results with different roughness values for the scene cornellbox_brushed_metal (left is 5 roughness, right is 15):
 
-[roughness5left15right ve diff hali]
+<p align="center">
+<img alt="roughness5left15right" src="https://github.com/user-attachments/assets/db9241d9-08c5-495f-9a61-5ed17ece92f8" />
+</p>
 
 And difference between roughness 5 and 15:
 
-[roughness5left15right diff hali]
+<p align="center">
+<img alt="roughnes5left diff" src="https://github.com/user-attachments/assets/cb850832-3708-4c97-9d55-3d921f85cb37" />
+</p>
 
 ### Outputs
 Chinese dragon still produces wrong results (which is strange with multisampling, it should have improved a little bit), therefore focusing_dragons scene is also affected. Also I encountered with a strange black screen render issue on cornellbox_boxes_dynamic scene. It is fixed when I turned off the BVH acceleration structure. I suspect there is a bug in my BVH construction code that causes this issue. To investigate this issue later on, I added a line that uses BVH on larger models only (more than 300 triangles), then I was rendering the other scenes, I realized that mirror reflection from the scene metal_glass_plates changed. I again tested with and without BVH, and confirmed that with BVH, reflections were correct but without BVH, reflections were wrong. Then I rechecked my brute force mesh intersection code and found a bug in the reflection calculation.
