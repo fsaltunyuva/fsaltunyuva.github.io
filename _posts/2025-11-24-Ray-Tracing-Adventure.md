@@ -236,6 +236,11 @@ Vec3 rayOriginBlur = rayOrigin.subtract(blurOffset);
 if (RayPlane(rayOriginBlur, rayDir, Vec3(p0_world), Vec3(N_world), t))
   // ...
 ```
+
+<p align="center">
+<img alt="cornellbox_boxes_dynamic" src="https://github.com/user-attachments/assets/2e6568f8-9bdf-4c47-aede-f45b3c8459bc" />
+</p>
+
 ### Material Roughness
 Material roughness defines the roughness of the mirrors, conductors, and dielectrics. A rough surface causes incoming rays to scatter in many directions, resulting in blurry reflections. 
 
@@ -286,7 +291,11 @@ And difference between roughness 5 and 15:
 ### Outputs
 Chinese dragon still produces wrong results (which is strange with multisampling, it should have improved a little bit), therefore focusing_dragons scene is also affected. Also I encountered with a strange black screen render issue on cornellbox_boxes_dynamic scene. It is fixed when I turned off the BVH acceleration structure. I suspect there is a bug in my BVH construction code that causes this issue. To investigate this issue later on, I added a line that uses BVH on larger models only (more than 300 triangles), then I was rendering the other scenes, I realized that mirror reflection from the scene metal_glass_plates changed. I again tested with and without BVH, and confirmed that with BVH, reflections were correct but without BVH, reflections were wrong. Then I rechecked my brute force mesh intersection code and found a bug in the reflection calculation.
 
-[BUGGED metal_glass_plates]
+Left reflection is the correct one, right reflection is wrong.
+
+<p align="center">
+<img alt="left correct-right wrong" src="https://github.com/user-attachments/assets/92474478-8a90-4cab-9077-bb1c2146992a" />
+</p>
 
 ```cpp
 if (RayTriangle(rayOriginBlur, rayDir, v0, v1, v2, t, performCulling, triN)) {
@@ -360,7 +369,9 @@ _Time: 41.2385 s_
 ---
 ### cornellbox_boxes_dynamic
 _Time: 41.2385 s_
-
+<p align="center">
+<img alt="cornellbox_boxes_dynamic" src="https://github.com/user-attachments/assets/2393c821-a141-4bea-98d3-0b149fa138f2" />
+</p>
 
 ---
 ### cornellbox_brushed_metal
@@ -379,7 +390,9 @@ _Time: 41.2385 s_
 ---
 ### focusing_dragons
 _Time: 41.2385 s_
-
+<p align="center">
+<img alt="focusing_dragons" src="https://github.com/user-attachments/assets/8eaef1f8-4a64-4ae3-b7e1-c085a7ec4207" />
+</p>
 
 ---
 ### metal_glass_plates
@@ -428,7 +441,7 @@ _Time: 41.2385 s_
 ### wine_glass
 _Time: 41.2385 s_
 <p align="center">
-<img alt="spheres_dof" src="https://github.com/user-attachments/assets/65f0c527-3749-43cd-9cd0-cd05e5b65a62" />
+ <img alt="wine_glass" src="https://github.com/user-attachments/assets/37fa4a15-0147-43a5-971a-636d26f947f1" />
 </p>
 
 ---
