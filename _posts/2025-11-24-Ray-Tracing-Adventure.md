@@ -363,7 +363,7 @@ Also, I merged tap water input json files' render into a .mp4 video (using [FFmp
 ### cornellbox_area
 _Time: 41.2385 s_
 <p align="center">
-<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/f0e86fb8-fe4d-453d-86b6-7fcff19b24e1" />
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
 </p>
 
 ---
@@ -377,7 +377,7 @@ _Time: 41.2385 s_
 ### cornellbox_brushed_metal
 _Time: 41.2385 s_
 <p align="center">
-<img  alt="cornellbox_brushed_metal" src="https://github.com/user-attachments/assets/e4939c3c-f663-47bc-a193-7bd0204a8a81" />
+<img alt="cornellbox_brushed_metal" src="https://github.com/user-attachments/assets/6db4f3de-d65f-4568-a0ae-25c2a11cfa85" />
 </p>
 
 ---
@@ -398,13 +398,15 @@ _Time: 41.2385 s_
 ### metal_glass_plates
 _Time: 41.2385 s_
 <p align="center">
-<img alt="metal_glass_plates" src="https://github.com/user-attachments/assets/4040962f-2807-4a42-8cca-ed328a94e5da" />
+<img alt="metal_glass_plates" src="https://github.com/user-attachments/assets/9f2e21ea-e416-4018-a266-7cab9628402c" />
 </p>
+
 ---
+
 ### spheres_dof
 _Time: 41.2385 s_
 <p align="center">
-<img alt="spheres_dof" src="https://github.com/user-attachments/assets/65f0c527-3749-43cd-9cd0-cd05e5b65a62" />
+    <img alt="spheres_dof" src="https://github.com/user-attachments/assets/f39b1a8d-0eb4-4bee-8496-a25797c8480e" />
 </p>
 
 ---
