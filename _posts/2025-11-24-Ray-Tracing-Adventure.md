@@ -22,6 +22,41 @@ To start with the chinese dragon model, as I mentioned in my previous post, the 
 <img alt="chinese dragon bug" src="https://github.com/user-attachments/assets/8eb29623-5e2f-463d-8507-d6b27c3c4704" />
 </p>
 
+Also, as I mentioned in first part, this project also contributes my C++ skills so I want to mention a small (but surprisingly effective) optimization I did in the intersection code.
+
+I was initializing Intersector for both isInShadow and traceRay functions separately. I knew that this was not optimal but I thought the performance gain would be negligible.
+
+```cpp
+static bool isInShadow(const Scene& scene, const Vec3& shadowRayOrigin, const Vec3& shadowRayDir, float lightDistance) {
+    Intersector intersector(scene); 
+
+    IntersectionInfo info = intersector.findClosestIntersection(shadowRayOrigin, shadowRayDir, true);
+    //...
+}
+
+Vec3 traceRay(const Scene& scene, const Vec3& rayOrigin, const Vec3& rayDir, int depth) {
+    Intersector intersector(scene); 
+
+    IntersectionInfo info = intersector.findClosestIntersection(rayOrigin, rayDir, false);
+    //...
+}
+```
+
+Instead of this, I created Intersector once in the main rendering loop and passed it as a reference to these functions. Of course I should also consider the thread-safety when doing this in a parallel program, so I created one Intersector instance per thread.
+
+```cpp
+#pragma omp parallel
+{
+  Intersector threadIntersector(scene); // Thread-local intersector for parallel safety
+
+#pragma omp for schedule(dynamic)
+  for (int y = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x) {
+        // ...
+```
+
+Even though I did not expect a big performance gain, rendering time decreased from 80.6 seconds to 55.5 seconds in chinese_dragon scene. So, this became a nice example for me showing how much using references can affect performance :).
+
 ### Multisampling
 Multisampling is a technique used to reduce aliasing artifacts in computer graphics. It works by taking multiple samples per pixel and averaging the results to produce a smoother final image. In ray tracing, we can implement multisampling by sending multiple rays per pixel, each with a slightly different direction. This helps to capture more detail and reduces jagged edges. For my implementation, I used a simple jittered grid sampling method, where I divided each pixel into a grid and randomly sampled within each grid cell. 
 
@@ -224,9 +259,13 @@ Vec3 idealReflectDir = reflect(rayDir, hitNormal).normalize();
 Vec3 reflectDir = perturbDirection(idealReflectDir, material.roughness);
 ```
 
-Some results with different roughness values:
+Some results with different roughness values for the scene cornellbox_brushed_metal:
 
-[ÖRNEK ROUGHNESS GÖRSELLERİ]
+[roughness5left15right ve diff hali]
+
+And difference between roughness 5 and 15:
+
+[roughness5left15right diff hali]
 
 ### Outputs
 Chinese dragon still produces wrong results (which is strange with multisampling, it should have improved a little bit), therefore focusing_dragons scene is also affected. Also I encountered with a strange black screen render issue on cornellbox_boxes_dynamic scene. It is fixed when I turned off the BVH acceleration structure. I suspect there is a bug in my BVH construction code that causes this issue. To investigate this issue later on, I added a line that uses BVH on larger models only (more than 300 triangles), then I was rendering the other scenes, I realized that mirror reflection from the scene metal_glass_plates changed. I again tested with and without BVH, and confirmed that with BVH, reflections were correct but without BVH, reflections were wrong. Then I rechecked my brute force mesh intersection code and found a bug in the reflection calculation.
