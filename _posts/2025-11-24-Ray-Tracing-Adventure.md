@@ -60,7 +60,7 @@ Even though I did not expect a big performance gain, rendering time decreased fr
 ### Multisampling
 Multisampling is a technique used to reduce aliasing artifacts in computer graphics. It works by taking multiple samples per pixel and averaging the results to produce a smoother final image. In ray tracing, we can implement multisampling by sending multiple rays per pixel, each with a slightly different direction. This helps to capture more detail and reduces jagged edges. For my implementation, I used a simple jittered grid sampling method, where I divided each pixel into a grid and randomly sampled within each grid cell. 
 
-Here are some results with different sample sizes:
+Here are some results with different sample sizes (36 vs 100 samples per pixel) on the scene metal_glass_plates, noise reduce can be clearly seen (even though GIF itself has some compression artifacts):
 
 [ÖRNEK MULTISAMPLING GÖRSELLERİ]
 
