@@ -113,7 +113,70 @@ Vec3 eff = light.radiance * geom;
 
 ### Motion Blur
 
+Motion blur is a technique used to simulate the effect of objects moving during the exposure time of a camera. In a ray tracer, this is achieved by letting each ray carry a random time parameter t ∈ [0,1]. My tracer will be assume only translational movements for simplicity.
+
+When shooting primary rays, I generate a random time value per ray:
+
+```cpp
+float rayTime = dist(rng); // random in [0,1]
+```
+
+I added the time parameter to the necessary functions:
+
+```cpp
+Vec3 traceRay(const Scene& scene, const Vec3& rayOrigin, const Vec3& rayDir, int depth, Intersector& intersector, float rayTime);
+
+static bool isInShadow(const Scene& scene, const Vec3& shadowRayOrigin, const Vec3& shadowRayDir, float lightDistance, Intersector& intersector, float rayTime);
+
+IntersectionInfo Intersector::findClosestIntersection(const Vec3& rayOrigin,const Vec3& rayDir, bool isShadowRay, float rayTime);
+```
+
+I basically created a blur offset for each moving object based on its velocity and the ray time and subtracted it from the original ray position as can be seen in plane example below:
+
+```cpp
+// Motion blur
+Vec3 blurOffset = plane.motionBlur.scale(rayTime);
+Vec3 rayOriginBlur = rayOrigin.subtract(blurOffset);
+
+if (RayPlane(rayOriginBlur, rayDir, Vec3(p0_world), Vec3(N_world), t))
+  // ...
+```
 ### Material Roughness
+Material roughness defines the roughness of the mirrors, conductors, and dielectrics. A rough surface causes incoming rays to scatter in many directions, resulting in blurry reflections. 
+
+Given the ideal direction idealDir, I apply a roughness offset using:
+
+```cpp
+static Vec3 perturbDirection(const Vec3& idealDir, float roughness) {
+    if (roughness <= 0.0f) // No perturbation for perfectly smooth surfaces
+        return idealDir;
+
+    float r = std::min(roughness, 1.0f);
+    // float r = roughness;
+
+    Vec3 randVec = randomInUnitSphere();
+    Vec3 perturbed = idealDir.add(randVec.scale(r));
+
+    return perturbed.normalize();
+}
+```
+
+The line `float r = std::min(roughness, 1.0f);` ensures that the roughness value does not exceed 1.0, which would produce preventing the perturbed reflection direction from deviating too far away from the ideal one. Without this clamp, extremely large roughness values could push the random offset to dominate the ideal direction completely. This would cause the resulting vector to lose its correlation with the surface reflection direction and produce unrealistic results.
+
+Here is the difference in the scene metal_glass_plates with `float r = std::min(roughness, 1.0f);` instead of `float r = roughness;`:
+
+[ROUGHNESS DIFFereNCE]
+
+In the shading part, I used this function to perturb the reflection and refraction directions:
+
+```cpp
+Vec3 idealReflectDir = reflect(rayDir, hitNormal).normalize();
+Vec3 reflectDir = perturbDirection(idealReflectDir, material.roughness);
+```
+
+Some results with different roughness values:
+
+[ÖRNEK ROUGHNESS GÖRSELLERİ]
 
 ### Outputs
 Chinese dragon still produces wrong results (which is strange with multisampling, it should have improved a little bit), therefore focusing_dragons scene is also affected. Also I encountered with a strange black screen render issue on cornellbox_boxes_dynamic scene. It is fixed when I turned off the BVH acceleration structure. I suspect there is a bug in my BVH construction code that causes this issue. To investigate this issue later on, I added a line that uses BVH on larger models only (more than 300 triangles), then I was rendering the other scenes, I realized that mirror reflection from the scene metal_glass_plates changed. I again tested with and without BVH, and confirmed that with BVH, reflections were correct but without BVH, reflections were wrong. Then I rechecked my brute force mesh intersection code and found a bug in the reflection calculation.
@@ -121,34 +184,34 @@ Chinese dragon still produces wrong results (which is strange with multisampling
 [BUGGED metal_glass_plates]
 
 ```cpp
-            if (RayTriangle(rayOriginBlur, rayDir, v0, v1, v2, t, performCulling, triN)) {
-                if (t > intersectionTestEpsilon && t < closestT) {
-                    // Updating closest intersection
-                    // ...
+if (RayTriangle(rayOriginBlur, rayDir, v0, v1, v2, t, performCulling, triN)) {
+    if (t > intersectionTestEpsilon && t < closestT) {
+        // Updating closest intersection
+        // ...
 
-                    // normal transformation (inverse-transpose of M)
-                    glm::vec3 nWorld = glm::normalize(glm::vec3(normalM * glm::vec4(triN.x, triN.y, triN.z, 0.0f)));
-                    info.hitNormal = Vec3(nWorld);
+        // normal transformation (inverse-transpose of M)
+        glm::vec3 nWorld = glm::normalize(glm::vec3(normalM * glm::vec4(triN.x, triN.y, triN.z, 0.0f)));
+        info.hitNormal = Vec3(nWorld);
 
-                    if (info.hitNormal.dot(rayDir) > 0)
-                        info.hitNormal = info.hitNormal.scale(-1.0f);
+        if (info.hitNormal.dot(rayDir) > 0)
+            info.hitNormal = info.hitNormal.scale(-1.0f);
 ```
 
 Here, I was transforming the normal using the normalM matrix, which is the transpose of the inverse of the model matrix. However, triN is already computed in world space (because the triangle vertices are transformed with M before calling RayTriangle), so applying normalM again transforms the normal twice. After removing this extra transformation, the reflections became correct in both cases:
 
 ```cpp
-            if (RayTriangle(rayOriginBlur, rayDir, v0, v1, v2, t, performCulling, triN)) {
-                if (t > intersectionTestEpsilon && t < closestT) {
-                    // Updating closest intersection
-                    // ...
+if (RayTriangle(rayOriginBlur, rayDir, v0, v1, v2, t, performCulling, triN)) {
+    if (t > intersectionTestEpsilon && t < closestT) {
+        // Updating closest intersection
+        // ...
 
-                    info.hitNormal = triN.normalize();
+        info.hitNormal = triN.normalize();
 
-                    if (info.hitNormal.dot(rayDir) > 0)
-                        info.hitNormal = info.hitNormal.scale(-1.0f);
+        if (info.hitNormal.dot(rayDir) > 0)
+            info.hitNormal = info.hitNormal.scale(-1.0f);
 ```
 
- Also, I am getting more reflective results than expected results since the first part (as can be seen in chessboard_arealight, there is no reflection in the original image) as in the case of some of my friends, I am suspecting that I am calculating an additional reflection term somewhere in the code, I am investigating this issue as well.
+Also, I am getting more reflective results than expected results since the first part (as can be seen in chessboard_arealight, there is no reflection in the original image) as in the case of some of my friends, I am suspecting that I am calculating an additional reflection term somewhere in the code, I am investigating this issue as well.
 
 As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Ramazan Tokay for contributions to the 3D models.
 
@@ -171,52 +234,7 @@ You can see the rendering times of this part below:
 
 *Used CPU: AMD Ryzen 5 5600X 6-Core Processor (3.70 GHz)*
 
-
-<p align="center">
-<img alt="cornellbox_area_bugged" src="https://github.com/user-attachments/assets/edc16074-4160-4f15-9ada-51ac9439bcd3" />
-</p>
-
-<p align="center">
-<img alt="chessboard_arealight" src="https://github.com/user-attachments/assets/aa246bdf-9015-4148-bb05-14717e6f5274" />
-</p>
-
-<p align="center">
-<img alt="chessboard_arealight_dof" src="https://github.com/user-attachments/assets/191f2b5f-17c6-4173-ab9e-1f36f8890849" />
-</p>
-
-<p align="center">
-<img alt="chessboard_arealight_dof_glass_queen" src="https://github.com/user-attachments/assets/5f229211-ecad-4c07-8a4c-a4cbf52694e9" />
-</p>
-
-<p align="center">
-<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/f0e86fb8-fe4d-453d-86b6-7fcff19b24e1" />
-</p>
-
-<p align="center">
-<img  alt="cornellbox_brushed_metal" src="https://github.com/user-attachments/assets/e4939c3c-f663-47bc-a193-7bd0204a8a81" />
-</p>
-
-<p align="center">
-<img alt="deadmau5" src="https://github.com/user-attachments/assets/4d22cf6b-778b-4bb1-ad56-4181530819cf" />
-</p>
-
-<p align="center">
-<img alt="dragon_dynamic" src="https://github.com/user-attachments/assets/f760b6c5-5ffc-4db9-9ccf-bd361f69e753" />
-</p>
-
-<p align="center">
-<img alt="metal_glass_plates" src="https://github.com/user-attachments/assets/4040962f-2807-4a42-8cca-ed328a94e5da" />
-</p>
-
-<p align="center">
-<img alt="spheres_dof" src="https://github.com/user-attachments/assets/65f0c527-3749-43cd-9cd0-cd05e5b65a62" />
-</p>
-
-
-[WINE GLASS]
-
-[CORNELLBOX_BOXES_DYNAMIC]
-
+Also, I merged tap water input json files' render into a .mp4 video (using [FFmpeg](https://www.ffmpeg.org/)). I downscaled the resolution to 500x500 for faster rendering. Each frame nearly took 16 seconds to render on Ryzen 5 7640HS 4.30 GHz.
 
 ---
 
@@ -224,4 +242,79 @@ You can see the rendering times of this part below:
 <video width="100%" controls autoplay muted loop playsinline>
   <source src="{{ site.baseurl }}/videos/tapwater.mp4" type="video/mp4">
 </video>
+
 ---
+### Grass Desert
+_Time: 41.2385 s_
+<p align="center">
+<img alt="cornellbox_area_bugged" src="https://github.com/user-attachments/assets/edc16074-4160-4f15-9ada-51ac9439bcd3" />
+</p>
+
+---
+### Grass Desert
+_Time: 41.2385 s_
+<p align="center">
+<img alt="chessboard_arealight" src="https://github.com/user-attachments/assets/aa246bdf-9015-4148-bb05-14717e6f5274" />
+</p>
+
+---
+### Grass Desert
+_Time: 41.2385 s_
+<p align="center">
+<img alt="chessboard_arealight_dof" src="https://github.com/user-attachments/assets/191f2b5f-17c6-4173-ab9e-1f36f8890849" />
+</p>
+
+---
+### Grass Desert
+_Time: 41.2385 s_
+<p align="center">
+<img alt="chessboard_arealight_dof_glass_queen" src="https://github.com/user-attachments/assets/5f229211-ecad-4c07-8a4c-a4cbf52694e9" />
+</p>
+
+---
+### Grass Desert
+_Time: 41.2385 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/f0e86fb8-fe4d-453d-86b6-7fcff19b24e1" />
+</p>
+
+---
+### Grass Desert
+_Time: 41.2385 s_
+<p align="center">
+<img  alt="cornellbox_brushed_metal" src="https://github.com/user-attachments/assets/e4939c3c-f663-47bc-a193-7bd0204a8a81" />
+</p>
+
+---
+### Grass Desert
+_Time: 41.2385 s_
+<p align="center">
+<img alt="deadmau5" src="https://github.com/user-attachments/assets/4d22cf6b-778b-4bb1-ad56-4181530819cf" />
+</p>
+
+---
+### Grass Desert
+_Time: 41.2385 s_
+<p align="center">
+<img alt="dragon_dynamic" src="https://github.com/user-attachments/assets/f760b6c5-5ffc-4db9-9ccf-bd361f69e753" />
+</p>
+
+---
+### Grass Desert
+_Time: 41.2385 s_
+<p align="center">
+<img alt="metal_glass_plates" src="https://github.com/user-attachments/assets/4040962f-2807-4a42-8cca-ed328a94e5da" />
+</p>
+
+---
+### Grass Desert
+_Time: 41.2385 s_
+<p align="center">
+<img alt="spheres_dof" src="https://github.com/user-attachments/assets/65f0c527-3749-43cd-9cd0-cd05e5b65a62" />
+</p>
+
+---
+
+[WINE GLASS]
+
+[CORNELLBOX_BOXES_DYNAMIC]
