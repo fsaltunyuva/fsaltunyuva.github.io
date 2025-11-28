@@ -16,7 +16,7 @@ Hello again, I will continue my ray tracing adventure with Part 3, focusing on i
 Before I begin, I should mention that this blog and project are part of the [Advanced Ray Tracing](https://catalog.metu.edu.tr/course.php?prog=571&course_code=5710795) course given by my professor Ahmet Oğuz Akyüz, at Middle East Technical University.
 
 ### Bugs on Part 2 
-To start with the chinese dragon model, as I mentioned in my previous post, the problem was the very small coordinates of the model. Therefore, I thought that multisampling would help. However, after implementing multisampling (and trying 900 samples) and testing with different intersection test epsilon values, I could not see any difference other than sharper edges. I will continue to investigate this issue in the future using larger samples or different techniques. This is the difference with 900 samples and 1e-14 intersection test epsilon (new render has green outline):
+To start with the chinese dragon model, as I mentioned in my previous post, the problem was the very small coordinates of the model. Therefore, I thought that multisampling would help. However, after implementing multisampling (and trying 900 samples) and testing with different intersection test epsilon values, I could not see any difference other than sharper edges. I will continue to investigate this issue in the future using larger samples or different techniques. This is the difference with 900 samples and 1e-14 (larger values of intersection epsilon also gave the same result) intersection test epsilon (new render has green outline):
 
 ![chinese_Dragon_bug_gif](https://github.com/user-attachments/assets/42fca045-31aa-40e7-bac8-592a82286d22)
     
