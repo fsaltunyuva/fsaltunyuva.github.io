@@ -1,3 +1,10 @@
+---
+layout: post
+title: "Ray Tracing Adventure Part 4 (Homework 4)"
+date: 2025-12-15
+categories: [ray-tracing, graphics, adventure]
+---
+
 | Scene                 | Time (seconds) |
 | --------------------- | -------- |
 | brickwall_with_normalmap                 | 1.60214  |
@@ -34,3 +41,193 @@
 *Used CPU: AMD Ryzen 5 5600X 6-Core Processor (3.70 GHz)*
 
 **Used CPU: AMD Ryzen 5 7640HS 6-Core Processor (4.30 GHz)*
+
+---
+## dragon_new
+This render took nearly 4 hours, and when I was losing my faith, my ray tracer finally won its battle with 3.686.400 pixels :). So I wanted to place this render at the top of all other renders.
+_Time: 14394.7 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+
+### tunnel_of_doom
+<video width="100%" controls autoplay muted loop playsinline>
+  <source src="{{ site.baseurl }}/videos/tunnelofdoom.mp4" type="video/mp4">
+</video>
+
+---
+### brickwall_with_normalmap
+_Time: 1.60214 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### bump_mapping_transformed
+_Time: 3.24855 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### cube_cushion
+_Time: 1.53794 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### cube_perlin
+_Time: 1.47713 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### cube_perlin_bump
+_Time: 1.56417 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### cube_wall
+_Time: 1.57439 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### cube_wall_normal
+_Time: 1.566830 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### cube_waves
+_Time: 1.63458 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### ellipsoids_texture
+_Time: 2.92964 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### galactica_dynamic
+_Time: 449.681 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### galactica_static
+_Time: 5.75577 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### killeroo_bump_walls
+_Time: 26.6139 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### plane_bilinear
+_Time: 1.09835 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### plane_nearest
+_Time: 1.13796 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### sphere_nearest_bilinear
+_Time: 2.16499 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### sphere_nobump_bump
+_Time: 1.9995 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### sphere_nobump_justbump
+_Time: 1.94817 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### sphere_normal
+_Time: 117.432 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### sphere_perlin
+_Time: 2.4421 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### sphere_perlin_bump
+_Time: 2.55343 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### sphere_perlin_scale
+_Time: 2.40968 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### wood_box
+_Time: 1.58755 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### wood_box_all
+_Time: 1.60994 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### wood_box_no_specular
+_Time: 1.5577 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
+
+---
+### VeachAjar
+_Time: 174.211 s_
+<p align="center">
+<img alt="cornellbox_area" src="https://github.com/user-attachments/assets/98880e23-565a-4efa-91f2-25c49d33ce7e" />
+</p>
