@@ -47,7 +47,7 @@ categories: [ray-tracing, graphics, adventure]
 This render took nearly 4 hours, and when I was losing my faith, my ray tracer finally won its battle with 3.686.400 pixels :). So I wanted to place this render at the top of all other renders.
 _Time: 14394.7 s_
 <p align="center">
-<img alt="dragon_new" src="https://github.com/fsaltunyuva/fsaltunyuva.github.io/blob/main/images/2025-12-15-Ray-Tracing-Adventure/dragon_new.png" />
+<img alt="dragon_new" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/dragon_new.png" />
 </p>
 
 ---
