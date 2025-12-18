@@ -24,7 +24,6 @@ else if (material.type == "mirror")
 ```
 ![car reflectance GIF](https://github.com/user-attachments/assets/9b708cb1-33fa-4f82-9d08-5cbaed8501d6)
 
-[belki beers law]
 
 ### Texture Mapping
 Texture mapping is a fundamental technique in computer graphics used to add surface detail to 3D models. Instead of assigning a single flat color to an object, we map a 2D image (or a procedural pattern) onto the 3D surface using UV coordinates. This allows us to simulate complex materials like wood, stone, or earth without increasing the geometric complexity of the mesh. This technique is widely used in video games because it give good looking results without requiring high processing power by keeping the geometry simple even though the textures can be very detailed.
@@ -36,14 +35,12 @@ Also there are different types of texture maps that serve various purposes, Norm
 <p align="center">
     <img alt="earth normal map" src="https://github.com/user-attachments/assets/396af046-01bc-47fc-8697-1108f5d12936" />
     <br>
-    <em>Normal Map Example from Homework Inputs<em>
-</p>
-
-<p align="center">
+    <em>Normal Map Example from Homework Inputs</em>
+    <br>
 <img alt="woodboxdiffuse" src="https://github.com/user-attachments/assets/b1d07a3e-88c3-4d3f-b9e5-04bb9aa2604d" />
 <img alt="woodboxspecular" src="https://github.com/user-attachments/assets/8dca5f24-8fb4-4fb9-a421-657ca8877ddf" />
     <br>
-    <em>Diffuse and Specular Map Examples from Homework Inputs<em>
+    <em>Diffuse and Specular Map Examples from Homework Inputs</em>
 </p>
 
 We map textures using UV coordinates, which are 2D coordinates that correspond to points on the texture image. The U coordinate typically runs horizontally across the texture, while the V coordinate runs vertically. These coordinates are normalized between 0 and 1, and they are assigned to each vertex of the 3D model. During rendering, the UV coordinates are interpolated across the surface of the polygon to determine which part of the texture image corresponds to each pixel on the screen.
@@ -53,7 +50,7 @@ But choosing which texel (texture element) to sample is crucial for quality. Man
 <p align="center">
     <img alt="unityfiltering" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
     <br>
-    <em>Unity Filtering Options<em>
+    <em>Unity Filtering Options</em>
 </p>
 
 There are several sampling techniques, but I focused on two primary methods: Nearest Neighbor and Bilinear Interpolation.
@@ -96,7 +93,7 @@ When I run this, I see a render like this, and I thought that it was the same as
 <p align="center">
     <img alt="bugged_cube_wall_normal" src="[https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac](https://github.com/user-attachments/assets/26133ec9-f950-4322-9ab9-05714ea01d5a)" />
     <br>
-    <em>Bugged Cube Wall Normal<em>
+    <em>Bugged Cube Wall Normal</em>
 </p>
 
 Then, after some time, I also wanted to test my results with a comparison tool, and I found out that my implementation was slightly off.
