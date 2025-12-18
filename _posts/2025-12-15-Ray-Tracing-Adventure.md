@@ -219,6 +219,32 @@ for (int k = 0; k < K; ++k) {
 }
 ```
 
+### Normalizer
+
+There is also a field named "Normalizer" in input files for some textures. I interpreted this as a divisor for the standard 8-bit color range, applying a scaling factor of 255.0f / Normalizer.
+
+```cpp
+if (tm->normalizer != 255.0f && tm->normalizer > 0.0f) {
+    float scaleFactor = 255.0f / tm->normalizer;
+    texColor = texColor.scale(scaleFactor);
+}
+```
+
+But after trying this on ellipsoids_texture scene, I realized that something is wrong. Also, at this time, I was trying to figure out why the painting on the wall is completely white in the veachajar scene.
+
+[veachajar wall bugged image]
+
+[ellipsoids_texture normalizer bugged image]
+
+When I checked the Normalizer value in the ellipsoids_texture scene, it was set to 1.0f, which means no scaling should be applied. However, I mistakenly applied the scaling factor regardless of the Normalizer value, thus multiplying the texture colors by 255.0f, leading to completely white colors. So I also checked for the 1f value and skipped scaling in that case, which fixed the problem.
+
+```cpp
+if (tm->normalizer > 0.0f && tm->normalizer != 255.0f && tm->normalizer != 1.0f) {
+    float scaleFactor = 255.0f / tm->normalizer;
+    texColor = texColor.scale(scaleFactor);
+}
+```
+
 ### Outputs and Closing Thoughts
 Even though this part was including straightforward implementations of well-known techniques, testing the features and debugging them took a lot of time because wrong texture mapping results cannot be easily diagnosed by human eyes.
 
