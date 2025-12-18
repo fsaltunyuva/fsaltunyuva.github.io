@@ -33,15 +33,28 @@ There are two main types of texture mapping I implemented: Image Textures and Pr
 
 Also there are different types of texture maps that serve various purposes, Normal Maps and Bump Maps modify surface normals to simulate detail, while Diffuse and Specular Maps define how light interacts with the surface. These maps usually looks like this:
 
-[eart and eartnormalmap image]
+<p align="center">
+    <img alt="earth normal map" src="https://github.com/user-attachments/assets/396af046-01bc-47fc-8697-1108f5d12936" />
+    <br>
+    <em>Normal Map Example from Homework Inputs<em>
+</p>
 
-[woodbox diffuse and specular map image]
+<p align="center">
+<img alt="woodboxdiffuse" src="https://github.com/user-attachments/assets/b1d07a3e-88c3-4d3f-b9e5-04bb9aa2604d" />
+<img alt="woodboxspecular" src="https://github.com/user-attachments/assets/8dca5f24-8fb4-4fb9-a421-657ca8877ddf" />
+    <br>
+    <em>Diffuse and Specular Map Examples from Homework Inputs<em>
+</p>
 
 We map textures using UV coordinates, which are 2D coordinates that correspond to points on the texture image. The U coordinate typically runs horizontally across the texture, while the V coordinate runs vertically. These coordinates are normalized between 0 and 1, and they are assigned to each vertex of the 3D model. During rendering, the UV coordinates are interpolated across the surface of the polygon to determine which part of the texture image corresponds to each pixel on the screen.
 
 But choosing which texel (texture element) to sample is crucial for quality. Many games or game engines ask the user for different sampling methods to avoid artifacts like aliasing or blurriness. For example in Unity, you can choose which method to use for texture filtering.
 
-[Unity Texture Filtering Options Image]
+<p align="center">
+    <img alt="unityfiltering" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <br>
+    <em>Unity Filtering Options<em>
+</p>
 
 There are several sampling techniques, but I focused on two primary methods: Nearest Neighbor and Bilinear Interpolation.
 
@@ -78,19 +91,21 @@ Vec3 Image::sampleNearest(const Vec2& uv) const {
 }
 ```
 
-When I run this, I see a render like this and I thought that it is the same as expected result.
+When I run this, I see a render like this, and I thought that it was the same as the expected result at first glance.
 
-[Image.cpp samplenearest problem fix commit, bugged image]
+<p align="center">
+    <img alt="bugged_cube_wall_normal" src="[https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac](https://github.com/user-attachments/assets/26133ec9-f950-4322-9ab9-05714ea01d5a)" />
+    <br>
+    <em>Bugged Cube Wall Normal<em>
+</p>
 
-Then after some time, I also wanted to test my results with a comparing tool, and I found out that my implementation was slightly off.
+Then, after some time, I also wanted to test my results with a comparison tool, and I found out that my implementation was slightly off.
 
-[Image.cpp samplenearest problem fix commit, original image]
+![cube wall difference GIF](![Kayt2025-12-18173432-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/8b301018-f26d-4c47-b04f-2f8800bba164)
 
-Upon closer inspection, I realized the culprit was a standard convention I had blindly adopted: ```v = 1.0f - v;```.
+Upon closer inspection, I realized that the problem was a simple assumption I made about where the "starting point" of the image was. I assumed that the texture coordinates (0,0) should start at the top-left corner of the image. To match this assumption, I added the line ```v = 1.0f - v;``` to flip the vertical coordinate upside down.
 
-The problem was a simple assumption I made about where the "starting point" of the image was. I assumed that the texture coordinates (0,0) should start at the top-left corner of the image. To match this assumption, I added the line v = 1.0f - v; to flip the vertical coordinate upside down.
-
-It turned out my assumption was wrong. The input data was already set up correctly, so by flipping the V coordinate, I was actually breaking the alignment by inverting it unnecessarily. So I removed that line, and got the correct results.
+It turned out my assumption was wrong. The input data was already set up correctly, so by flipping the V coordinate, I was actually breaking the alignment by inverting it unnecessarily. So I removed that line and got the correct results.
 
 Even though this method is simple to implement and solves the problem, for image textures, simply picking the nearest pixel can result in "blocky" artifacts when the camera is close to the surface.
 
@@ -98,7 +113,7 @@ Even though this method is simple to implement and solves the problem, for image
 
 ### Bilinear Interpolation
 
-To solve this, we can use Bilinear Interpolation. In this method, instead of taking the single nearest texel, we sample the four surrounding texels and interpolated their colors based on the exact UV position.
+To solve this, we can use Bilinear Interpolation. In this method, instead of taking the single nearest texel, we sample the four surrounding texels and interpolate their colors based on the exact UV position.
 
 [https://www.gamedevelopment.blog/wp-content/uploads/2017/11/nearest-vs-linear-texture-filter.png]
 
