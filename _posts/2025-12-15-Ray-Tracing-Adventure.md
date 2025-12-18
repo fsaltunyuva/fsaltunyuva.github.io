@@ -22,8 +22,7 @@ As I mentioned in previous sections, my renders were showing excessive reflectio
 // else if (material.mirrorReflectance.x > 0 || material.mirrorReflectance.y > 0 || material.mirrorReflectance.z > 0)
 else if (material.type == "mirror")
 ```
-
-[car reflectance fix.gif]
+![car reflectance GIF](https://github.com/user-attachments/assets/9b708cb1-33fa-4f82-9d08-5cbaed8501d6)
 
 [belki beers law]
 
