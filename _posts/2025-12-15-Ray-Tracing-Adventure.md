@@ -253,7 +253,10 @@ Therefore I used digital tools a lot for debugging, such as [Diffchecker](https:
 
 Sphere inputs was not including bump factor value, so I tried different values to see which one is giving the expected results and used 10 as the bump factor for those scenes. Also, in veachajar scene, I got a PLY read error while importing the models/Mesh015_fixed.ply file, but when I used the original models/Mesh015.ply file it worked fine, The [happly](https://github.com/nmwsharp/happly) library was giving an error about unsigned int usage in the fixed file, so I just used the original file.
 
-Other than these, I get somewhat different result in killeroo_bump_walls scene, I could not figure out the exact reason, but I thought it might be related to bump factor but even different bump factor values did not result in an exact match with expected output, I will investigate this issue further in the next parts. Here are my final renders and their render times:
+Other than these, I get somewhat different result in killeroo_bump_walls scene, I could not figure out the exact reason, but I thought it might be related to bump factor but even different bump factor values did not result in an exact match with expected output, I will investigate this issue further in the next parts. 
+
+
+As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Ramazan Tokay for contributions to the 3D models. Here are my final renders and their render times:
 
 | Scene                 | Time (seconds) |
 | --------------------- | -------- |
