@@ -23,9 +23,7 @@ As I mentioned in previous sections, my renders were showing excessive reflectio
 else if (material.type == "mirror")
 ```
 
-
-![car reflectance_GIF](https://github.com/user-attachments/assets/9b708cb1-33fa-4f82-9d08-5cbaed8501d6)
-
+![car reflectance_GIF](https://github.com/user-attachments/assets/ceeeb7a8-6cf6-49e7-b470-2580145f02d3)
 
 ### Texture Mapping
 Texture mapping is a fundamental technique in computer graphics used to add surface detail to 3D models. Instead of assigning a single flat color to an object, we map a 2D image (or a procedural pattern) onto the 3D surface using UV coordinates. This allows us to simulate complex materials like wood, stone, or earth without increasing the geometric complexity of the mesh. This technique is widely used in video games because it gives good looking results without requiring high processing power by keeping the geometry simple, even though the textures can be very detailed.
