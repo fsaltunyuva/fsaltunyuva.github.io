@@ -319,7 +319,7 @@ Other than these, I get somewhat different results in killeroo_bump_walls scene.
 Before wrapping up this part, I would like to share a render that genuinely made me laugh. At that point, I had forgotten to apply the vertex and texture offsets and hadn’t fixed the reflectance bug yet, so this is what I ended up with while testing the galactica_static scene:
 
 <p align="center">
-<img alt="galactica_dynamic_bugged" src="placeholder_for_image" />
+<img alt="galactica_static_bugged" src="https://github.com/user-attachments/assets/7da43c07-7437-47ad-816f-093b2df30ea8" />
 </p>
 
 As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Ramazan Tokay for contributions to the 3D models. Here are my final renders and their render times:
