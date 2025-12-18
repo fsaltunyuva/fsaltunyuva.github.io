@@ -26,11 +26,11 @@ else if (material.type == "mirror")
 
 
 ### Texture Mapping
-Texture mapping is a fundamental technique in computer graphics used to add surface detail to 3D models. Instead of assigning a single flat color to an object, we map a 2D image (or a procedural pattern) onto the 3D surface using UV coordinates. This allows us to simulate complex materials like wood, stone, or earth without increasing the geometric complexity of the mesh. This technique is widely used in video games because it give good looking results without requiring high processing power by keeping the geometry simple even though the textures can be very detailed.
+Texture mapping is a fundamental technique in computer graphics used to add surface detail to 3D models. Instead of assigning a single flat color to an object, we map a 2D image (or a procedural pattern) onto the 3D surface using UV coordinates. This allows us to simulate complex materials like wood, stone, or earth without increasing the geometric complexity of the mesh. This technique is widely used in video games because it gives good looking results without requiring high processing power by keeping the geometry simple, even though the textures can be very detailed.
 
-There are two main types of texture mapping I implemented: Image Textures and Procedural Textures. Image textures use images like PNG to define surface colors, while procedural textures generate patterns algorithmically (like Perlin Noise for some patterns as in sphere_perlin_bump render).
+There are two main types of texture mapping I implemented: Image Textures and Procedural Textures. Image textures use images like PNG to define surface colors, while procedural textures generate patterns algorithmically (like Perlin Noise for some patterns, as in sphere_perlin_bump render).
 
-Also there are different types of texture maps that serve various purposes, Normal Maps and Bump Maps modify surface normals to simulate detail, while Diffuse and Specular Maps define how light interacts with the surface. These maps usually looks like this:
+Also, there are different types of texture maps that serve various purposes. Normal Maps and Bump Maps modify surface normals to simulate detail, while Diffuse and Specular Maps define how light interacts with the surface. These maps usually look like this:
 
 <p align="center">
     <img alt="earth normal map" src="https://github.com/user-attachments/assets/396af046-01bc-47fc-8697-1108f5d12936" />
@@ -45,7 +45,7 @@ Also there are different types of texture maps that serve various purposes, Norm
 
 We map textures using UV coordinates, which are 2D coordinates that correspond to points on the texture image. The U coordinate typically runs horizontally across the texture, while the V coordinate runs vertically. These coordinates are normalized between 0 and 1, and they are assigned to each vertex of the 3D model. During rendering, the UV coordinates are interpolated across the surface of the polygon to determine which part of the texture image corresponds to each pixel on the screen.
 
-But choosing which texel (texture element) to sample is crucial for quality. Many games or game engines ask the user for different sampling methods to avoid artifacts like aliasing or blurriness. For example in Unity, you can choose which method to use for texture filtering.
+But choosing which texel (texture element) to sample is crucial for quality. Many games or game engines ask the user for different sampling methods to avoid artifacts like aliasing or blurriness. For example, in Unity, you can choose which method to use for texture filtering.
 
 <p align="center">
     <img alt="unityfiltering" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
@@ -91,14 +91,14 @@ Vec3 Image::sampleNearest(const Vec2& uv) const {
 When I run this, I see a render like this, and I thought that it was the same as the expected result at first glance.
 
 <p align="center">
-    <img alt="bugged_cube_wall_normal" src="[https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac](https://github.com/user-attachments/assets/26133ec9-f950-4322-9ab9-05714ea01d5a)" />
+    <img alt="bugged_cube_wall_normal" src="https://github.com/user-attachments/assets/26133ec9-f950-4322-9ab9-05714ea01d5a" />
     <br>
     <em>Bugged Cube Wall Normal</em>
 </p>
 
 Then, after some time, I also wanted to test my results with a comparison tool, and I found out that my implementation was slightly off.
 
-![cube wall difference GIF](![Kayt2025-12-18173432-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/8b301018-f26d-4c47-b04f-2f8800bba164)
+![cube wall difference GIF](https://github.com/user-attachments/assets/8b301018-f26d-4c47-b04f-2f8800bba164)
 
 Upon closer inspection, I realized that the problem was a simple assumption I made about where the "starting point" of the image was. I assumed that the texture coordinates (0,0) should start at the top-left corner of the image. To match this assumption, I added the line ```v = 1.0f - v;``` to flip the vertical coordinate upside down.
 
@@ -106,13 +106,15 @@ It turned out my assumption was wrong. The input data was already set up correct
 
 Even though this method is simple to implement and solves the problem, for image textures, simply picking the nearest pixel can result in "blocky" artifacts when the camera is close to the surface.
 
-[Nearest Neighbor Example Image]
-
 ### Bilinear Interpolation
 
 To solve this, we can use Bilinear Interpolation. In this method, instead of taking the single nearest texel, we sample the four surrounding texels and interpolate their colors based on the exact UV position.
 
-[https://www.gamedevelopment.blog/wp-content/uploads/2017/11/nearest-vs-linear-texture-filter.png]
+<p align="center">
+    <img alt="nearest-vs-linear-texture-filter" src="https://www.gamedevelopment.blog/wp-content/uploads/2017/11/nearest-vs-linear-texture-filter.png" />
+    <br>
+    <em>Nearest Neighbor - Bilinear Comparison from https://www.gamedevelopment.blog/texture-filter</em>
+</p>
 
 Here is how I calculated the weighted average of the four neighbors:
 
@@ -133,7 +135,11 @@ return top.scale(1.0f - dy).add(bot.scale(dy));
 
 We can also see the difference in my renders between Nearest Neighbor and Bilinear Interpolation in the `plane_nearest` and `plane_bilinear` renders.
 
-[Bilinear Interpolation Example Image]
+<p align="center">
+    <img alt="nearest-vs-linear" src="https://github.com/user-attachments/assets/638112fe-7b54-462c-b0ca-e4b602059d09" />
+    <br>
+    <em>plane_nearest vs plane_bilinear</em>
+</p>
 
 There are more advanced techniques like Mipmapping and Anisotropic Filtering, but for this project, Nearest Neighbor and Bilinear Interpolation were sufficient for me to achieve good quality textures.
 
@@ -159,7 +165,7 @@ Vec3 nTS = Vec3(-displacement_u, -displacement_v, 1.0f).normalize();
 
 In the code snippet above, you might have noticed the bumpFactor variable. This is a crucial parameter because the raw intensity values from a texture image (0 to 255) do not have an inherent physical height. Without a scaling factor, the calculated gradients might be too steep or too shallow for the object's scale. While a high value creates deep grooves and sharp ridges, making the surface look very rough, a low value creates subtle imperfections, like the grain on wood or slight scratches on metal.
 
-Not all scenes included bump factor value, so I used 0.01f as a default value for those scenes. Here you can see some different bump factor values and their effects on the final render.
+Not all scenes included a bump factor value, so I used 0.01f as a default value for those scenes. Here you can see some different bump factor values and their effects on the final render.
 
 [Bump Factor Comparison Image]
 
@@ -199,9 +205,11 @@ By modifying kd and ks before the lighting calculation, the rest of the ray trac
 Finally, I implemented procedural generation using the most popular procedural texture technique,
 Perlin Noise. Unlike images, procedural textures are calculated on the fly using mathematical functions. Perlin Noise is a gradient noise function that produces smooth, natural-looking patterns. It is widely used for simulating organic textures like clouds, marble, wood grain, and terrain. Because of the easiness and amazing results of Perlin Noise, Ken Perlin even won an Academy Award for Technical Achievement for his invention in 1997.
 
-[Perlin Noise Örneği]
+<p align="center">
+    <img alt="perlin noise" src="https://github.com/user-attachments/assets/9e353128-c745-4c2d-9228-aa0ad30cdd8c" />
+</p>
 
-[The video "What is Perlin Noise?" by Acerola](https://www.youtube.com/watch?v=DxUY42r_6Cg) about the Perlin Noise was very fun and informative to watch, it helped me to understand the concept better and, I strongly recommend it to anyone interested.
+[The video "What is Perlin Noise?" by Acerola](https://www.youtube.com/watch?v=DxUY42r_6Cg) about the Perlin Noise was very fun and informative to watch. It helped me to understand the concept better. I strongly recommend it to anyone interested.
 
 Perlin Noise works by defining a grid of random gradient vectors and interpolating between them based on the input coordinates. This creates a continuous noise function that can be sampled at any point in 3D space. 
 
@@ -232,7 +240,7 @@ for (int k = 0; k < K; ++k) {
 
 ### Normalizer
 
-There is also a field named "Normalizer" in input files for some textures. I interpreted this as a divisor for the standard 8-bit color range, applying a scaling factor of 255.0f / Normalizer.
+There is also a field named "Normalizer" in the input files for some textures. I interpreted this as a divisor for the standard 8-bit color range, applying a scaling factor of 255.0f / Normalizer.
 
 ```cpp
 if (tm->normalizer != 255.0f && tm->normalizer > 0.0f) {
@@ -243,9 +251,11 @@ if (tm->normalizer != 255.0f && tm->normalizer > 0.0f) {
 
 But after trying this on ellipsoids_texture scene, I realized that something is wrong. Also, at this time, I was trying to figure out why the painting on the wall is completely white in the veachajar scene.
 
-[veachajar wall bugged image]
+<p align="center">
+    <img alt="VeachAjar-bugged" src="[https://github.com/user-attachments/assets/638112fe-7b54-462c-b0ca-e4b602059d09](https://github.com/user-attachments/assets/9e3f5637-866e-458b-9093-01c684af163e)" />
+        <img alt="ellipsoids_texture-bugged" src="[https://github.com/user-attachments/assets/638112fe-7b54-462c-b0ca-e4b602059d09](https://github.com/user-attachments/assets/5a3d07be-89a0-4ec7-bf66-110f43c4a988)" />
+</p>
 
-[ellipsoids_texture normalizer bugged image]
 
 When I checked the Normalizer value in the ellipsoids_texture scene, it was set to 1.0f, which means no scaling should be applied. However, I mistakenly applied the scaling factor regardless of the Normalizer value, thus multiplying the texture colors by 255.0f, leading to completely white colors. So I also checked for the 1f value and skipped scaling in that case, which fixed the problem.
 
@@ -261,11 +271,11 @@ Even though this part was including straightforward implementations of well-know
 
 [Wood box wrong texture mapping example]
 
-Therefore I used digital tools a lot for debugging, such as [Diffchecker](https://www.diffchecker.com/image-compare/).
+Therefore, I used digital tools a lot for debugging, such as [Diffchecker](https://www.diffchecker.com/image-compare/).
 
-Sphere inputs was not including bump factor value, so I tried different values to see which one is giving the expected results and used 10 as the bump factor for those scenes. Also, in veachajar scene, I got a PLY read error while importing the models/Mesh015_fixed.ply file, but when I used the original models/Mesh015.ply file it worked fine, The [happly](https://github.com/nmwsharp/happly) library was giving an error about unsigned int usage in the fixed file, so I just used the original file.
+Sphere inputs were not includingthe  bump factor value, so I tried different values to see which one is giving the expected results and used 10 as the bump factor for those scenes. Also, in veachajar scene, I got a PLY read error while importing the models/Mesh015_fixed.ply file, but when I used the original models/Mesh015.ply file it worked fine, The [happly](https://github.com/nmwsharp/happly) library was giving an error about unsigned int usage in the fixed file, so I just used the original file.
 
-Other than these, I get somewhat different result in killeroo_bump_walls scene, I could not figure out the exact reason, but I thought it might be related to bump factor but even different bump factor values did not result in an exact match with expected output, I will investigate this issue further in the next parts. 
+Other than these, I get somewhat different results in killeroo_bump_walls scene. I could not figure out the exact reason, but I thought it might be related tothe  bump factor but even different bump factor values did not result in an exact match with the expected output. I will investigate this issue further in the next parts. 
 
 
 As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Ramazan Tokay for contributions to the 3D models. Here are my final renders and their render times:
