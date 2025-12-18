@@ -22,6 +22,8 @@ As I mentioned in previous sections, my renders were showing excessive reflectio
 // else if (material.mirrorReflectance.x > 0 || material.mirrorReflectance.y > 0 || material.mirrorReflectance.z > 0)
 else if (material.type == "mirror")
 ```
+
+
 ![car reflectance GIF](https://github.com/user-attachments/assets/9b708cb1-33fa-4f82-9d08-5cbaed8501d6)
 
 
@@ -37,8 +39,7 @@ Also, there are different types of texture maps that serve various purposes. Nor
     <br>
     <em>Normal Map Example from Homework Inputs</em>
     <br>
-<img alt="woodboxdiffuse" src="https://github.com/user-attachments/assets/b1d07a3e-88c3-4d3f-b9e5-04bb9aa2604d" />
-<img alt="woodboxspecular" src="https://github.com/user-attachments/assets/8dca5f24-8fb4-4fb9-a421-657ca8877ddf" />
+<img alt="woodboxdiffusespecular" src="https://github.com/user-attachments/assets/9a010af4-32e2-40bb-bab6-6d61fba77d52" />
     <br>
     <em>Diffuse and Specular Map Examples from Homework Inputs</em>
 </p>
@@ -113,7 +114,7 @@ To solve this, we can use Bilinear Interpolation. In this method, instead of tak
 <p align="center">
     <img alt="nearest-vs-linear-texture-filter" src="https://www.gamedevelopment.blog/wp-content/uploads/2017/11/nearest-vs-linear-texture-filter.png" />
     <br>
-    <em>Nearest Neighbor - Bilinear Comparison from https://www.gamedevelopment.blog/texture-filter</em>
+    <em>Nearest Neighbor - Bilinear Comparison from gamedevelopment.blog/texture-filter</em>
 </p>
 
 Here is how I calculated the weighted average of the four neighbors:
@@ -167,7 +168,11 @@ In the code snippet above, you might have noticed the bumpFactor variable. This 
 
 Not all scenes included a bump factor value, so I used 0.01f as a default value for those scenes. Here you can see some different bump factor values and their effects on the final render.
 
-[Bump Factor Comparison Image]
+<p align="center">
+    <img alt="bumpfactorcomparison" src="https://github.com/user-attachments/assets/cd98e5e9-d143-4e5a-a047-1690d0816c3d" />
+    <br>
+    <em>0.01, 1, and 10 Bump Factors from Left to Right</em>
+</p>
 
 ### Diffuse & Specular Reflectance Mapping
 While Bump Mapping handles the geometry's "feel," Diffuse Mapping handles its "look." This is the most common form of texturing, where an image is mapped onto the 3D surface to define its color.
@@ -252,8 +257,8 @@ if (tm->normalizer != 255.0f && tm->normalizer > 0.0f) {
 But after trying this on ellipsoids_texture scene, I realized that something is wrong. Also, at this time, I was trying to figure out why the painting on the wall is completely white in the veachajar scene.
 
 <p align="center">
-    <img alt="VeachAjar-bugged" src="[https://github.com/user-attachments/assets/638112fe-7b54-462c-b0ca-e4b602059d09](https://github.com/user-attachments/assets/9e3f5637-866e-458b-9093-01c684af163e)" />
-        <img alt="ellipsoids_texture-bugged" src="[https://github.com/user-attachments/assets/638112fe-7b54-462c-b0ca-e4b602059d09](https://github.com/user-attachments/assets/5a3d07be-89a0-4ec7-bf66-110f43c4a988)" />
+    <img alt="VeachAjar-bugged" src="https://github.com/user-attachments/assets/9e3f5637-866e-458b-9093-01c684af163e" />
+    <img alt="ellipsoids_texture-bugged" src="https://github.com/user-attachments/assets/5a3d07be-89a0-4ec7-bf66-110f43c4a988" />
 </p>
 
 
