@@ -316,6 +316,11 @@ Sphere inputs did not include the bump factor value, so I tried different values
 
 Other than these, I get somewhat different results in killeroo_bump_walls scene. I could not figure out the exact reason, but I thought it might be related to the bump factor but even different bump factor values did not result in an exact match with the expected output. I will investigate this issue further in the next parts. 
 
+Before wrapping up this part, I would like to share a render that genuinely made me laugh. At that point, I had forgotten to apply the vertex and texture offsets and hadn’t fixed the reflectance bug yet, so this is what I ended up with while testing the galactica_static scene:
+
+<p align="center">
+<img alt="galactica_dynamic_bugged" src="placeholder_for_image" />
+</p>
 
 As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Ramazan Tokay for contributions to the 3D models. Here are my final renders and their render times:
 
