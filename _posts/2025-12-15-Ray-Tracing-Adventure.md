@@ -24,7 +24,7 @@ else if (material.type == "mirror")
 ```
 
 
-![car reflectance GIF](https://github.com/user-attachments/assets/9b708cb1-33fa-4f82-9d08-5cbaed8501d6)
+![car reflectance_GIF](https://github.com/user-attachments/assets/9b708cb1-33fa-4f82-9d08-5cbaed8501d6)
 
 
 ### Texture Mapping
@@ -147,8 +147,6 @@ There are more advanced techniques like Mipmapping and Anisotropic Filtering, bu
 ### Bump Mapping
 While texture mapping changes the color, Bump Mapping changes how light interacts with the surface to simulate depth and wrinkles. It works by perturbing the surface normal based on the intensity (or height) of a texture map. This creates the illusion of geometric detail, like the ridges on a spaceship or the grout between tiles, without actually moving any vertices.
 
-[Bump Mapping Örneği]
-
 To implement this, I had to calculate the gradient (slope) of the texture at the hit point. Crucially, this requires taking the derivative of the texture height in the U and V directions. By moving a tiny amount (du, dv) in texture space, I calculated the new normal relative to the surface's tangent space (TBN):
 
 ```cpp
@@ -211,8 +209,9 @@ Finally, I implemented procedural generation using the most popular procedural t
 Perlin Noise. Unlike images, procedural textures are calculated on the fly using mathematical functions. Perlin Noise is a gradient noise function that produces smooth, natural-looking patterns. It is widely used for simulating organic textures like clouds, marble, wood grain, and terrain. Because of the easiness and amazing results of Perlin Noise, Ken Perlin even won an Academy Award for Technical Achievement for his invention in 1997.
 
 <p align="center">
-    <img alt="perlin noise" src="https://github.com/user-attachments/assets/9e353128-c745-4c2d-9228-aa0ad30cdd8c" />
+    <img width="300" height="300" alt="perlin noise" src="https://github.com/user-attachments/assets/9e353128-c745-4c2d-9228-aa0ad30cdd8c" />
 </p>
+
 
 [The video "What is Perlin Noise?" by Acerola](https://www.youtube.com/watch?v=DxUY42r_6Cg) about the Perlin Noise was very fun and informative to watch. It helped me to understand the concept better. I strongly recommend it to anyone interested.
 
@@ -272,9 +271,7 @@ if (tm->normalizer > 0.0f && tm->normalizer != 255.0f && tm->normalizer != 1.0f)
 ```
 
 ### Outputs and Closing Thoughts
-Even though this part was including straightforward implementations of well-known techniques, testing the features and debugging them took a lot of time because wrong texture mapping results cannot be easily diagnosed by human eyes.
-
-[Wood box wrong texture mapping example]
+Even though this part was including straightforward implementations of well-known techniques, testing the features and debugging them took a lot of time because wrong texture mapping results cannot be easily diagnosed by human eyes, as in my bug in the nearest neighbor section.
 
 Therefore, I used digital tools a lot for debugging, such as [Diffchecker](https://www.diffchecker.com/image-compare/).
 
