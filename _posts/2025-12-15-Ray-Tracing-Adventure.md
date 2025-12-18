@@ -109,7 +109,7 @@ Even though this method is simple to implement and solves the problem, for image
 
 ### Bilinear Interpolation
 
-To solve this, we can use Bilinear Interpolation. In this method, instead of taking the single nearest texel, we sample the four surrounding texels and interpolate their colors based on the exact UV position.
+To improve this, we can use Bilinear Interpolation. In this method, instead of taking the single nearest texel, we sample the four surrounding texels and interpolate their colors based on the exact UV position.
 
 <p align="center">
     <img alt="nearest-vs-linear-texture-filter" src="https://www.gamedevelopment.blog/wp-content/uploads/2017/11/nearest-vs-linear-texture-filter.png" />
@@ -204,9 +204,37 @@ else if (tm->decalMode == DecalMode::ReplaceKs) {
 
 By modifying kd and ks before the lighting calculation, the rest of the ray tracer (shadows, light attenuation, etc.) works automatically with these new, detailed material properties.
 
+### Checkerboard Textures
+One of the simplest and most useful procedural textures is the 3D checkerboard. Instead of sampling an image using UV coordinates, we compute the color directly from the hit point position. This gives a pattern that has no texture resolution limit, and it’s especially handy for debugging mapping / transforms (you instantly see stretching or wrong spaces).
+
+My implementation follows the pseudo-code shared with homework.
+
+```cpp
+static Vec3 sampleCheckerboard(const CheckerTextureMap& tm, const Vec3& pos)
+{
+    bool x = ((int)std::floor((pos.x + tm.offset) * tm.scale)) % 2;
+    bool y = ((int)std::floor((pos.y + tm.offset) * tm.scale)) % 2;
+    bool z = ((int)std::floor((pos.z + tm.offset) * tm.scale)) % 2;
+
+    bool xorXY = (x != y);
+    if (xorXY != z) return tm.blackColor;
+    else return tm.whiteColor;
+}
+```
+
+But there is a important detail, if we sample the checkerboard in world space, then moving an object might make the pattern look like it’s “stuck to the world” rather than painted on the object. To make the checkerboard behave like an actual object texture, I transform the hit point into the object’s local space using the inverse model matrix.
+
+```cpp
+// Transform hit point to object local space
+glm::mat4 invM = glm::inverse(info.modelMatrix);
+glm::vec4 pL = invM * glm::vec4(hitPoint.x, hitPoint.y, hitPoint.z, 1.0f);
+posForProc = Vec3(pL.x, pL.y, pL.z); // Use this position for procedural texture sampling
+
+Vec3 texColor = sampleCheckerboard(*tm, posForProc);
+```
+
 ### Perlin Noise
-Finally, I implemented procedural generation using the most popular procedural texture technique,
-Perlin Noise. Unlike images, procedural textures are calculated on the fly using mathematical functions. Perlin Noise is a gradient noise function that produces smooth, natural-looking patterns. It is widely used for simulating organic textures like clouds, marble, wood grain, and terrain. Because of the easiness and amazing results of Perlin Noise, Ken Perlin even won an Academy Award for Technical Achievement for his invention in 1997.
+Finally, I implemented the most popular procedural texture technique, Perlin Noise. Unlike images, procedural textures are calculated on the fly using mathematical functions. Perlin Noise is a gradient noise function that produces smooth, natural-looking patterns. It is widely used for simulating organic textures like clouds, marble, wood grain, and terrain. Because of the easiness and amazing results of Perlin Noise, Ken Perlin even won an Academy Award for Technical Achievement for his invention in 1997.
 
 <p align="center">
     <img width="300" height="300" alt="perlin noise" src="https://github.com/user-attachments/assets/9e353128-c745-4c2d-9228-aa0ad30cdd8c" />
