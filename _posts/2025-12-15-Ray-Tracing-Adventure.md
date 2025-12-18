@@ -160,12 +160,11 @@ hy *= bumpTM->bumpFactor;
 Vec3 nTS(-hx, -hy, 1.0f);
 nTS = nTS.normalize();
 
-// TBN -> world space
 Vec3 nW = T.scale(nTS.x).add(B.scale(nTS.y)).add(N.scale(nTS.z)).normalize();
 hitNormal = (nW.dot(rayDir) > 0.0f) ? nW.scale(-1.0f) : nW;
 ```
 
-In the code snippet above, you might have noticed the bumpFactor variable. This is a crucial parameter because the raw intensity values from a texture image (0 to 255) do not have a physical height. Without a scaling factor, the calculated gradients might be too steep or too shallow for the object's scale. While a high value creates  sharp ridges, making the surface look very rough, a low value creates subtle imperfections, like the grain on wood.
+In the code snippet above, you might have noticed the bumpFactor variable. This is an important parameter because the raw intensity values from a texture image (0 to 255) do not have a physical height. Without a scaling factor, the calculated gradients might be too steep or too shallow for the object's scale. While a high value creates sharp ridges, making the surface look very rough, a low value creates subtle imperfections, like the grain on wood.
 
 Not all scenes included a bump factor value, so I used 0.01f as a default value for those scenes. Here you can see some different bump factor values and their effects on the final render.
 
@@ -313,7 +312,7 @@ Even though this part was including straightforward implementations of well-know
 
 Therefore, I used digital tools a lot for debugging, such as [Diffchecker](https://www.diffchecker.com/image-compare/).
 
-Sphere inputs did not including the bump factor value, so I tried different values to see which one is giving the expected results and used 10 as the bump factor for those scenes. Also, in veachajar scene, I got a PLY read error while importing the models/Mesh015_fixed.ply file, but when I used the original models/Mesh015.ply file it worked fine, The [happly](https://github.com/nmwsharp/happly) library was giving an error about unsigned int usage in the fixed file, so I just used the original file.
+Sphere inputs did not include the bump factor value, so I tried different values to see which one is giving the expected results and used 10 as the bump factor for those scenes. Also, in veachajar scene, I got a PLY read error while importing the models/Mesh015_fixed.ply file, but when I used the original models/Mesh015.ply file, it worked fine. The [happly](https://github.com/nmwsharp/happly) library was giving an error about unsigned int usage in the fixed file, so I just used the original file.
 
 Other than these, I get somewhat different results in killeroo_bump_walls scene. I could not figure out the exact reason, but I thought it might be related to the bump factor but even different bump factor values did not result in an exact match with the expected output. I will investigate this issue further in the next parts. 
 
