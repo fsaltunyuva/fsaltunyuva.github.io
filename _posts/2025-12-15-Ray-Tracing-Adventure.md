@@ -16,7 +16,7 @@ Hello again, I will continue my ray tracing adventure with Part 4, focusing on i
 Before I begin, I should mention that this blog and project are part of the [Advanced Ray Tracing](https://catalog.metu.edu.tr/course.php?prog=571&course_code=5710795) course given by my professor Ahmet Oğuz Akyüz, at Middle East Technical University.
 
 ### Bugs from Previous Parts 
-As I mentioned in previous sections, my renders were showing excessive reflections, making the scene appear more reflective than it actually was. I easily found the source of the problem by referring to a blog post where Professor Oğuz answered. I was applying reflection directly if any coordinate value of the material's mirror reflectance vector was greater than 0, but it turned out that mirror reflectance should only be applied if the material's _type value is 'mirror'. As Oğuz Hoca indicated, checking via _type solved the problem, and the renders were the same as expected.
+As I mentioned in previous sections, my renders were showing excessive reflections, making the scene appear more reflective than it actually was. I easily found the source of the problem by referring to a blog post where Oğuz hoca answered. I was applying reflection directly if any coordinate value of the material's mirror reflectance vector was greater than 0, but it turned out that mirror reflectance should only be applied if the material's _type value is 'mirror'. As Oğuz Hoca indicated, checking via _type solved the problem, and the renders were the same as expected.
 
 ```cpp
 // else if (material.mirrorReflectance.x > 0 || material.mirrorReflectance.y > 0 || material.mirrorReflectance.z > 0)
@@ -118,19 +118,13 @@ To improve this, we can use Bilinear Interpolation. In this method, instead of t
 Here is how I calculated the weighted average of the four neighbors:
 
 ```cpp
-// Calculate weights based on position within the pixel grid
-float dx = x_coord - x0;
-float dy = y_coord - y0;
-
-// ... fetch c00, c10, c01, c11 neighbors ...
-
-// Interpolate along X
+// Bilinear interpolation of four neighboring texels
 Vec3 top = c00.scale(1.0f - dx).add(c10.scale(dx));
 Vec3 bot = c01.scale(1.0f - dx).add(c11.scale(dx));
 
-// Interpolate along Y for the final color
-return top.scale(1.0f - dy).add(bot.scale(dy));
+Vec3 color = top.scale(1.0f - dy).add(bot.scale(dy));
 ```
+Here, c00, c10, c01, and c11 are the four nearest texels, while dx and dy represent the fractional offset inside the pixel cell. Interpolation is first done along the x-axis, then along the y-axis.
 
 We can also see the difference in my renders between Nearest Neighbor and Bilinear Interpolation in the `plane_nearest` and `plane_bilinear` renders.
 
@@ -143,24 +137,35 @@ We can also see the difference in my renders between Nearest Neighbor and Biline
 There are more advanced techniques like Mipmapping and Anisotropic Filtering, but for this project, Nearest Neighbor and Bilinear Interpolation were sufficient for me to achieve good quality textures.
 
 ### Bump Mapping
-While texture mapping changes the color, Bump Mapping changes how light interacts with the surface to simulate depth and wrinkles. It works by perturbing the surface normal based on the intensity (or height) of a texture map. This creates the illusion of geometric detail, like the ridges on a spaceship or the grout between tiles, without actually moving any vertices.
+While texture mapping changes the color, Bump Mapping changes the surface normal used in lighting calculations to simulate depth and wrinkles. It works by perturbing the surface normal based on the intensity (or height) of a texture map. This creates the illusion of geometric detail, like the ridges on a spaceship, without actually moving any vertices.
 
-To implement this, I had to calculate the gradient (slope) of the texture at the hit point. Crucially, this requires taking the derivative of the texture height in the U and V directions. By moving a tiny amount (du, dv) in texture space, I calculated the new normal relative to the surface's tangent space (TBN):
+I sample the height at (u, v) and at two nearby points (u + du, v) and (u, v + dv). Here, du and dv are chosen as one texel step (1/width, 1/height). The differences hx and hy approximate the slope of the height field in U and V directions.
+
+Also, if a normal map (ReplaceNormal) exists, I skip bump mapping to avoid stacking two normal modifications on top of each other.
 
 ```cpp
-// Calculate derivatives (gradients)
-float dH_du = (h_u - h) / du;
-float dH_dv = (h_v - h) / dv;
+// Height from texture (grayscale)
+float du = 1.0f / bumpTM->image->width;
+float dv = 1.0f / bumpTM->image->height;
 
-// Scale by bump factor
-float displacement_u = dH_du * bumpTM->bumpFactor;
-float displacement_v = dH_dv * bumpTM->bumpFactor;
+float h  = H(u, v);
+float hx = H(u + du, v) - h;
+float hy = H(u, v + dv) - h;
 
-// Perturb the normal in Tangent Space
-Vec3 nTS = Vec3(-displacement_u, -displacement_v, 1.0f).normalize();
+// Scale effect
+hx *= bumpTM->bumpFactor;
+hy *= bumpTM->bumpFactor;
+
+// Tangent-space perturbed normal
+Vec3 nTS(-hx, -hy, 1.0f);
+nTS = nTS.normalize();
+
+// TBN -> world space
+Vec3 nW = T.scale(nTS.x).add(B.scale(nTS.y)).add(N.scale(nTS.z)).normalize();
+hitNormal = (nW.dot(rayDir) > 0.0f) ? nW.scale(-1.0f) : nW;
 ```
 
-In the code snippet above, you might have noticed the bumpFactor variable. This is a crucial parameter because the raw intensity values from a texture image (0 to 255) do not have an inherent physical height. Without a scaling factor, the calculated gradients might be too steep or too shallow for the object's scale. While a high value creates deep grooves and sharp ridges, making the surface look very rough, a low value creates subtle imperfections, like the grain on wood or slight scratches on metal.
+In the code snippet above, you might have noticed the bumpFactor variable. This is a crucial parameter because the raw intensity values from a texture image (0 to 255) do not have a physical height. Without a scaling factor, the calculated gradients might be too steep or too shallow for the object's scale. While a high value creates  sharp ridges, making the surface look very rough, a low value creates subtle imperfections, like the grain on wood.
 
 Not all scenes included a bump factor value, so I used 0.01f as a default value for those scenes. Here you can see some different bump factor values and their effects on the final render.
 
@@ -173,39 +178,48 @@ Not all scenes included a bump factor value, so I used 0.01f as a default value 
 ### Diffuse & Specular Reflectance Mapping
 While Bump Mapping handles the geometry's "feel," Diffuse Mapping handles its "look." This is the most common form of texturing, where an image is mapped onto the 3D surface to define its color.
 
-In my implementation, I supported two distinct modes for diffuse textures, controlled by the DecalMode enum: Replace and Blend. In Replace mode, the texture completely overrides the material's base color. This is used when the texture represents the object's skin entirely, like the map of the Earth or a wooden floor. In Blend mode, the texture color is averaged with the material's existing color. This is useful for adding detail to a base material without losing its original hue.
-
-However, realistic materials are rarely uniform in their shininess. A rusty metal plate, for example, is shiny where the metal is exposed but dull where the rust has formed. To simulate this, I implemented Specular Mapping.
-
-A specular map (usually a grayscale image) controls the specular coefficient. Brighter parts of the texture make the surface more reflective to light, while darker parts make it matte.
-
-Here is how I integrated these modes into the shading loop. Before calculating the Phong lighting model, I check the texture mode and update the material coefficients ($k_d$ and $k_s$) dynamically:
+In my shading loop, image textures can modify material reflectance directly. Depending on DecalMode, the sampled texture color is used to replace or blend the diffuse term (kd), replace the specular term (ks), or, in ReplaceAll mode, bypass lighting entirely. I sample the texture using nearest or bilinear filtering and apply the optional normalizer scaling before updating the coefficients.
 
 ```cpp
-// Sample the texture color (using bilinear or nearest)
-Vec3 texColor = tm->image->sample(info.hitUV);
-
-// Apply the Decal Mode logic
-if (tm->decalMode == DecalMode::ReplaceKd) {
-    // Completely replace diffuse color
-    kd = texColor;
-} 
-else if (tm->decalMode == DecalMode::BlendKd) {
-    // Average the texture with the base material color
-    kd = kd.add(texColor).scale(0.5f);
-} 
-else if (tm->decalMode == DecalMode::ReplaceKs) {
-    // Update specular coefficient based on texture intensity
-    ks = texColor;
+Vec3 texColor;
+if (tm->interpolation == InterpolationMode::Bilinear) {
+    texColor = tm->image->sampleBilinear(info.hitUV);
+} else {
+    texColor = tm->image->sampleNearest(info.hitUV);
 }
+
+if (tm->normalizer > 0.0f && tm->normalizer != 255.0f && tm->normalizer != 1.0f) {
+    float scaleFactor = 255.0f / tm->normalizer;
+    texColor = texColor.scale(scaleFactor);
+}
+
+if (tm->decalMode == DecalMode::ReplaceKd) kd = texColor;
+
+else if (tm->decalMode == DecalMode::BlendKd) {
+    // Blend with existing kd
+    kd = kd.add(texColor).scale(0.5f);
+}
+
+if (tm->decalMode == DecalMode::ReplaceKs) ks = texColor;
+
+if (tm->decalMode == DecalMode::ReplaceAll) {
+    doReplaceAll = true;
+    replaceAllColor = texColor;
+}
+
+//...
+
+// Return immediately if ReplaceAll was applied
+if (doReplaceAll)
+    return replaceAllColor.scale(255.0f);
 ```
 
 By modifying kd and ks before the lighting calculation, the rest of the ray tracer (shadows, light attenuation, etc.) works automatically with these new, detailed material properties.
 
 ### Checkerboard Textures
-One of the simplest and most useful procedural textures is the 3D checkerboard. Instead of sampling an image using UV coordinates, we compute the color directly from the hit point position. This gives a pattern that has no texture resolution limit, and it’s especially handy for debugging mapping / transforms (you instantly see stretching or wrong spaces).
+One of the simplest and most useful procedural textures is the 3D checkerboard. Instead of sampling an image using UV coordinates, we compute the color directly from the hit point position. This gives a pattern that has no texture resolution limit, and it’s especially useful for debugging mapping.
 
-My implementation follows the pseudo-code shared with homework.
+My implementation follows the pseudo-code shared with the homework.
 
 ```cpp
 static Vec3 sampleCheckerboard(const CheckerTextureMap& tm, const Vec3& pos)
@@ -220,7 +234,7 @@ static Vec3 sampleCheckerboard(const CheckerTextureMap& tm, const Vec3& pos)
 }
 ```
 
-But there is a important detail, if we sample the checkerboard in world space, then moving an object might make the pattern look like it’s “stuck to the world” rather than painted on the object. To make the checkerboard behave like an actual object texture, I transform the hit point into the object’s local space using the inverse model matrix.
+But there is an important detail, if we sample the checkerboard in world space, then moving an object might make the pattern look like it’s “stuck to the world” rather than painted on the object. To make the checkerboard behave like an actual object texture, I transform the hit point into the object’s local space using the inverse model matrix.
 
 ```cpp
 // Transform hit point to object local space
@@ -245,9 +259,9 @@ Perlin Noise works by defining a grid of random gradient vectors and interpolati
 
 I used an existing implementation of Perlin Noise from [here](https://mrl.nyu.edu/~perlin/noise/) and integrated it into my ray tracer.
 
-In original Perlin Noise, we sum multiple octaves of noise to create fractal patterns. Each octave has a different frequency and amplitude, allowing for both large-scale and fine details.
+In practice, Perlin Noise is often combined across multiple octaves to create fractal patterns. Each octave increases the frequency while decreasing the amplitude, allowing both large scale structure and detail to appear simultaneously.
 
-I implemented support for "Turbulence," which creates marble-like or "snake-like" veins. The key difference here is taking the absolute value of the noise before accumulating it into the sum. This creates sharp creases in the pattern where the value crosses zero.
+I implemented support for turbulence, which is created by taking the absolute value of the noise before accumulation. This folds the noise around zero and produces sharp, marble-like or snake-like veins:
 
 ```cpp
 for (int k = 0; k < K; ++k) {
@@ -255,10 +269,8 @@ for (int k = 0; k < K; ++k) {
     float n = gPerlin.noise(q.x, q.y, q.z); 
 
     if (tm.conversion == NoiseConversion::AbsVal) {
-        // Absolute value for turbulence (snake-like patterns)
         s += amp * std::fabs(n);
     } else {
-        // Standard summation (cloud-like patterns)
         s += amp * n;
     }
     
@@ -301,9 +313,9 @@ Even though this part was including straightforward implementations of well-know
 
 Therefore, I used digital tools a lot for debugging, such as [Diffchecker](https://www.diffchecker.com/image-compare/).
 
-Sphere inputs were not includingthe  bump factor value, so I tried different values to see which one is giving the expected results and used 10 as the bump factor for those scenes. Also, in veachajar scene, I got a PLY read error while importing the models/Mesh015_fixed.ply file, but when I used the original models/Mesh015.ply file it worked fine, The [happly](https://github.com/nmwsharp/happly) library was giving an error about unsigned int usage in the fixed file, so I just used the original file.
+Sphere inputs did not including the bump factor value, so I tried different values to see which one is giving the expected results and used 10 as the bump factor for those scenes. Also, in veachajar scene, I got a PLY read error while importing the models/Mesh015_fixed.ply file, but when I used the original models/Mesh015.ply file it worked fine, The [happly](https://github.com/nmwsharp/happly) library was giving an error about unsigned int usage in the fixed file, so I just used the original file.
 
-Other than these, I get somewhat different results in killeroo_bump_walls scene. I could not figure out the exact reason, but I thought it might be related tothe  bump factor but even different bump factor values did not result in an exact match with the expected output. I will investigate this issue further in the next parts. 
+Other than these, I get somewhat different results in killeroo_bump_walls scene. I could not figure out the exact reason, but I thought it might be related to the bump factor but even different bump factor values did not result in an exact match with the expected output. I will investigate this issue further in the next parts. 
 
 
 As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Ramazan Tokay for contributions to the 3D models. Here are my final renders and their render times:
