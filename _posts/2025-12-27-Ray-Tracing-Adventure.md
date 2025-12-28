@@ -169,6 +169,33 @@ for (const auto& sl : scene.spotLights) {
 }
 ```
 
+While testing spot lights, I noticed a visible hard ring at the edge of the illumination cone. The light was behaving correctly inside the inner cone, but the transition region produced an unnatural boundary.
+
+[spot light hard edge]
+
+The issue was was in my falloff interpolation. In the falloff region, the attenuation term should be 1 at the falloff boundary and smoothly decrease to 0 at the coverage boundary.
+
+However, in my first implementation I normalized the parameter incorrectly (effectively making the attenuation become 0 right at the falloff boundary), which caused a sudden intensity drop and therefore a visible ring.
+
+The fix was to parameterize the interpolation so that it maps fallof to 1 and coverage to 0, then clamp it into [0,1] before applying the exponent.
+
+```cpp
+else if (cosAlpha >= cosCov) {
+  float denom = (cosFall - cosCov);
+  float t = (cosAlpha - cosCov) / denom;
+
+  // Clamp t to [0,1]
+  if (t < 0.0f) t = 0.0f;
+  if (t > 1.0f) t = 1.0f;
+
+  spotFactor = pow(t, 4.0f);
+}
+```
+
+After this change, the transition became smooth and the ring artifact disappeared:
+
+[spot light fix]
+
 ### Environment Lights
 The final lighting feature I added was environment lighting. Unlike point/spot/directional lights, an environment light does not come from a single position or direction it provides illumination from all directions, based on an HDR environment map (either latitude-longitude or light-probe format).
 
@@ -260,6 +287,11 @@ if (material.degamma) {
     material.diffuseReflectance = srgbToLinear(material.diffuseReflectance);
     material.specularReflectance = srgbToLinear(material.specularReflectance);
 }
+
+// ...
+// Parsing texture maps
+if (j.contains("_degamma")) tex.degamma = parseBool(j["_degamma"]);
+else tex.degamma = false;
 ```
 
 So if the degamma flag is true, I convert the sRGB values in the material to linear space before using them in shading calculations. Then after normalizing the texture color, I also applied degamma if needed:
@@ -285,7 +317,7 @@ But this time, I lost the textures:
 
 [VeachAjar ACES bugged 3]
 
-After thinking for a while, I realized that I was applying degamma after normalizing the texture color. But the normalizer value is defined in the sRGB space, so I should apply degamma before normalizing. By doing that, I get a better result:
+After thinking for a while, I realized that in my implementation, the order of normalization and degamma matters because both operations assume a specific value range. By changing the order, I get a better result:
 
 [VeachAjar ACES bugged 4]
 
