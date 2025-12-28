@@ -16,6 +16,94 @@ Hello again, I will continue my ray tracing adventure with Part 5, focusing on i
 Before I begin, I should mention that this blog and project are part of the [Advanced Ray Tracing](https://catalog.metu.edu.tr/course.php?prog=571&course_code=5710795) course given by my professor Ahmet Oğuz Akyüz, at Middle East Technical University.
 
 ### Bugs from Previous Parts 
+While rendering the Chinese Dragon in previous and this homeworks, I encountered a issue where the model appeared only as scattered points rather than a continuous surface. At first glance, I thought the error's source was backface culling errors, incorrect BVH construction, or insufficient sampling. As a result, I initially focused my debugging efforts on acceleration structures, sampling parameters, and camera or lighting configurations. However, none of these adjustments resolved the issue. The render output remained unchanged even after disabling backface culling and significantly increasing the sample count, which indicated that the problem was occurring at a more fundamental level.
+
+[bugged dragon render]
+
+After further inspection, I realized that the core issue was caused by hard-coded epsilon thresholds in the triangle intersection tests. Since the Chinese Dragon consists of a very large number of extremely small triangles, many valid intersections were incorrectly discarded due to absolute precision checks. As a result, only a small subset of rays successfully intersected the mesh, producing the "scattered points"” appearance in the final image.
+
+Here is the original triangle intersection code snippet with the problematic epsilon values:
+
+```cpp
+// If the area is too small, consider it degenerate
+if (N_len_sq < 1e-12f) 
+    return false; // Degenerate triangle
+
+float NdotD = N.dot(rayDir);
+
+if (fabs(NdotD) < 1e-8f)
+  return false; // Plane and ray are parallel
+```
+
+For now, I replaced epsilon with smaller values to accommodate the small triangle sizes in the dragon model, but I will get epsilon values directly from the input file and set a smaller value for the default case in future implementations. Her eyou can see the marching_dragons (rendered in 31.2205 seconds) from the Homework 2 also:
+
+[marching_dragons render]
+
+### Tonemapping and .exr/.hdr Images
+Until this point, my ray tracer mostly produced standard 8-bit images (PNG), where each color channel is clamped to the 0-255 range. That works fine for normal scenes, but it becomes a limitation as soon as the lighting gets intense. Bright highlights get clipped to pure white, and any detail in those regions is lost permanently.
+
+To solve this, in this part, I added HDR output support by writing renders as .exr file. EXR is a high dynamic range format, meaning pixel values are stored as floating point numbers (not restricted to 0–255). This allows the renderer to preserve real radiance values (even if they exceed 1.0 by a lot) so highlights and bright reflections are still recoverable later.
+
+However, an EXR file is not meant to be viewed directly as a regular image. To display HDR data on a standard monitor, we need tonemapping, which compresses HDR image into the limited range of an LDR image while trying to preserve contrast and details. As stated in homework, each camera can optionally define one or more tonemapping operators in the JSON scene file. This means a single HDR render can be converted into multiple PNG outputs using different tonemapping curves.
+
+For example, for cube_point_hdr scene, ray tracer produces:
+
+- cube_point_hdr.exr (raw HDR output)
+- cube_point_phot.png (Photographic tonemap)
+- cube_point_aces.png (ACES tonemap)
+- cube_point_film.png (Filmic tonemap)
+
+But what are the differences between these tonemapping operators? These different tonemapping operators handle highlights and midtones differently. In Photographic tonemapping, ray tracer produces a more “neutral” result by compressing luminance smoothly. ACES tends to preserve highlight roll-off in a more cinematic way (bright areas fade more naturally instead of clipping harshly). Finally, Filmic tonemapping mimics the response curve of film stock, producing a more contrasty image with deeper shadows and punchier highlights.
+
+Even though all three PNGs originate from the same EXR data, their brightness distribution and contrast should noticeably differ as you can see in the images below:
+
+[cube_point_hdr renders]
+
+The implementation strategy was quite straightforward. First, First, I render the scene once into an HDR framebuffer (a std::vector<Vec3>), where each pixel stores radiance values as floats (not clamped to 0-255). After the rendering is complete, I saved the .exr file using the [TinyEXR library](https://github.com/syoyo/tinyexr), because stb library does not support EXR format even though it supports HDR format. Then, for each tonemapping operator specified in the camera, I applied the corresponding tonemapping function to convert the HDR framebuffer into an LDR framebuffer (clamped to 0-255), and saved that as a PNG using stb_image_write.
+
+
+```cpp
+// Save EXR if the camera output is .exr
+if (ImageIO::endsWith(cam.imageName, ".exr")) {
+    ImageIO::writeEXR(cam.imageName, width, height, hdr);
+}
+
+// Tonemap and save PNGs
+for (const auto& tm : cam.tonemaps) {
+    auto png = Tonemapper::toPNG(width, height, hdr, tm);
+    string outName = ImageIO::replaceExrWithExtension(cam.imageName, tm.extension);
+    ImageIO::writePNG(outName, width, height, png);
+}
+```
+
+This process does not include additional ray tracing passes for each tonemapping operator, since the HDR framebuffer is reused. This keeps render times reasonable even when multiple tonemaps are requested.
+
+I implemented each tonemapping using the formulas discussed in class but I want to highlight the gamma correction step that is applied after tonemapping. It looks minor in code, but makes a huge difference in the final image. In my ray tracer, all lighting computations are done in linear space. This is important because shading equations (diffuse/specular etc.) assume linear intensity values. However, monitors and standard image formats (like PNG) do not display values linearly. Most displays roughly follow an sRGB-like response curve, meaning that if we directly write linear values into an 8-bit image, the result looks too dark, especially in midtones. This happens because the monitor effectively applies its own non-linear curve, compressing low values more than we intended.
+
+That’s why, after tonemapping compresses HDR radiance into an LDR 0-1 range, I apply gamma correction as the very last step before converting to 8-bit:
+
+```cpp
+float invGamma = 1.0f / gamma; // gamma is typically around 2.2f
+
+// Apply gamma correction
+c.x = pow(clamp01(c.x), invGamma);
+c.y = pow(clamp01(c.y), invGamma);
+c.z = pow(clamp01(c.z), invGamma);
+
+out[index + 0] = (unsigned char) lround(255.0f * c.x);
+out[index + 1] = (unsigned char) lround(255.0f * c.y);
+out[index + 2] = (unsigned char) lround(255.0f * c.z);
+```
+
+This step converts the image from linear space to display space. If gamma = 2.2, then using pow(x, 1/2.2) lifts mid-range values, making the image look visually correct on a typical monitor. Also another important detail is the order of operations. Gamma correction is applied after tonemapping, because tonemapping curves are defined in linear light. Applying gamma earlier would distort luminance relationships and can cause strange contrast shifts.
+
+### Directional Lights
+
+
+### Spot Lights
+
+
+### Environment Lights
 
 
 ### Outputs and Closing Thoughts
@@ -28,7 +116,7 @@ As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all
 | cube_directional                 | 1.69274  |
 | cube_point                 | 1.75236  |
 | cube_point_hdr                 | 2.98016  |
-| dragon_spot_light_msaa                 | 83.7131  |
+| dragon_spot_light_msaa                 | 79.1459  |
 | empty_environment_latlong                 | 1.22012  |
 | empty_environment_light_probe                 | 1.22698   |
 | glass_sphere_env                 | 2.91417  |
