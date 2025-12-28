@@ -177,7 +177,7 @@ The core idea is to treat the environment map as a function that returns radianc
 [formula for lat-long mapping 5,6,7]
 
 ```cpp
-static Vec2 dirToUV_LatLong(const Vec3& d) {
+Vec2 dirToUV_LatLong(const Vec3& d) {
     Vec3 dn = d.normalize();
     float u = (1.0f + atan2(dn.x, -dn.z) / (float) M_PI) * 0.5f;
     float v = acos(max(-1.0f, min(1.0f, dn.y))) / (float) M_PI;
@@ -192,8 +192,7 @@ and for light-probe mapping as:
 [formula for light-probe mapping 8,9,10]
 
 ```cpp
-
-static Vec2 dirToUV_Probe(const Vec3& d) {
+Vec2 dirToUV_Probe(const Vec3& d) {
     Vec3 dn = d.normalize();
     
     float denom = sqrt(dn.x * dn.x + dn.y * dn.y);
@@ -215,8 +214,85 @@ Because we only sample one direction (or a small number of directions), we must 
 
 Finally, just like directional lights, environment light shadow rays are treated as going to infinity (very large distance, 1e9), if any occluder is hit along wi, that sampled contribution is discarded.
 
+### Degamma
+After implementing and testing on several scenes, I tried the VeachAjar scene, and I got this result in ACES tonemapping:
+
+[VeachAjar ACES bugged 1]
+
+I immediately realized that I faced with a similar issue in previous part. The Normalizer value was affecting the results. So I firstly checked that part.
+
+```cpp
+if (tm->normalizer > 0.0f && tm->normalizer != 255.0f && tm->normalizer != 1.0f) {
+  float scaleFactor = 255.0f / tm->normalizer;
+  texColor = texColor.scale(scaleFactor);
+}
+```
+
+This part was not considering if the texture is HDR or LDR. So I added a flag in Texture class to indicate if the image is HDR or not, and I modified this part as follows:
+
+```cpp
+if (tm->normalizer > 0.0f) {
+    if (tm->image->isHDR) {
+        texColor = texColor.scale(1.0f / tm->normalizer); // For HDR, normalize to [0,1] range
+    } else {
+        texColor = texColor.scale(255.0f / tm->normalizer); // For LDR, normalize to [0,255] range
+    }
+}
+```
+
+After this fix, result looked better but still not correct:
+
+[VeachAjar ACES bugged 2]
+
+Then I looked at the input file and saw the "degamma" flag under some materials and texture maps. I was not handling that flag yet, so I added degamma flag to Material and TextureMap classes and modified the parsing part as follows:
+
+```cpp
+if (materialJson.contains("_degamma")) {
+    material.degamma = parseBool(materialJson["_degamma"]);
+}
+
+material.ambientReflectance = parseVec3(materialJson["AmbientReflectance"].get<string>());
+material.diffuseReflectance = parseVec3(materialJson["DiffuseReflectance"].get<string>());
+material.specularReflectance = parseVec3(materialJson["SpecularReflectance"].get<string>());
+
+if (material.degamma) {
+    material.ambientReflectance = srgbToLinear(material.ambientReflectance);
+    material.diffuseReflectance = srgbToLinear(material.diffuseReflectance);
+    material.specularReflectance = srgbToLinear(material.specularReflectance);
+}
+```
+
+So if the degamma flag is true, I convert the sRGB values in the material to linear space before using them in shading calculations. Then after normalizing the texture color, I also applied degamma if needed:
+
+```cpp
+// Only degamma for LDR texture
+// No degamma for normal maps or HDR textures
+bool affectsColor =
+    (tm->decalMode == DecalMode::ReplaceKd) ||
+    (tm->decalMode == DecalMode::BlendKd)   ||
+    (tm->decalMode == DecalMode::ReplaceKs) ||
+    (tm->decalMode == DecalMode::ReplaceAll);
+
+// Apply degamma if needed and texture is LDR
+if (material.degamma && affectsColor && tm->image && !tm->image->isHDR) {
+    texColor = Vec3(std::pow(std::max(0.0f, std::min(1.0f, texColor.x)), 2.2f),
+                    std::pow(std::max(0.0f, std::min(1.0f, texColor.y)), 2.2f),
+                    std::pow(std::max(0.0f, std::min(1.0f, texColor.z)), 2.2f));
+}
+```
+
+But this time, I lost the textures:
+
+[VeachAjar ACES bugged 3]
+
+After thinking for a while, I realized that I was applying degamma after normalizing the texture color. But the normalizer value is defined in the sRGB space, so I should apply degamma before normalizing. By doing that, I get a better result:
+
+[VeachAjar ACES bugged 4]
+
+Even though I get better results, there are still issues and my render is still not matching with the expected result. I will investigate further and try to fix the issues in future parts.
+
 ### Outputs and Closing Thoughts
-All renders are completed (also the chinese dragon for the first time :), but the 15th .ply file in VeachAjar scene is still causing problems as in previous part (happly gives error for unsigned int), but I still use the not fixed version and get the expected results. Some scenes like teapot_roughness and dragon_new_ply_with_spot took several hours to render. Therefore, I will try to refactor and optimize my ray tracer further in the next parts.
+I got the expected results (also the chinese dragon for the first time :) except some differences on VeachAjar, and even though I tried to implement degamma, I think I am missing something and the problem is related to that. Also the 15th .ply file in VeachAjar scene is still causing problems as in previous part (happly library gives error for unsigned int), but I still use the not fixed version and get the expected results. Some scenes like teapot_roughness and dragon_new_ply_with_spot took several hours to render. Therefore, I will try to refactor and optimize my ray tracer further in the next parts.
 
 I partially tried to convert my float calculations to double precision in critical sections (like intersection tests) to fix noise in some scenes as Oğuz Hoca suggested, but I could not finish that yet because project is getting bigger and I sometimes take shortcuts and they effect the genericity of the code, so a general change like this became difficult to me. As I said in the previous paragraph, I will try to improve the code structure and optimize performance in future parts to add new features more easily.
 
