@@ -98,13 +98,122 @@ out[index + 2] = (unsigned char) lround(255.0f * c.z);
 This step converts the image from linear space to display space. If gamma = 2.2, then using pow(x, 1/2.2) lifts mid-range values, making the image look visually correct on a typical monitor. Also another important detail is the order of operations. Gamma correction is applied after tonemapping, because tonemapping curves are defined in linear light. Applying gamma earlier would distort luminance relationships and can cause strange contrast shifts.
 
 ### Directional Lights
+After supporting point and area lights, the next lighting feature I added was Directional Lights. A directional light represents a light source that is effectively infinitely far away (the classic example is sunlight). Because the source is so far, all incoming rays are assumed to be parallel, meaning the light is defined only by a direction vector and a radiance value.
 
+A key difference from point or spot lights is that directional lights have no distance attenuation. With point lights, intensity falls off as 1 / d², but for directional lights the incoming radiance is constant everywhere in the scene. At each hit point, shading is very similar to a point light except there is no 1 / d^2 term (since d is infinite, no inverse square law) and there is no finite light position, so we treat the shadow ray as going forever.
+
+Because the light direciton is constant, instead of computing wi = normalize(lightPos − hitPoint), we already know the incoming direction, so the direction from the surface to the light is wi = -Direction. For shadow rays, to keep my code structure as it is, I treated directional light shadow checks as infinite distance (very large distance for now, 1e9) and only looked for any occluder. This way, directional lights integrate cleanly into the existing lighting loop without special-casing the intersection logic too much. In future, I may optimize this further by skipping distance checks for directional lights entirely.
+
+```cpp
+for (const auto& dl : scene.directionalLights) {
+  Vec3 wi = dl.direction.scale(-1.0f).normalize(); // Light direction is opposite to light's direction
+
+  // Shadow ray check for directional light at very large distance
+  Vec3 shadowOrigin = hitPoint.add(hitNormal.scale(scene.shadowRayEpsilon));
+  if (isInShadow(scene, shadowOrigin, wi, 1e9f, intersector, rayTime)) continue;
+
+  Vec3 eff = dl.radiance;
+
+  // Diffuse and Specular calculations as before with eff added
+  // ...
+  Vec3 diffuse = kd.multiply(eff).scale(NdotL);
+  // ...
+  Vec3 specular = ks.multiply(eff).scale(std::pow(NdotH, material.phongExponent));
+
+  color = color.add(diffuse).add(specular);
+}
+```
 
 ### Spot Lights
+After directional lights, I implemented Spot Lights, which can be thought of as a point light with a cone. A spot light has a finite position like a point light, but unlike a point light it does not illuminate equally in all directions. Instead, it emits light mainly around a preferred direction, and its contribution depends on the angle between the light direction and the direction from the light to the shaded point. It includes position, direction, intensity, coverage and falloff angle parameters (how wide the cone and how soft its edges).
 
+The usual inverse-square attenuation 1/d^2 a spot light only contributes if the shaded point lies inside the light’s coverage cone. I compute the angle α between the spot axis (light direction) and the direction from the light to the hit point, using a dot product (cosine space).
+
+If α is smaller than the falloff angle, the light behaves exactly like a point light (full intensity). Between the falloff and coverage angles, I apply a smooth falloff term
+
+[pdfteki s formulü]
+
+and scale the irradiance as s x I / d^2. Beyond the coverage angle the contribution becomes zero.
+
+```cpp
+for (const auto& sl : scene.spotLights) {
+    // ...
+
+    float cosAlpha = max(-1.0f, min(1.0f, spotAxis.dot(lightToHit)));
+
+    float cov = glm::radians(sl.coverageAngle * 0.5f);
+    float fall = glm::radians(sl.falloffAngle * 0.5f);
+
+    float cosCov = cos(cov);
+    float cosFall = cos(fall);
+
+    float spotFactor = 0.0f;
+
+    if (cosAlpha >= cosFall) {
+        spotFactor = 1.0f;
+    }
+    else if (cosAlpha >= cosCov) {
+        float denom = (cosFall - cosCov);
+        float t = (cosAlpha - cosFall) / denom;
+        t = max(0.0f, min(1.0f, t));
+        spotFactor = pow(t, 4.0f);
+    }
+    else {
+        continue;
+    }
+
+    Vec3 effIntensity = sl.intensity.scale(spotFactor / d2);
+
+    // Diffuse and Specular calculations as before with effIntensity added
+    // ...
+}
+```
 
 ### Environment Lights
+The final lighting feature I added was environment lighting. Unlike point/spot/directional lights, an environment light does not come from a single position or direction it provides illumination from all directions, based on an HDR environment map (either latitude-longitude or light-probe format).
 
+The core idea is to treat the environment map as a function that returns radiance for a given direction d. During shading, instead of querying a light position, I randomly sample a direction wi from the hemisphere above the surface. Then I convert that direction into texture coordinates (u, v) using the mapping described in the homework for lat-long as:
+
+[formula for lat-long mapping 5,6,7]
+
+```cpp
+static Vec2 dirToUV_LatLong(const Vec3& d) {
+    Vec3 dn = d.normalize();
+    float u = (1.0f + atan2(dn.x, -dn.z) / (float) M_PI) * 0.5f;
+    float v = acos(max(-1.0f, min(1.0f, dn.y))) / (float) M_PI;
+
+    u = u - floor(u); // Wrap u to [0,1]
+    v = max(0.0f, min(1.0f, v)); // Clamp v to [0,1]
+    return Vec2(u, v);
+}
+```
+
+and for light-probe mapping as:
+[formula for light-probe mapping 8,9,10]
+
+```cpp
+
+static Vec2 dirToUV_Probe(const Vec3& d) {
+    Vec3 dn = d.normalize();
+    
+    float denom = sqrt(dn.x * dn.x + dn.y * dn.y);
+
+    float r = (1.0f / (float) M_PI) * acos(max(-1.0f, min(1.0f, -dn.z))) / denom;
+    float u = (r * dn.x + 1.0f) * 0.5f;
+    float v = (-r * dn.y + 1.0f) * 0.5f;
+
+    u = u - floor(u); // Wrap u to [0,1]
+    v = max(0.0f, min(1.0f, v)); // Clamp v to [0,1]
+
+    return Vec2(u, v);
+}
+```
+
+and fetch the corresponding HDR radiance from the environment image.
+
+Because we only sample one direction (or a small number of directions), we must compensate for sampling probability. This is done by dividing the fetched radiance by the PDF of the sampling method. I implemented both uniform hemisphere sampling (constant PDF) and cosine-weighted sampling (PDF proportional to cosθ).
+
+Finally, just like directional lights, environment light shadow rays are treated as going to infinity (very large distance, 1e9), if any occluder is hit along wi, that sampled contribution is discarded.
 
 ### Outputs and Closing Thoughts
 
