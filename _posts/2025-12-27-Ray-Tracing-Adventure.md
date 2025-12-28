@@ -216,7 +216,9 @@ Because we only sample one direction (or a small number of directions), we must 
 Finally, just like directional lights, environment light shadow rays are treated as going to infinity (very large distance, 1e9), if any occluder is hit along wi, that sampled contribution is discarded.
 
 ### Outputs and Closing Thoughts
+All renders are completed (also the chinese dragon for the first time :), but the 15th .ply file in VeachAjar scene is still causing problems as in previous part (happly gives error for unsigned int), but I still use the not fixed version and get the expected results. Some scenes like teapot_roughness and dragon_new_ply_with_spot took several hours to render. Therefore, I will try to refactor and optimize my ray tracer further in the next parts.
 
+I partially tried to convert my float calculations to double precision in critical sections (like intersection tests) to fix noise in some scenes as Oğuz Hoca suggested, but I could not finish that yet because project is getting bigger and I sometimes take shortcuts and they effect the genericity of the code, so a general change like this became difficult to me. As I said in the previous paragraph, I will try to improve the code structure and optimize performance in future parts to add new features more easily.
 
 As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Akın Aydemir for contributions to the 3D models. Here are my final renders and their render times:
 
