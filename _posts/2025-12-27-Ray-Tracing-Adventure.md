@@ -217,7 +217,7 @@ The final lighting feature I added was environment lighting. Unlike point/spot/d
 The core idea is to treat the environment map as a function that returns radiance for a given direction d. During shading, instead of querying a light position, I randomly sample a direction wi from the hemisphere above the surface. Then I convert that direction into texture coordinates (u, v) using the mapping described in the homework for lat-long as:
 
 <p align="center">
-    <img width="20%" alt="latlongformulas" src="https://github.com/user-attachments/assets/2bb874c6-23ff-4d2e-994d-c752f1e90d15" />
+    <img width="35%" alt="latlongformulas" src="https://github.com/user-attachments/assets/2bb874c6-23ff-4d2e-994d-c752f1e90d15" />
 </p>
 
 ```cpp
@@ -405,18 +405,7 @@ _Time: 1.69274 s_
 ### cube_point
 _Time: 1.75236 s_
 <p align="center">
-<img alt="cube_point" src="https://github.com/user-attachments/assets/5c607afa-2b45-49ef-abf9-d05e3219f22e" />
-    <br>
-    <em>ACES</em>
-    <br>
-<img alt="cube_point" src="https://github.com/user-attachments/assets/5ceec10e-1682-42ee-a2db-16ec21ec1f00" />
-    <br>
-    <em>Filmic</em>
-    <br>
-<img alt="cube_point" src="https://github.com/user-attachments/assets/a9e8969e-dfa5-4fbd-95f7-ed616a6c86a6" />
-    <br>
-    <em>Photographic</em>
-    <br>
+<img alt="cube_point" src="https://github.com/user-attachments/assets/335ba37e-f133-4eaf-a7f1-03f2e02756a6" />
 </p>
 
 ---
@@ -424,7 +413,18 @@ _Time: 1.75236 s_
 ### cube_point_hdr
 _Time: 2.98016 s_
 <p align="center">
-<img alt="cube_point_hdr" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/cube_cushion.png" />
+<img alt="cube_point_hdr" src="https://github.com/user-attachments/assets/5c607afa-2b45-49ef-abf9-d05e3219f22e" />
+    <br>
+    <em>ACES</em>
+    <br>
+<img alt="cube_point_hdr" src="https://github.com/user-attachments/assets/5ceec10e-1682-42ee-a2db-16ec21ec1f00" />
+    <br>
+    <em>Filmic</em>
+    <br>
+<img alt="cube_point_hdr" src="https://github.com/user-attachments/assets/a9e8969e-dfa5-4fbd-95f7-ed616a6c86a6" />
+    <br>
+    <em>Photographic</em>
+    <br>
 </p>
 
 ---
@@ -439,15 +439,15 @@ _Time: 79.1459 s_
 ### empty_environment_latlong
 _Time: 1.22012 s_
 <p align="center">
-<img alt="cube_point_hdr_aces" src="https://github.com/user-attachments/assets/877e91fa-293e-487e-8fb8-6a46a33ece7f" />
+<img alt="empty_environment_latlong_aces" src="https://github.com/user-attachments/assets/3154f4d9-9a05-4113-a3b7-329d1cd8d31f" />
     <br>
     <em>ACES</em>
     <br>
-    <img alt="cube_point_hdr_film" src="https://github.com/user-attachments/assets/9e05c7df-1a29-46fe-8221-5296a28e0d48" />
+    <img alt="empty_environment_latlong_film" src="https://github.com/user-attachments/assets/0947c597-1005-4167-9f36-fec55047ae6c" />
     <br>
     <em>Filmic</em>
     <br>
-<img alt="cube_point_hdr_phot" src="https://github.com/user-attachments/assets/00e89b24-e80c-4f98-adf2-ec413228d341" />
+<img alt="empty_environment_latlong_phot" src="https://github.com/user-attachments/assets/871f85f0-88d2-4559-9181-fbfef980ac41" />
     <br>
     <em>Photographic</em>
     <br>
