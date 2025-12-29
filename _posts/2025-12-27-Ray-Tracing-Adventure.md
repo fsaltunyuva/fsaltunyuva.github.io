@@ -389,24 +389,38 @@ This render took nearly 5.5 hours, and I still could not get the expected result
 
 _Time: 14394.7 s_
 <p align="center">
-<img alt="teapot_roughness" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/dragon_new.png" />
+<img alt="teapot_roughness" src="https://github.com/user-attachments/assets/573e5709-0a80-4edb-b4af-1603fc5ae2da" />
 </p>
 
 ---
+
 ### cube_directional
 _Time: 1.69274 s_
 <p align="center">
-<img alt="cube_directional" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/brickwall_with_normalmap.png" />
+<img alt="cube_directional" src="https://github.com/user-attachments/assets/933a8170-8750-47c3-b877-28a35bb440a9" />
 </p>
 
 ---
+
 ### cube_point
 _Time: 1.75236 s_
 <p align="center">
-<img alt="cube_point" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/bump_mapping_transformed.png" />
+<img alt="cube_point" src="https://github.com/user-attachments/assets/5c607afa-2b45-49ef-abf9-d05e3219f22e" />
+    <br>
+    <em>ACES</em>
+    <br>
+<img alt="cube_point" src="https://github.com/user-attachments/assets/5ceec10e-1682-42ee-a2db-16ec21ec1f00" />
+    <br>
+    <em>Filmic</em>
+    <br>
+<img alt="cube_point" src="https://github.com/user-attachments/assets/a9e8969e-dfa5-4fbd-95f7-ed616a6c86a6" />
+    <br>
+    <em>Photographic</em>
+    <br>
 </p>
 
 ---
+
 ### cube_point_hdr
 _Time: 2.98016 s_
 <p align="center">
@@ -421,6 +435,7 @@ _Time: 79.1459 s_
 </p>
 
 ---
+
 ### empty_environment_latlong
 _Time: 1.22012 s_
 <p align="center">
@@ -435,6 +450,7 @@ _Time: 1.22698 s_
 </p>
 
 ---
+
 ### glass_sphere_env
 _Time: 2.91417 s_
 <p align="center">
@@ -442,6 +458,7 @@ _Time: 2.91417 s_
 </p>
 
 ---
+
 ### head_env_light
 _Time: 61.3175 s_
 <p align="center">
@@ -449,6 +466,7 @@ _Time: 61.3175 s_
 </p>
 
 ---
+
 ### mirror_sphere_env
 _Time: 1.71812 s_
 <p align="center">
@@ -456,6 +474,7 @@ _Time: 1.71812 s_
 </p>
 
 ---
+
 ### sphere_env_light
 _Time: 1156.8 s_
 <p align="center">
@@ -463,6 +482,7 @@ _Time: 1156.8 s_
 </p>
 
 ---
+
 ### sphere_point_hdr_texture
 _Time: 2.99435 s_
 <p align="center">
@@ -470,6 +490,7 @@ _Time: 2.99435 s_
 </p>
 
 ---
+
 ### dragon_new_ply_with_spot
 _Time: 15166.2* s_
 <p align="center">
@@ -477,6 +498,7 @@ _Time: 15166.2* s_
 </p>
 
 ---
+
 ### audi-tt-glacier  
 _Time: 7219.37* s_
 <p align="center">
@@ -484,6 +506,7 @@ _Time: 7219.37* s_
 </p>
 
 ---
+
 ### audi-tt-pisa
 _Time: 7209.42* s_
 <p align="center">
@@ -491,6 +514,7 @@ _Time: 7209.42* s_
 </p>
 
 ---
+
 ### VeachAjar
 _Time: 192.583 s_
 <p align="center">
