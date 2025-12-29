@@ -358,6 +358,8 @@ I got the expected results (also the chinese dragon for the first time :) for mo
 
 I partially tried to convert my float calculations to double precision in critical sections (like intersection tests) to fix noise in some scenes as Oğuz Hoca suggested, but I could not finish that yet because project is getting bigger and I sometimes take shortcuts and they effect the genericity of the code, so a general change like this became difficult to me. As I said in the previous paragraph, I will try to improve the code structure and optimize performance in future parts to add new features more easily.
 
+I uploaded .exr and .hdr files to [this folder in repository](https://github.com/fsaltunyuva/fsaltunyuva.github.io/tree/main/images/2025-12-27-Ray-Tracing-Adventure), I used [GIMP](https://www.gimp.org/) to view them but there are other softwares for that purpose.
+
 As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance, and Akın Aydemir for contributions to the 3D models. Here are my final renders and their render times:
 
 | Scene                 | Time (seconds) |
