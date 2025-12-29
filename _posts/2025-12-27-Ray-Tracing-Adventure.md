@@ -59,7 +59,7 @@ For example, for cube_point_hdr scene, ray tracer produces:
 
 But what are the differences between these tonemapping operators? These different tonemapping operators handle highlights and midtones differently. In Photographic tonemapping, ray tracer produces a more “neutral” result by compressing luminance smoothly. ACES tends to preserve highlight roll-off in a more cinematic way (bright areas fade more naturally instead of clipping harshly). Finally, Filmic tonemapping mimics the response curve of film stock, producing a more contrasty image with deeper shadows and punchier highlights.
 
-Even though all three PNGs originate from the same EXR data, their brightness distribution and contrast should noticeably differ as you can see in the images below:
+Even though all three PNGs originate from the same EXR data, their brightness distribution and contrast should noticeably differ as you can see in the images below (Photographic, ACES, and Filmic respectively):
 
 <p align="center">
     <img alt="phot-aces-filmic" src="https://github.com/user-attachments/assets/ced66605-2cbc-42bf-8709-e89b94a16c9a" />
@@ -101,7 +101,12 @@ out[index + 1] = (unsigned char) lround(255.0f * c.y);
 out[index + 2] = (unsigned char) lround(255.0f * c.z);
 ```
 
-This step converts the image from linear space to display space. If gamma = 2.2, then using pow(x, 1/2.2) lifts mid-range values, making the image look visually correct on a typical monitor. Also another important detail is the order of operations. Gamma correction is applied after tonemapping, because tonemapping curves are defined in linear light. Applying gamma earlier would distort luminance relationships and can cause strange contrast shifts.
+This step converts the image from linear space to display space. If gamma = 2.2, then using pow(x, 1/2.2) lifts mid-range values, making the image look visually correct on a typical monitor. Also another important detail is the order of operations. Gamma correction is applied after tonemapping, because tonemapping curves are defined in linear light. Applying gamma earlier would distort luminance relationships and could cause strange contrast shifts. Here you can see gamma corrected, and not gamma corrected example respectively:
+
+<p align="center">
+    <img alt="filmic-left-gamma-crtd-right-not" src="https://github.com/user-attachments/assets/013ae604-3fdb-441c-8b58-c343d85b7347" />
+</p>
+
 
 ### Directional Lights
 After supporting point and area lights, the next lighting feature I added was Directional Lights. A directional light represents a light source that is effectively infinitely far away (the classic example is sunlight). Because the source is so far, all incoming rays are assumed to be parallel, meaning the light is defined only by a direction vector and a radiance value.
@@ -379,8 +384,8 @@ As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all
 **Used CPU: AMD Ryzen 5 7640HS 6-Core Processor (4.30 GHz)*
 
 ---
-## dragon_new
-This render took nearly 4 hours, and when I was losing my faith, my ray tracer finally won its battle with 3.686.400 pixels :). So I wanted to place this render at the top of all other renders.
+## teapot_roughness
+This render took nearly 5.5 hours, and I still could not get the expected result (reason explained in Outputs part) :( but I wanted to place this render at the top of all other renders because of the time taken.
 
 _Time: 14394.7 s_
 <p align="center">
