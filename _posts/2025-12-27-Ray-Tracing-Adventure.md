@@ -1,3 +1,4 @@
+---
 layout: post
 title: "Ray Tracing Adventure Part 5 (Homework 5)"
 date: 2025-12-27
