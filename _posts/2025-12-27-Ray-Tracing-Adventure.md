@@ -59,7 +59,7 @@ Even though all three PNGs originate from the same EXR data, their brightness di
 
 [cube_point_hdr renders]
 
-The implementation strategy was quite straightforward. First, First, I render the scene once into an HDR framebuffer (a std::vector<Vec3>), where each pixel stores radiance values as floats (not clamped to 0-255). After the rendering is complete, I saved the .exr file using the [TinyEXR library](https://github.com/syoyo/tinyexr), because stb library does not support EXR format even though it supports HDR format. Then, for each tonemapping operator specified in the camera, I applied the corresponding tonemapping function to convert the HDR framebuffer into an LDR framebuffer (clamped to 0-255), and saved that as a PNG using stb_image_write.
+The implementation strategy was quite straightforward. First, I render the scene once into an HDR framebuffer, where each pixel stores radiance values as floats (not clamped to 0-255). After the rendering is complete, I saved the .exr file using the [TinyEXR library](https://github.com/syoyo/tinyexr) , because stb library does not support EXR format even though it supports HDR format. Then, for each tonemapping operator specified in the camera, I applied the corresponding tonemapping function to convert the HDR framebuffer into an LDR framebuffer (clamped to 0-255), and saved that as a PNG using stb_image_write.
 
 
 ```cpp
