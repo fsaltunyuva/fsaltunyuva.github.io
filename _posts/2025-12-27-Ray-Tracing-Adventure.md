@@ -100,9 +100,9 @@ This step converts the image from linear space to display space. If gamma = 2.2,
 ### Directional Lights
 After supporting point and area lights, the next lighting feature I added was Directional Lights. A directional light represents a light source that is effectively infinitely far away (the classic example is sunlight). Because the source is so far, all incoming rays are assumed to be parallel, meaning the light is defined only by a direction vector and a radiance value.
 
-A key difference from point or spot lights is that directional lights have no distance attenuation. With point lights, intensity falls off as 1 / d², but for directional lights the incoming radiance is constant everywhere in the scene. At each hit point, shading is very similar to a point light except there is no 1 / d^2 term (since d is infinite, no inverse square law) and there is no finite light position, so we treat the shadow ray as going forever.
+A key difference from point or spot lights is that directional lights have no distance attenuation. With point lights, intensity falls off as $\frac{1}{d^2}$, but for directional lights the incoming radiance is constant everywhere in the scene. At each hit point, shading is very similar to a point light except there is no $\frac{1}{d^2}$ term (since d is infinite, no inverse square law) and there is no finite light position, so we treat the shadow ray as going forever.
 
-Because the light direciton is constant, instead of computing wi = normalize(lightPos − hitPoint), we already know the incoming direction, so the direction from the surface to the light is wi = -Direction. For shadow rays, to keep my code structure as it is, I treated directional light shadow checks as infinite distance (very large distance for now, 1e9) and only looked for any occluder. This way, directional lights integrate cleanly into the existing lighting loop without special-casing the intersection logic too much. In future, I may optimize this further by skipping distance checks for directional lights entirely.
+Because the light direciton is constant, instead of computing ``wi = normalize(lightPos − hitPoint)``, we already know the incoming direction, so the direction from the surface to the light is ``wi = -direction``. For shadow rays, to keep my code structure as it is, I treated directional light shadow checks as infinite distance (very large distance for now, 1e9) and only looked for any occluder. This way, directional lights integrate cleanly into the existing lighting loop without special-casing the intersection logic too much. In future, I may optimize this further by skipping distance checks for directional lights entirely.
 
 ```cpp
 for (const auto& dl : scene.directionalLights) {
@@ -127,13 +127,13 @@ for (const auto& dl : scene.directionalLights) {
 ### Spot Lights
 After directional lights, I implemented Spot Lights, which can be thought of as a point light with a cone. A spot light has a finite position like a point light, but unlike a point light it does not illuminate equally in all directions. Instead, it emits light mainly around a preferred direction, and its contribution depends on the angle between the light direction and the direction from the light to the shaded point. It includes position, direction, intensity, coverage and falloff angle parameters (how wide the cone and how soft its edges).
 
-The usual inverse-square attenuation 1/d^2 a spot light only contributes if the shaded point lies inside the light’s coverage cone. I compute the angle α between the spot axis (light direction) and the direction from the light to the hit point, using a dot product (cosine space).
+The usual inverse-square attenuation $\frac{1}{d^2}$ a spot light only contributes if the shaded point lies inside the light’s coverage cone. I compute the angle α between the spot axis (light direction) and the direction from the light to the hit point, using a dot product (cosine space).
 
 If α is smaller than the falloff angle, the light behaves exactly like a point light (full intensity). Between the falloff and coverage angles, I apply a smooth falloff term
 
-[pdfteki s formulü]
+$$s = \left( \frac{\cos(\alpha) - \cos(\text{falloff}/2)}{\cos(\text{falloff}/2) - \cos(\text{coverage}/2)} \right)^4$$
 
-and scale the irradiance as s x I / d^2. Beyond the coverage angle the contribution becomes zero.
+and scale the irradiance as: $$\frac{s \times I}{d^2}$$ Beyond the coverage angle the contribution becomes zero.
 
 ```cpp
 for (const auto& sl : scene.spotLights) {
