@@ -1,4 +1,4 @@
----
+<img width="768" height="81" alt="image" src="https://github.com/user-attachments/assets/3a3e2197-c985-4e47-b78b-5abd52e5d281" />---
 layout: post
 title: "Ray Tracing Adventure Part 5 (Homework 5)"
 date: 2025-12-27
@@ -217,7 +217,7 @@ The final lighting feature I added was environment lighting. Unlike point/spot/d
 The core idea is to treat the environment map as a function that returns radiance for a given direction d. During shading, instead of querying a light position, I randomly sample a direction wi from the hemisphere above the surface. Then I convert that direction into texture coordinates (u, v) using the mapping described in the homework for lat-long as:
 
 <p align="center">
-    <img alt="latlongformulas" src="https://github.com/user-attachments/assets/2bb874c6-23ff-4d2e-994d-c752f1e90d15" />
+    <img width="20%" alt="latlongformulas" src="https://github.com/user-attachments/assets/2bb874c6-23ff-4d2e-994d-c752f1e90d15" />
 </p>
 
 ```cpp
@@ -235,7 +235,7 @@ Vec2 dirToUV_LatLong(const Vec3& d) {
 and for light-probe mapping as:
 
 <p align="center">
-    <img alt="probeformulas" src="https://github.com/user-attachments/assets/4ae3d25c-0393-4577-981e-1e9095de9d17" />
+    <img width="20%" alt="probeformulas" src="https://github.com/user-attachments/assets/4ae3d25c-0393-4577-981e-1e9095de9d17" />
 </p>
 
 ```cpp
@@ -431,7 +431,7 @@ _Time: 2.98016 s_
 ### dragon_spot_light_msaa
 _Time: 79.1459 s_
 <p align="center">
-<img alt="dragon_spot_light_msaa" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/cube_perlin.png" />
+<img alt="dragon_spot_light_msaa" src="https://github.com/user-attachments/assets/2ff0d40c-6cbd-480e-aa45-f5e3a681638b" />
 </p>
 
 ---
@@ -439,14 +439,37 @@ _Time: 79.1459 s_
 ### empty_environment_latlong
 _Time: 1.22012 s_
 <p align="center">
-<img alt="empty_environment_latlong" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/cube_perlin_bump.png" />
+<img alt="cube_point_hdr_aces" src="https://github.com/user-attachments/assets/877e91fa-293e-487e-8fb8-6a46a33ece7f" />
+    <br>
+    <em>ACES</em>
+    <br>
+    <img alt="cube_point_hdr_film" src="https://github.com/user-attachments/assets/9e05c7df-1a29-46fe-8221-5296a28e0d48" />
+    <br>
+    <em>Filmic</em>
+    <br>
+<img alt="cube_point_hdr_phot" src="https://github.com/user-attachments/assets/00e89b24-e80c-4f98-adf2-ec413228d341" />
+    <br>
+    <em>Photographic</em>
+    <br>
 </p>
 
 ---
+
 ### empty_environment_light_probe
 _Time: 1.22698 s_
 <p align="center">
-<img alt="empty_environment_light_probe" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/cube_wall.png" />
+<img alt="empty_environment_light_probe_aces" src="https://github.com/user-attachments/assets/f96e1ad3-9f9f-4be0-bd4e-3b3254db20c5" />
+        <br>
+    <em>ACES</em>
+    <br>
+    <img alt="empty_environment_light_probe_film" src="https://github.com/user-attachments/assets/6e979142-6738-4673-b732-6059d9da1f5f" />
+    <br>
+    <em>Filmic</em>
+    <br>
+<img alt="empty_environment_light_probe_phot" src="https://github.com/user-attachments/assets/a18063e3-1a4e-4f0c-b7ed-19e5dad7d243" />
+    <br>
+    <em>Photographic</em>
+    <br>
 </p>
 
 ---
@@ -454,7 +477,10 @@ _Time: 1.22698 s_
 ### glass_sphere_env
 _Time: 2.91417 s_
 <p align="center">
-<img alt="glass_sphere_env" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/cube_wall_normal.png" />
+<img alt="glass_sphere_env_phot" src="https://github.com/user-attachments/assets/27b3b2d3-dc67-4c56-8f7b-79a33800929b" />
+        <br>
+    <em>Photographic</em>
+    <br>
 </p>
 
 ---
@@ -462,7 +488,10 @@ _Time: 2.91417 s_
 ### head_env_light
 _Time: 61.3175 s_
 <p align="center">
-<img alt="head_env_light" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/cube_waves.png" />
+<img alt="head_env_light_phot" src="https://github.com/user-attachments/assets/c45dd861-159a-4f8a-b084-230f242c1efe" />
+            <br>
+    <em>Photographic</em>
+    <br>
 </p>
 
 ---
@@ -470,7 +499,10 @@ _Time: 61.3175 s_
 ### mirror_sphere_env
 _Time: 1.71812 s_
 <p align="center">
-<img alt="mirror_sphere_env" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/ellipsoids_texture.png" />
+<img alt="mirror_sphere_env_phot" src="https://github.com/user-attachments/assets/25fb5f57-ab43-4058-b29f-6767952c48b7" />
+            <br>
+    <em>Photographic</em>
+    <br>
 </p>
 
 ---
@@ -478,7 +510,10 @@ _Time: 1.71812 s_
 ### sphere_env_light
 _Time: 1156.8 s_
 <p align="center">
-<img alt="sphere_env_light" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/galactica_dynamic.png" />
+<img alt="sphere_env_light_phot" src="https://github.com/user-attachments/assets/cd4f7724-6694-4344-9e94-767ce5110b12" />
+                <br>
+    <em>Photographic</em>
+    <br>
 </p>
 
 ---
@@ -486,7 +521,18 @@ _Time: 1156.8 s_
 ### sphere_point_hdr_texture
 _Time: 2.99435 s_
 <p align="center">
-<img alt="sphere_point_hdr_texture" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/galactica_static.png" />
+<img alt="sphere_point_hdr_texture_aces" src="https://github.com/user-attachments/assets/2b6d6aad-57cd-498f-b628-67af9491fcc8" />
+            <br>
+    <em>ACES</em>
+    <br>
+    <img alt="sphere_point_hdr_texture_film" src="https://github.com/user-attachments/assets/61c70423-3cee-40b6-a80a-62663d95455b"  />
+    <br>
+    <em>Filmic</em>
+    <br>
+<img alt="sphere_point_hdr_texture_phot" src="https://github.com/user-attachments/assets/c1e7565f-07d5-44a0-a6ac-b9a2d65a7bb3" />
+    <br>
+    <em>Photographic</em>
+    <br>
 </p>
 
 ---
@@ -494,7 +540,7 @@ _Time: 2.99435 s_
 ### dragon_new_ply_with_spot
 _Time: 15166.2* s_
 <p align="center">
-<img alt="dragon_new_ply_with_spot" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/killeroo_bump_walls.png" />
+<img alt="dragon_new_ply_with_spot" src="https://github.com/user-attachments/assets/8072ef91-b8d5-42b9-a12d-a025ada42ba0" />
 </p>
 
 ---
@@ -502,7 +548,7 @@ _Time: 15166.2* s_
 ### audi-tt-glacier  
 _Time: 7219.37* s_
 <p align="center">
-<img alt="audi-tt-glacier" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/plane_bilinear.png" />
+<img alt="audi-tt-glacier" src="https://github.com/user-attachments/assets/0b12aad6-646d-4cf3-a9a3-2e8530b4c95a" />
 </p>
 
 ---
@@ -510,7 +556,7 @@ _Time: 7219.37* s_
 ### audi-tt-pisa
 _Time: 7209.42* s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/plane_nearest.png" />
+<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
 </p>
 
 ---
@@ -518,5 +564,36 @@ _Time: 7209.42* s_
 ### VeachAjar
 _Time: 192.583 s_
 <p align="center">
-<img alt="VeachAjar" src="https://raw.githubusercontent.com/fsaltunyuva/fsaltunyuva.github.io/refs/heads/main/images/2025-12-15-Ray-Tracing-Adventure/sphere_nearest_bilinear.png" />
+<img alt="VeachAjar_phot_key_0_18_s1_2_burn_1" src="https://github.com/user-attachments/assets/4e4ef41d-0910-4520-86a4-f1ff4d932401" />
+    <br>
+    <em>Photographic: key 0.18, saturation 1.2, burn 1%</em>
+    <br>
+    <img alt="VeachAjar_phot_key_0_18_s1_0_burn_1" src="https://github.com/user-attachments/assets/ceae6d73-2329-463c-ab41-f1f13b2af47c" />
+    <br>
+    <em>Photographic: key 0.18, saturation 1.0, burn 1%</em>
+    <br>
+    <img alt="VeachAjar_phot_key_0_18_s1_0_burn_0" src="https://github.com/user-attachments/assets/c64d9f79-3728-4bfb-9505-2871cafe0e95" />
+    <br>
+    <em>Photographic: key 0.18, saturation 1.0, burn 0%</em>
+    <br>
+    <img alt="VeachAjar_phot_key_0_09_s1_0_burn_1" src="https://github.com/user-attachments/assets/d0e81a88-b191-4726-8a08-6f61179a43c9" />
+    <br>
+    <em>Photographic: key 0.09, saturation 1.0, burn 1%</em>
+    <br>
+    <img alt="VeachAjar_film_key_0_18_s1_2_burn_1" src="https://github.com/user-attachments/assets/f3297502-712d-4579-bfc4-ad85deab66a2" />
+    <br>
+    <em>Filmic: key 0.18, saturation 1.2, burn 1%</em>
+    <br>
+    <img alt="VeachAjar_film_key_0_18_s1_2_burn_0" src="https://github.com/user-attachments/assets/49002af3-0b44-494e-a0cf-e4ff6a72707d" />
+    <br>
+    <em>Filmic: key 0.18, saturation 1.2, burn 0%</em>
+    <br>
+    <img alt="VeachAjar_aces_key_0_18_s1_2_burn_1" src="https://github.com/user-attachments/assets/ad686ba9-c77a-4f02-95c0-0afc31e2adf0" />
+    <br>
+    <em>ACES: key 0.18, saturation 1.2, burn 1%</em>
+    <br>
+    <img alt="VeachAjar_aces_key_0_18_s1_2_burn_0" src="https://github.com/user-attachments/assets/abb036bd-382f-4020-aa87-225369f7511a" />
+        <br>
+    <em>ACES: key 0.18, saturation 1.2, burn 0%</em>
+    <br>
 </p>
