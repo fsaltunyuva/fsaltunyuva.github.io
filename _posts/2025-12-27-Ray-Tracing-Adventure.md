@@ -192,7 +192,7 @@ While testing spot lights, I noticed a visible hard ring at the edge of the illu
 
 The issue was in my falloff interpolation. In the falloff region, the attenuation term should be 1 at the falloff boundary and smoothly decrease to 0 at the coverage boundary.
 
-However, in my first implementation I normalized the parameter incorrectly (effectively making the attenuation become 0 right at the falloff boundary), which caused a sudden intensity drop and therefore a visible ring.
+However, in my first implementation I normalized the parameter incorrectly (making the attenuation become 0 right at the falloff boundary), which caused a sudden intensity drop and therefore a visible ring.
 
 The fix was to parameterize the interpolation so that it maps fallof to 1 and coverage to 0, then clamp it into [0,1] before applying the exponent.
 
@@ -216,7 +216,7 @@ After this change, the transition became smooth, and the ring artifact disappear
 </p>
 
 ### Environment Lights
-The final lighting feature I added was environment lighting. Unlike point/spot/directional lights, an environment light does not come from a single position or direction it provides illumination from all directions, based on an HDR environment map (either latitude-longitude or light-probe format).
+The final lighting feature I added was environment lighting. Unlike point/spot/directional lights, an environment light does not come from a single position or direction, it provides illumination from all directions, based on an HDR environment map (either latitude-longitude or light-probe format).
 
 The core idea is to treat the environment map as a function that returns radiance for a given direction d. During shading, instead of querying a light position, I randomly sample a direction wi from the hemisphere above the surface. Then I convert that direction into texture coordinates (u, v) using the mapping described in the homework for lat-long as:
 
@@ -358,7 +358,7 @@ After thinking for a while, I realized that in my implementation, the order of n
 Even though I get better results, there are still issues and my render is still not matching with the expected result. I will investigate further and try to fix the issues in future parts.
 
 ### Outputs and Closing Thoughts
-I got the expected results (also the chinese dragon for the first time :) for most scenes except some differences on; VeachAjar (even though I tried to implement degamma, I think I am missing something and the problem is related to that), teapot_roughness (I recently refactored my beer's law implementation and there are still some issues remaining, I think the difference is coming from there), audi-tt (I forgot to turn off the backface culling as announced and smooth shading not working with .ply inputs for now), and glass_sphere_env. Also, the 15th .ply file inthe  VeachAjar scene is still causing problems as in previous part (happly library gives error for unsigned int), but I still use the not fixed version and get the expected results. Some scenes like teapot_roughness and dragon_new_ply_with_spot took several hours to render, they are heavy scenes but I think I can speed up my ray tracer. I will try to refactor and optimize my ray tracer further in the next parts.
+I got the expected results (also the chinese dragon for the first time :) for most scenes except some differences on; VeachAjar (even though I tried to implement degamma, I think I am missing something and the problem is related to that), teapot_roughness (I recently refactored my beer's law implementation and there are still some issues remaining, I think the difference is coming from there), audi-tt (I forgot to turn off the backface culling as announced and smooth shading not working with .ply inputs for now), and glass_sphere_env. Also, the 15th .ply file in the VeachAjar scene is still causing problems as in previous part (happly library gives error for unsigned int), but I still use the not fixed version and get the expected results. Some scenes like teapot_roughness and dragon_new_ply_with_spot took several hours to render, they are heavy scenes but I think I can speed up my ray tracer. I will try to refactor and optimize my ray tracer further in the next parts.
 
 I partially tried to convert my float calculations to double precision in critical sections (like intersection tests) to fix noise in some scenes as Oğuz Hoca suggested, but I could not finish that yet because project is getting bigger and I sometimes take shortcuts and they effect the genericity of the code, so a general change like this became difficult to me. As I said in the previous paragraph, I will try to improve the code structure and optimize performance in future parts to add new features more easily.
 
