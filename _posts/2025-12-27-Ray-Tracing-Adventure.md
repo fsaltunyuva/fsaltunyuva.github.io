@@ -59,10 +59,13 @@ For example, for cube_point_hdr scene, ray tracer produces:
 
 But what are the differences between these tonemapping operators? These different tonemapping operators handle highlights and midtones differently. In Photographic tonemapping, ray tracer produces a more “neutral” result by compressing luminance smoothly. ACES tends to preserve highlight roll-off in a more cinematic way (bright areas fade more naturally instead of clipping harshly). Finally, Filmic tonemapping mimics the response curve of film stock, producing a more contrasty image with deeper shadows and punchier highlights.
 
-Even though all three PNGs originate from the same EXR data, their brightness distribution and contrast should noticeably differ as you can see in the images below (Photographic, ACES, and Filmic respectively):
+Even though all three PNGs originate from the same EXR data, their brightness distribution and contrast should noticeably differ as you can see in the images below:
 
 <p align="center">
     <img alt="phot-aces-filmic" src="https://github.com/user-attachments/assets/ced66605-2cbc-42bf-8709-e89b94a16c9a" />
+        <br>
+    <em>Photographic, ACES, and Filmic respectively</em>
+    <br>
 </p>
 
 The implementation strategy was quite straightforward. First, I render the scene once into an HDR framebuffer, where each pixel stores radiance values as floats (not clamped to 0-255). After the rendering is complete, I saved the .exr file using the [TinyEXR library](https://github.com/syoyo/tinyexr) , because stb library does not support EXR format even though it supports HDR format. Then, for each tonemapping operator specified in the camera, I applied the corresponding tonemapping function to convert the HDR framebuffer into an LDR framebuffer (clamped to 0-255), and saved that as a PNG using stb_image_write.
@@ -101,12 +104,13 @@ out[index + 1] = (unsigned char) lround(255.0f * c.y);
 out[index + 2] = (unsigned char) lround(255.0f * c.z);
 ```
 
-This step converts the image from linear space to display space. If gamma = 2.2, then using pow(x, 1/2.2) lifts mid-range values, making the image look visually correct on a typical monitor. Also another important detail is the order of operations. Gamma correction is applied after tonemapping, because tonemapping curves are defined in linear light. Applying gamma earlier would distort luminance relationships and could cause strange contrast shifts. Here you can see gamma corrected, and not gamma corrected example respectively:
+This step converts the image from linear space to display space. If gamma = 2.2, then using pow(x, 1/2.2) lifts mid-range values, making the image look visually correct on a typical monitor. Also another important detail is the order of operations. Gamma correction is applied after tonemapping, because tonemapping curves are defined in linear light. Applying gamma earlier would distort luminance relationships and could cause strange contrast shifts.
 
 <p align="center">
     <img alt="filmic-left-gamma-crtd-right-not" src="https://github.com/user-attachments/assets/013ae604-3fdb-441c-8b58-c343d85b7347" />
+    <em>Left gamma corrected, Right not gamma corrected</em>
 </p>
-
+    
 
 ### Directional Lights
 After supporting point and area lights, the next lighting feature I added was Directional Lights. A directional light represents a light source that is effectively infinitely far away (the classic example is sunlight). Because the source is so far, all incoming rays are assumed to be parallel, meaning the light is defined only by a direction vector and a radiance value.
