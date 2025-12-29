@@ -18,7 +18,9 @@ Before I begin, I should mention that this blog and project are part of the [Adv
 ### Bugs from Previous Parts 
 While rendering the Chinese Dragon in previous and this homeworks, I encountered a issue where the model appeared only as scattered points rather than a continuous surface. At first glance, I thought the error's source was backface culling errors, incorrect BVH construction, or insufficient sampling. As a result, I initially focused my debugging efforts on acceleration structures, sampling parameters, and camera or lighting configurations. However, none of these adjustments resolved the issue. The render output remained unchanged even after disabling backface culling and significantly increasing the sample count, which indicated that the problem was occurring at a more fundamental level.
 
-[bugged dragon render]
+<p align="center">
+    <img alt="bugged dragon" src="https://github.com/user-attachments/assets/fcea000b-6c15-44e0-ad01-200a74aa5a3b" />
+</p>
 
 After further inspection, I realized that the core issue was caused by hard-coded epsilon thresholds in the triangle intersection tests. Since the Chinese Dragon consists of a very large number of extremely small triangles, many valid intersections were incorrectly discarded due to absolute precision checks. As a result, only a small subset of rays successfully intersected the mesh, producing the "scattered points"” appearance in the final image.
 
@@ -37,7 +39,9 @@ if (fabs(NdotD) < 1e-8f)
 
 For now, I replaced epsilon with smaller values to accommodate the small triangle sizes in the dragon model, but I will get epsilon values directly from the input file and set a smaller value for the default case in future implementations. Her eyou can see the marching_dragons (rendered in 31.2205 seconds) from the Homework 2 also:
 
-[marching_dragons render]
+<p align="center">
+    <img alt="marchingdragons" src="https://github.com/user-attachments/assets/0e1ba002-51ea-4c1f-a8d6-6a5cbf76e3b0" />
+</p>
 
 ### Tonemapping and .exr/.hdr Images
 Until this point, my ray tracer mostly produced standard 8-bit images (PNG), where each color channel is clamped to the 0-255 range. That works fine for normal scenes, but it becomes a limitation as soon as the lighting gets intense. Bright highlights get clipped to pure white, and any detail in those regions is lost permanently.
@@ -57,7 +61,9 @@ But what are the differences between these tonemapping operators? These differen
 
 Even though all three PNGs originate from the same EXR data, their brightness distribution and contrast should noticeably differ as you can see in the images below:
 
-[cube_point_hdr renders]
+<p align="center">
+    <img alt="phot-aces-filmic" src="https://github.com/user-attachments/assets/ced66605-2cbc-42bf-8709-e89b94a16c9a" />
+</p>
 
 The implementation strategy was quite straightforward. First, I render the scene once into an HDR framebuffer, where each pixel stores radiance values as floats (not clamped to 0-255). After the rendering is complete, I saved the .exr file using the [TinyEXR library](https://github.com/syoyo/tinyexr) , because stb library does not support EXR format even though it supports HDR format. Then, for each tonemapping operator specified in the camera, I applied the corresponding tonemapping function to convert the HDR framebuffer into an LDR framebuffer (clamped to 0-255), and saved that as a PNG using stb_image_write.
 
@@ -171,9 +177,11 @@ for (const auto& sl : scene.spotLights) {
 
 While testing spot lights, I noticed a visible hard ring at the edge of the illumination cone. The light was behaving correctly inside the inner cone, but the transition region produced an unnatural boundary.
 
-[spot light hard edge]
+<p align="center">
+    <img alt="hard-edge" src="https://github.com/user-attachments/assets/98fcdbe3-9fbf-4340-95bb-268aff2c4c3d" />
+</p>
 
-The issue was was in my falloff interpolation. In the falloff region, the attenuation term should be 1 at the falloff boundary and smoothly decrease to 0 at the coverage boundary.
+The issue was in my falloff interpolation. In the falloff region, the attenuation term should be 1 at the falloff boundary and smoothly decrease to 0 at the coverage boundary.
 
 However, in my first implementation I normalized the parameter incorrectly (effectively making the attenuation become 0 right at the falloff boundary), which caused a sudden intensity drop and therefore a visible ring.
 
@@ -192,16 +200,20 @@ else if (cosAlpha >= cosCov) {
 }
 ```
 
-After this change, the transition became smooth and the ring artifact disappeared:
+After this change, the transition became smooth, and the ring artifact disappeared:
 
-[spot light fix]
+<p align="center">
+    <img alt="hard-edge-fix" src="https://github.com/user-attachments/assets/80f9588d-7241-4046-a8c2-1738b5068049" />
+</p>
 
 ### Environment Lights
 The final lighting feature I added was environment lighting. Unlike point/spot/directional lights, an environment light does not come from a single position or direction it provides illumination from all directions, based on an HDR environment map (either latitude-longitude or light-probe format).
 
 The core idea is to treat the environment map as a function that returns radiance for a given direction d. During shading, instead of querying a light position, I randomly sample a direction wi from the hemisphere above the surface. Then I convert that direction into texture coordinates (u, v) using the mapping described in the homework for lat-long as:
 
-[formula for lat-long mapping 5,6,7]
+<p align="center">
+    <img alt="latlongformulas" src="https://github.com/user-attachments/assets/2bb874c6-23ff-4d2e-994d-c752f1e90d15" />
+</p>
 
 ```cpp
 Vec2 dirToUV_LatLong(const Vec3& d) {
@@ -216,7 +228,10 @@ Vec2 dirToUV_LatLong(const Vec3& d) {
 ```
 
 and for light-probe mapping as:
-[formula for light-probe mapping 8,9,10]
+
+<p align="center">
+    <img alt="probeformulas" src="https://github.com/user-attachments/assets/4ae3d25c-0393-4577-981e-1e9095de9d17" />
+</p>
 
 ```cpp
 Vec2 dirToUV_Probe(const Vec3& d) {
@@ -244,7 +259,9 @@ Finally, just like directional lights, environment light shadow rays are treated
 ### Degamma
 After implementing and testing on several scenes, I tried the VeachAjar scene, and I got this result in ACES tonemapping:
 
-[VeachAjar ACES bugged 1]
+<p align="center">
+    <img alt="veachajarbug1" src="https://github.com/user-attachments/assets/546d8946-c9cc-4e11-81fa-96048c3cbd46" />
+</p>
 
 I immediately realized that I faced with a similar issue in previous part. The Normalizer value was affecting the results. So I firstly checked that part.
 
@@ -269,7 +286,9 @@ if (tm->normalizer > 0.0f) {
 
 After this fix, result looked better but still not correct:
 
-[VeachAjar ACES bugged 2]
+<p align="center">
+    <img alt="veachajarbug2" src="https://github.com/user-attachments/assets/07cfc57c-82a2-47b1-9e6b-76f10acd2f36" />
+</p>
 
 Then I looked at the input file and saw the "degamma" flag under some materials and texture maps. I was not handling that flag yet, so I added degamma flag to Material and TextureMap classes and modified the parsing part as follows:
 
@@ -315,16 +334,22 @@ if (material.degamma && affectsColor && tm->image && !tm->image->isHDR) {
 
 But this time, I lost the textures:
 
-[VeachAjar ACES bugged 3]
+<p align="center">
+    <img alt="veachajarbug3" src="https://github.com/user-attachments/assets/0e0b0fdc-14af-4e8c-8000-41e43b00eb69" />
+</p>
+
 
 After thinking for a while, I realized that in my implementation, the order of normalization and degamma matters because both operations assume a specific value range. By changing the order, I get a better result:
 
-[VeachAjar ACES bugged 4]
+<p align="center">
+    <img alt="veachajarbug3" src="https://github.com/user-attachments/assets/d42d0b1c-ee79-4001-8db1-925be9abd35b" />
+</p>
+
 
 Even though I get better results, there are still issues and my render is still not matching with the expected result. I will investigate further and try to fix the issues in future parts.
 
 ### Outputs and Closing Thoughts
-I got the expected results (also the chinese dragon for the first time :) except some differences on VeachAjar, and even though I tried to implement degamma, I think I am missing something and the problem is related to that. Also the 15th .ply file in VeachAjar scene is still causing problems as in previous part (happly library gives error for unsigned int), but I still use the not fixed version and get the expected results. Some scenes like teapot_roughness and dragon_new_ply_with_spot took several hours to render. Therefore, I will try to refactor and optimize my ray tracer further in the next parts.
+I got the expected results (also the chinese dragon for the first time :) except some differences on VeachAjar, and even though I tried to implement degamma, I think I am missing something, and the problem is related to that. Also, the 15th .ply file inthe  VeachAjar scene is still causing problems as in previous part (happly library gives error for unsigned int), but I still use the not fixed version and get the expected results. Some scenes like teapot_roughness and dragon_new_ply_with_spot took several hours to render. Therefore, I will try to refactor and optimize my ray tracer further in the next parts.
 
 I partially tried to convert my float calculations to double precision in critical sections (like intersection tests) to fix noise in some scenes as Oğuz Hoca suggested, but I could not finish that yet because project is getting bigger and I sometimes take shortcuts and they effect the genericity of the code, so a general change like this became difficult to me. As I said in the previous paragraph, I will try to improve the code structure and optimize performance in future parts to add new features more easily.
 
