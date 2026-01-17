@@ -26,7 +26,9 @@ Up to this point, my ray tracer was able to trace rays correctly and compute int
 
 A BRDF defines how light is reflected at a surface point, given two directions, the incoming light direction (wi) and the outgoing view direction (wo). More precisely, a BRDF describes how much of the incoming radiance from a given direction is scattered toward another direction. This abstraction is powerful because it separates geometry, lighting, and material behavior into cleanly defined components.
 
-[BRDF IMAGE HERE]
+<p align="center">
+    <img alt="brdf-wiki" src="https://github.com/user-attachments/assets/6397a03d-af95-4e2f-9435-8619bf3dd6ff" />
+</p>
 
 As stated in the homework file the possible BRDF models to implement were:
 - Original Blinn-Phong
