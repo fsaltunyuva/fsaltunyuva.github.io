@@ -81,8 +81,7 @@ float cosAlphaH = clamp01(wh.dot(n));
 The Original Blinn-Phong BRDF corresponds to the classic shading model commonly used in computer graphics. Instead of using the perfect reflection direction, it computes specular reflection based on the half vector between the incoming light direction and the view direction. It is defined as:
 
 <p align="center">
-    <img alt="original-blinn-phong" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
-    <br>
+    <img alt="original-blinn-phong" src="https://github.com/user-attachments/assets/5b4eac2e-c341-41f1-9a22-bfb2907abf19" />
 </p>
 
 ```cpp
@@ -94,8 +93,7 @@ specScalar = c / cosI;
 The Original Phong BRDF is similar but it computes the specular term using the reflection direction of the incoming light instead of the half vector. The highlight intensity depends on the alignment between this reflection direction and the view direction.
 
 <p align="center">
-    <img alt="original-phong" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
-    <br>
+    <img alt="original-phong" src="https://github.com/user-attachments/assets/d0cd0a92-8f96-4f47-bdfd-1619e6924633" />
 </p>
 
 ```cpp
@@ -109,15 +107,13 @@ The Modified Phong and Modified Blinn-Phong BRDFs extend their originals by opti
 Modified Phong:
 
 <p align="center">
-    <img alt="modified-phong" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
-    <br>
+    <img alt="modified-phong" src="https://github.com/user-attachments/assets/c35aeb1b-4d98-4fe8-8885-24b2bf95dd4f" />
 </p>
 
 Modified Blinn-Phong:
 
 <p align="center">
-    <img alt="modified-phong" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
-    <br>
+    <img alt="modified-phong" src="https://github.com/user-attachments/assets/fa7658d9-5fe5-45ee-abbb-7733a0f62e11" />
 </p>
 
 ```cpp
@@ -156,15 +152,17 @@ The Torrance Sparrow BRDF models surface reflection using a microfacets and is n
 The ```_kdfresnel``` parameter defines the Fresnel reflectance at normal incidence, When enabled, the diffuse component is scaled by:
 
 <p align="center">
-    <img alt="torrance-sparrow" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
-    <br>
+    <img alt="torrance-sparrow" src="https://github.com/user-attachments/assets/76e367e7-9f53-4f37-9c46-9b2b5af786be" />
 </p>
 
 instead of the usual ```(1 - kd)``` term. This adjustment accounts for the fact that some portion of the incoming light is reflected at the surface interface due to Fresnel effects, reducing the amount of light available for diffuse reflection.
 
 <p align="center">
-    <img alt="figure" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <img alt="figure" src="https://github.com/user-attachments/assets/49613b6e-11ca-4a40-8c93-f6f2fc53c700" />
     <br>
+    Figure 3: Configuration for deriving the normalizing factor of the micro-facet
+distribution function from BRDF Summary prepared by Professor Ahmet Oğuz Akyuz.
+    </br>
 </p>
 
 I followed the steps outlined in the lecture notes to implement the Torrance-Sparrow BRDF as follows:
@@ -174,8 +172,7 @@ I followed the steps outlined in the lecture notes to implement the Torrance-Spa
 3. *Compute the probability of this α using D(α) function (Blinn's distrubiton in our case).*
 
 <p align="center">
-    <img alt="D(α)" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
-    <br>
+    <img alt="D(α)" src="https://github.com/user-attachments/assets/50194788-6e5a-4e50-ab40-31ed013d4004" />
 </p>
 
 ```cpp
@@ -189,8 +186,7 @@ float D = ((exponent + 2.0f) / (2.0f * PI)) * pow(nDotWh, exponent);
 4. *Compute the geometry term G(wi, wo).*
 
 <p align="center">
-    <img alt="G(wi, wo)" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
-    <br>
+    <img alt="G(wi, wo)" src="https://github.com/user-attachments/assets/66af4f3a-a9ee-44a5-a03c-511d2e1ef227" />
 </p>
 
 ```cpp
@@ -204,7 +200,7 @@ G = max(0.0f, G);
 5. *Compute the Fresnel reflectance using Shlick's approximation.*
 
 <p align="center">
-    <img alt="F" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <img alt="F" src="https://github.com/user-attachments/assets/6d459bec-e693-463e-87ff-a7bbbae807ae" />
     <br>
 </p>
 
