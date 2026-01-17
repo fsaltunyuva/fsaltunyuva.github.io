@@ -160,8 +160,8 @@ instead of the usual ```(1 - kd)``` term. This adjustment accounts for the fact 
 <p align="center">
     <img alt="figure" src="https://github.com/user-attachments/assets/49613b6e-11ca-4a40-8c93-f6f2fc53c700" />
     <br>
-    Figure 3: Configuration for deriving the normalizing factor of the micro-facet
-distribution function from BRDF Summary prepared by Professor Ahmet Oğuz Akyuz.
+    *Figure 3:* _Configuration for deriving the normalizing factor of the micro-facet
+distribution function from BRDF Summary prepared by Professor Ahmet Oğuz Akyüz._
     </br>
 </p>
 
@@ -172,7 +172,7 @@ I followed the steps outlined in the lecture notes to implement the Torrance-Spa
 3. *Compute the probability of this α using D(α) function (Blinn's distrubiton in our case).*
 
 <p align="center">
-    <img alt="D(α)" src="https://github.com/user-attachments/assets/50194788-6e5a-4e50-ab40-31ed013d4004" />
+    <img width="20%" alt="D(α)" src="https://github.com/user-attachments/assets/50194788-6e5a-4e50-ab40-31ed013d4004" />
 </p>
 
 ```cpp
@@ -186,7 +186,7 @@ float D = ((exponent + 2.0f) / (2.0f * PI)) * pow(nDotWh, exponent);
 4. *Compute the geometry term G(wi, wo).*
 
 <p align="center">
-    <img alt="G(wi, wo)" src="https://github.com/user-attachments/assets/66af4f3a-a9ee-44a5-a03c-511d2e1ef227" />
+    <img width="35%" alt="G(wi, wo)" src="https://github.com/user-attachments/assets/66af4f3a-a9ee-44a5-a03c-511d2e1ef227" />
 </p>
 
 ```cpp
@@ -200,7 +200,7 @@ G = max(0.0f, G);
 5. *Compute the Fresnel reflectance using Shlick's approximation.*
 
 <p align="center">
-    <img alt="F" src="https://github.com/user-attachments/assets/6d459bec-e693-463e-87ff-a7bbbae807ae" />
+    <img width="35%" alt="F" src="https://github.com/user-attachments/assets/6d459bec-e693-463e-87ff-a7bbbae807ae" />
     <br>
 </p>
 
