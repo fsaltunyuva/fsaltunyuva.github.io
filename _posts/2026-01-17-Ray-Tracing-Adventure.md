@@ -7,15 +7,184 @@ categories: [ray-tracing, graphics, adventure]
 
 Hello again, I will continue my ray tracing adventure with Part 6, focusing on implementing features:
 
-- **BRDF**
+- **Bidirectional Reflectance Distribution Function (BRDF)**
 - **Object Lights**
 - **Path Tracing**
 
 Before I begin, I should mention that this blog and project are part of the [Advanced Ray Tracing](https://catalog.metu.edu.tr/course.php?prog=571&course_code=5710795) course given by my professor Ahmet Oğuz Akyüz, at Middle East Technical University.
 
 ### Bugs from Previous Parts 
+Before starting this part, I decided to optimize my ray tracer because I had been getting progressively slower results after each homework part, and also because I saw in the homework file that the VeachAJar scene could reach rendering times of around 36 hours. While making additions to my code in previous parts, I had been taking notes on unnecessary extra operations I noticed in some places or sections that could be handled more efficiently, but I was afraid to refactor, after all, the unwritten rule of engineering is 'if it ain't broke, don't fix it' :). However, the most suitable time to try these optimizations was before starting this homework because I knew how costly the path tracing process would be, and I was determined to get those beautiful path tracing renders that would crown all the results we achieved since the beginning of the semester in time for the homework deadline. Anyway, as I mentioned, I started first with the codes I had previously written and marked with notes like ```// TODO: Not used?``` and ```// TODO: Slows the process?```. With each change I made, I tested various input files from previous parts to check whether I was getting the same results. Although I managed to reduce my renders from around 15 seconds to 12-13 seconds as a result of these changes, what really sped up my ray tracer were the compiler optimization techniques that I thought I had already implemented and configured correctly. Almost none of the optimization methods that I thought I had configured correctly since practically the first homework were actually working. After realizing this, I first felt sad about the time I had wasted waiting unnecessarily in past parts, but then I was glad that I had at least solved this problem before this homework's renders :) This way, I managed to reduce my rendering times by almost half.
+
+Here you can see some comparisons of render times before and after optimizations:
+
+| Scene                 | Before (seconds) | After (seconds) |
+| --------------------- | ---------------- | --------------- |
+
+### Bidirectional Reflectance Distribution Function (BRDF)
+Up to this point, my ray tracer was able to trace rays correctly and compute intersections, but the actual appearance of surfaces was still quite limited. Every surface responded to light in a very basic way, without considering the complex interactions between light and material properties. To address this, I implemented a Bidirectional Reflectance Distribution Function (BRDF) system. 
+
+A BRDF defines how light is reflected at a surface point, given two directions, the incoming light direction (wi) and the outgoing view direction (wo). More precisely, a BRDF describes how much of the incoming radiance from a given direction is scattered toward another direction. This abstraction is powerful because it separates geometry, lighting, and material behavior into cleanly defined components.
+
+[BRDF IMAGE HERE]
+
+As stated in the homework file the possible BRDF models to implement were:
+- Original Blinn-Phong
+- Original Phong
+- Modified Blinn-Phong
+- Modified Phong
+- Torrance Sparrow
+
+and BRDF field in JSON files included the options ```_normalized``` to indicate whether the BRDF should be normalized or not and ```Exponent``` to define the shininess of the surface. Also, Torrance Sparrow model required an additional parameter ```_kdfresnel``` to define the Fresnel reflectance at normal incidence, I will explain this parameter in more detail below.
+
+As in previous parts, I implemented BRDF models as common interface because they all input the same parameters (wi, wo, normal) and output the reflectance value. The shading logic does not need to know which BRDF is being used, it simply calls the BRDF’s evaluation function. In this way, making changes to the BRDF models or adding new ones becomes straightforward without affecting other parts of the code.
+
+Before starting the implementation of the BRDF models, I normalized all direction vectors (wi, wo, normal) at the beginning of each BRDF evaluation function to ensure consistent calculations. Then I caculated cosine terms between the surface normal and trhe incoming and outgoing directions, which are essential for determining how much light is reflected based on the angle of incidence and reflection.
+
+```cpp
+Vec3 n = nRaw.normalize();
+Vec3 wi = wiRaw.normalize();
+Vec3 wo = woRaw.normalize();
+
+float cosI = n.dot(wi);
+float cosO = n.dot(wo);
+```
+
+For all BRDF models, the diffuse component is initalized as Lambertian term:
+
+```cpp
+Vec3 diffuse = kd.scale(1.0f / PI);
+```
+
+In Torrance Sparrow model, it will be modified based on the Fresnel reflectance parameter.
+
+Depending on the BRDF type, the specular component uses either the reflection vector or the half vector. To support both Phong and Blinn-Phong models, helper functions are defined as follows:
+
+Phong uses the cosine between the reflection direction and the view direction (cosAlphaR):
+
+```cpp
+Vec3 r = reflect(wi.scale(-1.0f), n).normalize();
+float cosAlphaR = clamp01(r.dot(wo));
+```
+
+Where reflect is a helper function that computes the reflection direction of an incoming vector about a normal.
+
+Blinn-Phong uses the cosine between the surface normal and the half vector (cosAlphaH):
+
+```cpp
+Vec3 wh = wi.add(wo).normalize();
+float cosAlphaH = clamp01(wh.dot(n));
+```
+
+
+#### Original Blinn-Phong
+The Original Blinn-Phong BRDF corresponds to the classic shading model commonly used in computer graphics. Instead of using the perfect reflection direction, it computes specular reflection based on the half vector between the incoming light direction and the view direction. It is defined as:
+
+[FORMULA IMAGE HERE]
+
+```cpp
+float c = pow(cosAlphaH(), exponent);
+specScalar = c / cosI;
+```
+
+#### Original Phong
+The Original Phong BRDF is similar but it computes the specular term using the reflection direction of the incoming light instead of the half vector. The highlight intensity depends on the alignment between this reflection direction and the view direction.
+
+[FORMULA IMAGE HERE]
+
+```cpp
+float c = pow(cosAlphaR(), exponent);
+specScalar = c / cosI;
+```
+
+#### Modified Phong and Modified Blinn-Phong
+The Modified Phong and Modified Blinn-Phong BRDFs extend their originals by optionally applying normalization. When the ```_normalized``` flag is enabled, a normalization factor derived from the exponent is applied to the specular term. This ensures that the total reflected energy does not exceed the incoming energy, preventing materials from becoming unrealistically bright as the exponent increases.
+
+[FORMULA IMAGE HERE]
+
+
+```cpp
+case BRDFType::ModifiedPhong: {
+    Vec3 diffuse = kd.scale(INV_PI); // 1 / pi for lambertian
+
+    if (normalized) {
+        float c = pow(cosAlphaR(), exponent);
+        specScalar = ((exponent + 2.0f) / (2.0f * PI)) * c; // normalized as in the formula
+    }
+    else {
+        float c = pow(cosAlphaR(), exponent);
+        specScalar = c;
+    }
+    break;
+}
+
+case BRDFType::ModifiedBlinnPhong: {
+    Vec3 diffuse = kd.scale(INV_PI); // 1 / pi for lambertian
+
+    if (normalized) {
+        float c = pow(cosAlphaR(), exponent); // brdf.pdf uses cosAlphaR
+        specScalar = ((exponent + 8.0f) / (8.0f * PI)) * c; // normalized as in the formula
+    }
+    else {
+        float c = pow(cosAlphaH(), exponent);
+        specScalar = c;
+    }
+    break;
+}
+```
+
+#### Torrance-Sparrow
+The Torrance Sparrow BRDF models surface reflection using a microfacets and is normalized by definition. In this model, the ```Exponent``` parameter corresponds to the p term in the microfacet distribution function, controlling the roughness of the surface.
+
+The ```_kdfresnel``` parameter defines the Fresnel reflectance at normal incidence, When enabled, the diffuse component is scaled by:
+
+[FORMULA IMAGE HERE]
+
+instead of the usual ```(1 - kd)``` term. This adjustment accounts for the fact that some portion of the incoming light is reflected at the surface interface due to Fresnel effects, reducing the amount of light available for diffuse reflection.
+
+[Figure 3 IMAGE HERE]
+
+I followed the steps outlined in the lecture notes to implement the Torrance-Sparrow BRDF as follows:
+
+1. *Compute the half vector (wh) between the incoming (wi) and outgoing (wo).*
+2. *Compute the angle α as wh • n.*
+3. *Compute the probability of this α using D(α) function (Blinn's distrubiton in our case).*
+
+[FORMULA IMAGE HERE]
+
+```cpp
+diffuse = kd.scale(1.0f / PI); // Inverse pi for lambertian
+
+Vec3 wh = wi.add(wo).normalize();
+float nDotWh = clamp01(n.dot(wh));
+float D = ((exponent + 2.0f) / (2.0f * PI)) * pow(nDotWh, exponent);
+```
+
+4. *Compute the geometry term G(wi, wo).*
+
+[FORMULA IMAGE HERE]
+
+```cpp
+float denomG = max(epsilon, woDotWh); // Prevent division by zero
+float g1 = (2.0f * nDotWh * cosO_clamped) / denomG;
+float g2 = (2.0f * nDotWh * cosI_clamped) / denomG;
+float G = min(1.0f, min(g1, g2));
+G = max(0.0f, G);
+```
+
+5. *Compute the Fresnel reflectance using Shlick's approximation.*
+
+[FORMULA IMAGE HERE]
+
+### Object Lights
+
+
+### Path Tracing
+
 
 ### Outputs and Closing Thoughts
+
+I uploaded .exr and .hdr files to [this folder in repository](https://github.com/fsaltunyuva/fsaltunyuva.github.io/tree/main/images/2025-12-27-Ray-Tracing-Adventure), I used [GIMP](https://www.gimp.org/) to view them but there are other softwares for that purpose.
 
 As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance. Here are my final renders and their render times:
 
