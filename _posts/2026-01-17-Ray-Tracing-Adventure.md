@@ -80,7 +80,10 @@ float cosAlphaH = clamp01(wh.dot(n));
 #### Original Blinn-Phong
 The Original Blinn-Phong BRDF corresponds to the classic shading model commonly used in computer graphics. Instead of using the perfect reflection direction, it computes specular reflection based on the half vector between the incoming light direction and the view direction. It is defined as:
 
-[FORMULA IMAGE HERE]
+<p align="center">
+    <img alt="original-blinn-phong" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <br>
+</p>
 
 ```cpp
 float c = pow(cosAlphaH(), exponent);
@@ -90,7 +93,10 @@ specScalar = c / cosI;
 #### Original Phong
 The Original Phong BRDF is similar but it computes the specular term using the reflection direction of the incoming light instead of the half vector. The highlight intensity depends on the alignment between this reflection direction and the view direction.
 
-[FORMULA IMAGE HERE]
+<p align="center">
+    <img alt="original-phong" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <br>
+</p>
 
 ```cpp
 float c = pow(cosAlphaR(), exponent);
@@ -100,8 +106,19 @@ specScalar = c / cosI;
 #### Modified Phong and Modified Blinn-Phong
 The Modified Phong and Modified Blinn-Phong BRDFs extend their originals by optionally applying normalization. When the ```_normalized``` flag is enabled, a normalization factor derived from the exponent is applied to the specular term. This ensures that the total reflected energy does not exceed the incoming energy, preventing materials from becoming unrealistically bright as the exponent increases.
 
-[FORMULA IMAGE HERE]
+Modified Phong:
 
+<p align="center">
+    <img alt="modified-phong" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <br>
+</p>
+
+Modified Blinn-Phong:
+
+<p align="center">
+    <img alt="modified-phong" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <br>
+</p>
 
 ```cpp
 case BRDFType::ModifiedPhong: {
@@ -138,11 +155,17 @@ The Torrance Sparrow BRDF models surface reflection using a microfacets and is n
 
 The ```_kdfresnel``` parameter defines the Fresnel reflectance at normal incidence, When enabled, the diffuse component is scaled by:
 
-[FORMULA IMAGE HERE]
+<p align="center">
+    <img alt="torrance-sparrow" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <br>
+</p>
 
 instead of the usual ```(1 - kd)``` term. This adjustment accounts for the fact that some portion of the incoming light is reflected at the surface interface due to Fresnel effects, reducing the amount of light available for diffuse reflection.
 
-[Figure 3 IMAGE HERE]
+<p align="center">
+    <img alt="figure" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <br>
+</p>
 
 I followed the steps outlined in the lecture notes to implement the Torrance-Sparrow BRDF as follows:
 
@@ -150,7 +173,10 @@ I followed the steps outlined in the lecture notes to implement the Torrance-Spa
 2. *Compute the angle α as wh • n.*
 3. *Compute the probability of this α using D(α) function (Blinn's distrubiton in our case).*
 
-[FORMULA IMAGE HERE]
+<p align="center">
+    <img alt="D(α)" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <br>
+</p>
 
 ```cpp
 diffuse = kd.scale(1.0f / PI); // Inverse pi for lambertian
@@ -162,7 +188,10 @@ float D = ((exponent + 2.0f) / (2.0f * PI)) * pow(nDotWh, exponent);
 
 4. *Compute the geometry term G(wi, wo).*
 
-[FORMULA IMAGE HERE]
+<p align="center">
+    <img alt="G(wi, wo)" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <br>
+</p>
 
 ```cpp
 float denomG = max(epsilon, woDotWh); // Prevent division by zero
@@ -174,7 +203,10 @@ G = max(0.0f, G);
 
 5. *Compute the Fresnel reflectance using Shlick's approximation.*
 
-[FORMULA IMAGE HERE]
+<p align="center">
+    <img alt="F" src="https://github.com/user-attachments/assets/6ce5c2c5-b590-4794-9bd4-9e8d23d724ac" />
+    <br>
+</p>
 
 ### Object Lights
 
