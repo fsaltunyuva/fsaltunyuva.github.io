@@ -203,8 +203,25 @@ G = max(0.0f, G);
 
 <p align="center">
     <img width="35%" alt="F" src="https://github.com/user-attachments/assets/6d459bec-e693-463e-87ff-a7bbbae807ae" />
-    <br>
 </p>
+
+#### Comparison
+
+Here you can see some comparisons between different BRDF models implemented in killeroo_closeup_phot scene:
+
+<p align="center">
+    <img alt="brdf_comparison" src="https://github.com/user-attachments/assets/ae966782-d2ba-4a01-8489-c53e28246f7c" />
+</p>
+
+Also, you can see the render times for each BRDF model in the table below:
+
+| BRDF Model               | Time (seconds) |
+| ----------------------- | --------------- |
+| Original Blinn-Phong    | 91.3994        |
+| Original Phong          | 97.8805        |
+| Modified Blinn-Phong    | 105.885         |
+| Modified Phong          | 99.3751         |
+| Torrance-Sparrow        | 90.5573         |
 
 ### Object Lights
 
