@@ -173,7 +173,7 @@ I followed the steps outlined in the lecture notes to implement the Torrance-Spa
 3. *Compute the probability of this α using D(α) function (Blinn's distrubiton in our case).*
 
 <p align="center">
-    <img width="20%" alt="D(α)" src="https://github.com/user-attachments/assets/50194788-6e5a-4e50-ab40-31ed013d4004" />
+    <img width="40%" alt="D(α)" src="https://github.com/user-attachments/assets/50194788-6e5a-4e50-ab40-31ed013d4004" />
 </p>
 
 ```cpp
@@ -187,7 +187,7 @@ float D = ((exponent + 2.0f) / (2.0f * PI)) * pow(nDotWh, exponent);
 4. *Compute the geometry term G(wi, wo).*
 
 <p align="center">
-    <img alt="G(wi, wo)" src="https://github.com/user-attachments/assets/66af4f3a-a9ee-44a5-a03c-511d2e1ef227" />
+    <img width="50%" alt="G(wi, wo)" src="https://github.com/user-attachments/assets/66af4f3a-a9ee-44a5-a03c-511d2e1ef227" />
 </p>
 
 ```cpp
@@ -201,7 +201,7 @@ G = max(0.0f, G);
 5. *Compute the Fresnel reflectance using Shlick's approximation.*
 
 <p align="center">
-    <img width="35%" alt="F" src="https://github.com/user-attachments/assets/6d459bec-e693-463e-87ff-a7bbbae807ae" />
+    <img width="45%" alt="F" src="https://github.com/user-attachments/assets/6d459bec-e693-463e-87ff-a7bbbae807ae" />
 </p>
 
 #### Smooth Shading Bug Fix
@@ -407,7 +407,7 @@ Next Event Estimation is a technique used in path tracing to reduce noise and im
 In the lecture notes, the direct lighting term is written as an integral over the hemisphere (or equivalently over light surfaces). With NEE, we estimate it by sampling a direction toward a light and using the Monte Carlo estimator:
 
 <p align="center">
-    <img alt="formula3" src="https://github.com/user-attachments/assets/c00443e2-6265-4e6b-9836-ae4e9445f184" />
+    <img width="50%" alt="formula3" src="https://github.com/user-attachments/assets/c00443e2-6265-4e6b-9836-ae4e9445f184" />
 </p>
 
 In my code, this is implemented by sampling one emitter (including light spheres and light meshes) and computing:
@@ -428,7 +428,7 @@ For the same sampled direction, there may be multiple ways to generate it. MIS c
 For example, using the balance heuristic, the light sampled contribution is weighted by:
 
 <p align="center">
-    <img width="50%" alt="formula3" src="https://github.com/user-attachments/assets/8f68847a-e26f-467d-ada9-6f2d6f1f62a2" />
+    <img width="30%" alt="formula3" src="https://github.com/user-attachments/assets/8f68847a-e26f-467d-ada9-6f2d6f1f62a2" />
 </p>
 
 ```cpp
@@ -535,7 +535,7 @@ This render took nearly 20 hours, and although the render is not completely matc
 
 _Time: 71627.6* s_
 <p align="center">
-<img alt="teapot_roughness" src="https://github.com/user-attachments/assets/573e5709-0a80-4edb-b4af-1603fc5ae2da" />
+<img alt="VeachAjar_phot" src="https://github.com/user-attachments/assets/15e9eae7-33ff-4ba6-8451-0f5a336611a4" />
 </p>
 
 ---
@@ -543,7 +543,8 @@ _Time: 71627.6* s_
 ### killeroo_blinnphong
 _Time: 77.2764 s_
 <p align="center">
-<img alt="cube_directional" src="https://github.com/user-attachments/assets/933a8170-8750-47c3-b877-28a35bb440a9" />
+<img alt="killeroo_blinnphong_phot" src="https://github.com/user-attachments/assets/404cd6d4-7256-4829-ba1d-589125d8f81e" />
+
 </p>
 
 ---
@@ -551,7 +552,7 @@ _Time: 77.2764 s_
 ### killeroo_blinnphong (killeroo_blinnphong_closeup) 
 _Time: 91.3994 s_
 <p align="center">
-<img alt="cube_point" src="https://github.com/user-attachments/assets/335ba37e-f133-4eaf-a7f1-03f2e02756a6" />
+<img alt="killeroo_torrancesparrow_closeup_phot" src="https://github.com/user-attachments/assets/54df27fc-1286-415b-b7a1-83d0c6351f3a" />
 </p>
 
 ---
@@ -559,14 +560,16 @@ _Time: 91.3994 s_
 ### killeroo_torrancesparrow  
 _Time: 71.9786 s_
 <p align="center">
-<img alt="cube_point_hdr" src="https://github.com/user-attachments/assets/5c607afa-2b45-49ef-abf9-d05e3219f22e" />
+<img alt="killeroo_torrancesparrow_phot" src="https://github.com/user-attachments/assets/b8fa408a-f428-4847-9ab1-1ba9fb963e49" />
+
 </p>
 
 ---
 ### killeroo_torrancesparrow (killeroo_torrancesparrow_closeup)
 _Time: 90.5573 s_
 <p align="center">
-<img alt="dragon_spot_light_msaa" src="https://github.com/user-attachments/assets/2ff0d40c-6cbd-480e-aa45-f5e3a681638b" />
+<img alt="killeroo_torrancesparrow_closeup_phot" src="https://github.com/user-attachments/assets/278e4f50-d9ea-4a06-b115-11202198356f" />
+
 </p>
 
 ---
@@ -574,7 +577,8 @@ _Time: 90.5573 s_
 ### cornellbox_jaroslav_diffuse
 _Time: 113.283 s_
 <p align="center">
-<img alt="empty_environment_latlong_aces" src="https://github.com/user-attachments/assets/3154f4d9-9a05-4113-a3b7-329d1cd8d31f" />
+<img alt="cornellbox_jaroslav_diffuse_phot" src="https://github.com/user-attachments/assets/3b414a41-f84a-4748-9579-23754d6f5f81" />
+
 </p>
 
 ---
@@ -582,7 +586,7 @@ _Time: 113.283 s_
 ### cornellbox_jaroslav_diffuse_area
 _Time: 79.1459 s_
 <p align="center">
-<img alt="empty_environment_light_probe_aces" src="https://github.com/user-attachments/assets/f96e1ad3-9f9f-4be0-bd4e-3b3254db20c5" />
+<img alt="cornellbox_jaroslav_diffuse_area_phot" src="https://github.com/user-attachments/assets/2d26bb58-b861-42a0-a59f-b45ade806e4a" />
 </p>
 
 ---
@@ -590,7 +594,8 @@ _Time: 79.1459 s_
 ### cornellbox_jaroslav_glossy
 _Time: 4.42081 s_
 <p align="center">
-<img alt="glass_sphere_env_phot" src="https://github.com/user-attachments/assets/27b3b2d3-dc67-4c56-8f7b-79a33800929b" />
+<img alt="cornellbox_jaroslav_glossy_phot" src="https://github.com/user-attachments/assets/f334d6c9-c594-4f75-96d5-4dacd7dc745f" />
+
 </p>
 
 ---
@@ -598,10 +603,7 @@ _Time: 4.42081 s_
 ### cornellbox_jaroslav_glossy_area
 _Time: 112.296 s_
 <p align="center">
-<img alt="head_env_light_phot" src="https://github.com/user-attachments/assets/c45dd861-159a-4f8a-b084-230f242c1efe" />
-            <br>
-    <em>Photographic</em>
-    <br>
+<img alt="cornellbox_jaroslav_glossy_area_phot" src="https://github.com/user-attachments/assets/9e8a902b-6a7a-4f20-9ca1-d8b6c20fa96a" />
 </p>
 
 ---
@@ -609,7 +611,8 @@ _Time: 112.296 s_
 ### cornellbox_jaroslav_glossy_area_ellipsoid
 _Time: 155.784 s_
 <p align="center">
-<img alt="mirror_sphere_env_phot" src="https://github.com/user-attachments/assets/25fb5f57-ab43-4058-b29f-6767952c48b7" />
+<img alt="cornellbox_jaroslav_glossy_area_ellipsoid_phot" src="https://github.com/user-attachments/assets/ff9755c2-4b0e-486b-8834-e661e512caab" />
+
 </p>
 
 ---
@@ -617,10 +620,8 @@ _Time: 155.784 s_
 ### cornellbox_jaroslav_glossy_area_small
 _Time: 212.469 s_
 <p align="center">
-<img alt="sphere_env_light_phot" src="https://github.com/user-attachments/assets/cd4f7724-6694-4344-9e94-767ce5110b12" />
-                <br>
-    <em>Photographic</em>
-    <br>
+<img alt="cornellbox_jaroslav_glossy_area_small_phot" src="https://github.com/user-attachments/assets/4e725906-041f-4a11-b49b-858e0d51afff" />
+
 </p>
 
 ---
@@ -628,7 +629,8 @@ _Time: 212.469 s_
 ### cornellbox_jaroslav_glossy_area_sphere
 _Time: 168.635 s_
 <p align="center">
-<img alt="sphere_point_hdr_texture_aces" src="https://github.com/user-attachments/assets/2b6d6aad-57cd-498f-b628-67af9491fcc8" />
+<img alt="cornellbox_jaroslav_glossy_area_sphere_phot" src="https://github.com/user-attachments/assets/2a28565c-42fb-4bde-9338-6bf31ed854af" />
+
 </p>
 
 ---
@@ -636,7 +638,7 @@ _Time: 168.635 s_
 ### cornell_diffuse (diffuse_cornell_box_default)
 _Time: 12.1427 s_
 <p align="center">
-<img alt="dragon_new_ply_with_spot" src="https://github.com/user-attachments/assets/8072ef91-b8d5-42b9-a12d-a025ada42ba0" />
+<img alt="diffuse_cornell_box_default_phot" src="https://github.com/user-attachments/assets/de743b50-99b2-41fa-b7a3-bdf2ed03f629" />
 </p>
 
 ---
@@ -644,7 +646,7 @@ _Time: 12.1427 s_
 ### cornell_diffuse (diffuse_cornell_box_importance) 
 _Time: 11.9678 s_
 <p align="center">
-<img alt="audi-tt-glacier" src="https://github.com/user-attachments/assets/0b12aad6-646d-4cf3-a9a3-2e8530b4c95a" />
+<img alt="diffuse_cornell_box_importance_phot" src="https://github.com/user-attachments/assets/3aa861a8-a4ca-409f-b369-fa962646e6f2" />
 </p>
 
 ---
@@ -652,7 +654,7 @@ _Time: 11.9678 s_
 ### cornell_diffuse (diffuse_cornell_box_importance_nee_mis_balance)
 _Time: 21.8582 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="diffuse_cornell_box_importance_nee_mis_balance_phot" src="https://github.com/user-attachments/assets/7701db06-7c35-4d6c-8cd9-549624cc1f73" />
 </p>
 
 ---
@@ -660,7 +662,7 @@ _Time: 21.8582 s_
 ### cornell_diffuse (diffuse_cornell_box_importance_nee_mis_balance_clamping)
 _Time: 21.628 s_
 <p align="center">
-<img alt="VeachAjar_phot_key_0_18_s1_2_burn_1" src="https://github.com/user-attachments/assets/4e4ef41d-0910-4520-86a4-f1ff4d932401" />
+<img alt="diffuse_cornell_box_importance_nee_mis_balance_clamping_phot" src="https://github.com/user-attachments/assets/ecc75d00-e745-4eaa-95ee-7a77f28ec85e" />
 </p>
 
 ---
@@ -668,7 +670,7 @@ _Time: 21.628 s_
 ### cornell_diffuse (diffuse_cornell_box_importance_nee_mis_balance_splitting) 
 _Time: 1.12045 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="diffuse_cornell_box_importance_nee_mis_balance_splitting_phot" src="https://github.com/user-attachments/assets/2db609af-f97b-41e9-bc34-d5be517349da" />
 </p>
 
 ---
@@ -676,7 +678,7 @@ _Time: 1.12045 s_
 ### cornell_diffuse (diffuse_cornell_box_importance_nee_mis_balance_splitting_clamp)
 _Time: 1.08141 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="diffuse_cornell_box_importance_nee_mis_balance_splitting_clamp_phot" src="https://github.com/user-attachments/assets/2f54b34d-d8eb-491b-8624-fccf854e79b5" />
 </p>
 
 ---
@@ -684,7 +686,7 @@ _Time: 1.08141 s_
 ### cornell_diffuse (diffuse_cornell_box_importance_nee_mis_balance_russian)
 _Time: 20.3728 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="diffuse_cornell_box_importance_nee_mis_balance_russian_phot" src="https://github.com/user-attachments/assets/ece96d60-3f33-41d5-b767-f327bf0021d3" />
 </p>
 
 ---
@@ -692,7 +694,7 @@ _Time: 20.3728 s_
 ### cornell_diffuse (diffuse_cornell_box_importance_nee_mis_balance_russian_1600)
 _Time: 284.931 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="diffuse_cornell_box_importance_nee_mis_balance_russian_1600_phot" src="https://github.com/user-attachments/assets/ebfc05b4-5921-4730-ab52-baf97fc969c6" />
 </p>
 
 ---
@@ -700,7 +702,7 @@ _Time: 284.931 s_
 ### cornell_glass_mirror (cornell_box_default) 
 _Time: 11.3779 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="cornell_box_default_phot" src="https://github.com/user-attachments/assets/48a790f6-a042-4626-9707-8d62c1e40cc3" />
 </p>
 
 ---
@@ -708,7 +710,7 @@ _Time: 11.3779 s_
 ### cornell_glass_mirror (cornell_box_importance)
 _Time: 10.2495 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="cornell_box_importance_phot" src="https://github.com/user-attachments/assets/0f593af1-45c1-4d66-b647-89b59127b571" />
 </p>
 
 ---
@@ -716,7 +718,7 @@ _Time: 10.2495 s_
 ### cornell_glass_mirror (cornell_box_importance_nee_mis_balance) 
 _Time: 147.712 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="cornell_box_importance_nee_mis_balance_phot" src="https://github.com/user-attachments/assets/8abf29a5-52af-4b08-a463-680ce77b1f44" />
 </p>
 
 ---
@@ -724,7 +726,7 @@ _Time: 147.712 s_
 ### cornell_glass_mirror (cornell_box_importance_nee_mis_balance_clamping)
 _Time: 148.752 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="cornell_box_importance_nee_mis_balance_clamping_phot" src="https://github.com/user-attachments/assets/623da4f8-cccc-4e8e-83c0-fb2f03e5c248" />
 </p>
 
 ---
@@ -732,7 +734,7 @@ _Time: 148.752 s_
 ### cornell_glass_mirror (cornell_box_importance_nee_mis_balance_splitting)
 _Time: 6.16006 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="cornell_box_importance_nee_mis_balance_splitting_phot" src="https://github.com/user-attachments/assets/8fa5868f-f5ea-4ad4-a619-775daa0ff746" />
 </p>
 
 ---
@@ -740,7 +742,7 @@ _Time: 6.16006 s_
 ### cornell_glass_mirror (cornell_box_importance_nee_mis_balance_splitting_clamp)
 _Time: 6.19947 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="cornell_box_importance_nee_mis_balance_splitting_clamp_phot" src="https://github.com/user-attachments/assets/f6ad87c0-5c14-4d0d-a70f-6be294dfea25" />
 </p>
 
 ---
@@ -748,7 +750,8 @@ _Time: 6.19947 s_
 ### cornell_glass_mirror (cornell_box_importance_nee_mis_balance_russian)  
 _Time: 136.45 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="cornell_box_importance_nee_mis_balance_russian_phot" src="https://github.com/user-attachments/assets/8e55551f-5270-467e-8442-ab8595dd46b7" />
+
 </p>
 
 ---
@@ -756,7 +759,7 @@ _Time: 136.45 s_
 ### cornell_glass_mirror (cornell_box_importance_nee_mis_balance_2500x2) 
 _Time: 3963.64 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img alt="cornell_box_importance_nee_mis_balance_2500x2_phot" src="https://github.com/user-attachments/assets/66a79ff7-cf67-436b-a2d6-fde4c27bc319" />
 </p>
 
 ---
@@ -764,7 +767,7 @@ _Time: 3963.64 s_
 ### cornellbox_prism_light
 _Time: 113.818 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img width="512" height="512" alt="cornellbox_prism_light_phot" src="https://github.com/user-attachments/assets/924f01c8-467c-4a57-a74d-b002dcfd8a06" />
 </p>
 
 ---
@@ -772,7 +775,7 @@ _Time: 113.818 s_
 ### cornellbox_sphere_light
 _Time: 72.9574 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img width="512" height="512" alt="cornellbox_sphere_light_phot" src="https://github.com/user-attachments/assets/a4da6f91-b0b0-44c5-bc31-4f2c0ff276ab" />
 </p>
 
 ---
@@ -780,7 +783,7 @@ _Time: 72.9574 s_
 ### sponza_direct
 _Time: 104.626 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img width="1280" height="720" alt="sponza_direct_phot" src="https://github.com/user-attachments/assets/09404b84-e983-4d3b-a824-d9bbeb33180c" />
 </p>
 
 ---
@@ -788,5 +791,5 @@ _Time: 104.626 s_
 ### sponza_path
 _Time: 3047.49 s_
 <p align="center">
-<img alt="audi-tt-pisa" src="https://github.com/user-attachments/assets/2b6f7c09-6944-41bc-8f5a-e5fcbfcd79db" />
+<img width="1280" height="720" alt="sponza_path_phot" src="https://github.com/user-attachments/assets/b27ae8cb-ff76-4e44-a7ad-02a68c50a99c" />
 </p>
