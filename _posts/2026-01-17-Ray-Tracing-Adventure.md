@@ -767,7 +767,7 @@ _Time: 3963.64 s_
 ### cornellbox_prism_light
 _Time: 113.818 s_
 <p align="center">
-<img width="512" height="512" alt="cornellbox_prism_light_phot" src="https://github.com/user-attachments/assets/924f01c8-467c-4a57-a74d-b002dcfd8a06" />
+<img alt="cornellbox_prism_light_phot" src="https://github.com/user-attachments/assets/924f01c8-467c-4a57-a74d-b002dcfd8a06" />
 </p>
 
 ---
@@ -775,7 +775,7 @@ _Time: 113.818 s_
 ### cornellbox_sphere_light
 _Time: 72.9574 s_
 <p align="center">
-<img width="512" height="512" alt="cornellbox_sphere_light_phot" src="https://github.com/user-attachments/assets/a4da6f91-b0b0-44c5-bc31-4f2c0ff276ab" />
+<img alt="cornellbox_sphere_light_phot" src="https://github.com/user-attachments/assets/a4da6f91-b0b0-44c5-bc31-4f2c0ff276ab" />
 </p>
 
 ---
@@ -783,7 +783,7 @@ _Time: 72.9574 s_
 ### sponza_direct
 _Time: 104.626 s_
 <p align="center">
-<img width="1280" height="720" alt="sponza_direct_phot" src="https://github.com/user-attachments/assets/09404b84-e983-4d3b-a824-d9bbeb33180c" />
+<img alt="sponza_direct_phot" src="https://github.com/user-attachments/assets/09404b84-e983-4d3b-a824-d9bbeb33180c" />
 </p>
 
 ---
@@ -791,5 +791,5 @@ _Time: 104.626 s_
 ### sponza_path
 _Time: 3047.49 s_
 <p align="center">
-<img width="1280" height="720" alt="sponza_path_phot" src="https://github.com/user-attachments/assets/b27ae8cb-ff76-4e44-a7ad-02a68c50a99c" />
+<img alt="sponza_path_phot" src="https://github.com/user-attachments/assets/b27ae8cb-ff76-4e44-a7ad-02a68c50a99c" />
 </p>
