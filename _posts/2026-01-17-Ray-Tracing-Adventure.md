@@ -205,6 +205,16 @@ G = max(0.0f, G);
     <img width="35%" alt="F" src="https://github.com/user-attachments/assets/6d459bec-e693-463e-87ff-a7bbbae807ae" />
 </p>
 
+#### Smooth Shading Bug Fix
+After implementing BRDF, I tried killeroo_torrancesparrow scene but I get the following render:
+
+[BUGGED KILLEROO RENDER IMAGE]
+
+I was confused at first because I thought my BRDF implementation had some bugs, but after double checking everything, I realized that the problem was also in my HW4 render too. Then I realized that there is a bug in my smooth shading implementation, it was caused by computing barycentric coordinates in world space while using mesh local vertex positions and by indexing per vertex normals with global vertex indices. The problem was fixed by transforming the hit point back into local space before computing barycentric coordinates.
+
+[FIXED KILLEROO RENDER IMAGE]
+
+
 #### Comparison
 
 Here you can see some comparisons between different BRDF models implemented in killeroo_closeup_phot scene:
@@ -257,6 +267,22 @@ if (info.isEmissive) {
 If Next Event Estimation (NEE) is disabled we can add the emission directly because we are not sampling lights separately. However, if NEE is enabled, we only add the emission if the last bounce was specular. This prevents double counting light contributions from light sources when we are already sampling them explicitly.
 
 I will explain path tracing and next event estimation in more detail below in the Path Tracing section.
+
+#### Shadow Bug Fix
+After implementing object lights, I tried cornellbox_sphere_light scene but I got the following render:
+
+[BUGGED 2500 IMAGE]
+
+There is an additional light on the ceiling that should not be there. Same issue was also occured in HW3 where I was trying to implement area lights. The issue was caused by double-sided lighting. My code was using ```fabs``` for the cosine calculation, which caused the light mesh to emit light both downwards (into the room) and upwards (onto the ceiling).
+
+To fix this, I removed the absolute value to make the light source one-sided, ensuring it only emits light in the direction of the normal (downwards):
+
+```cpp
+// float cosL = max(0.0f, fabs(nTri.dot(wi.scale(-1.0f))));
+float cosL = max(0.0f, nTri.dot(wi.scale(-1.0f)));
+```
+
+Additionally, I enabled back-face culling for light meshes in the intersector. This ensures that when rays hit the back of the light (the side facing the ceiling), they pass through it instead of being blocked, preventing a black square artifact on the ceiling.
 
 ### Path Tracing
 Here we come to the most satisfying renders of the entire ray tracing adventure. Up to this point, my renderer was able to compute direct illumination correctly using ray tracing and explicit light sampling. However, this approach alone cannot capture important global illumination effects such as indirect lighting or soft interreflections. To address this limitations, we will implement a path tracer.
@@ -406,6 +432,19 @@ Scenes that contain glasses and mirrors can cause problems due to their generati
 Increasing the sample count can help reduce fireflies (as in almost all of our problems :)), but it also increases render times significantly. To address this, we use clamping, which limits the maximum contribution from any single sample. This helps to reduce variance and fireflies without requiring an more samples.
 
 [CLAMPING COMPARISON RENDERS IMAGE]
+
+#### A classic bug of every part: the forgotten epsilon
+I forget to add or subtract epsilon so often when calling functions (especially isInShadow) that I can now spot epsilon related bugs instantly :). Instead of manually adding or subtracting epsilons in the parameters, I should handle this directly inside the functions. Below is the bug caused by the forgotten epsilon in this section, along with its fixed version:
+
+```cpp
+// if (isInShadow(scene, shadowOrigin, wi, d, intersector, rayTime)) 
+//    return out;
+
+if (isInShadow(scene, shadowOrigin, wi, d - scene.shadowRayEpsilon, intersector, rayTime)) 
+    return out;
+```
+
+[BUGGED EPSILON GIF]
 
 ### Outputs and Closing Thoughts
 There are some minor differences in killeroo scene and I am suspecting that it is because of a different bug from previous parts because I had these issues in previous killeroo renders as well. As I mentioned in previous parts, I broke some things in Beer's Law implementation while refactoring so there are some differences due to that in cornell_glass_mirror and veach_ajar scene. Other than these, I think my renders are mostly correct.
