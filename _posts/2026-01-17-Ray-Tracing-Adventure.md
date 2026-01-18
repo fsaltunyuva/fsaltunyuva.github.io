@@ -395,7 +395,13 @@ In the end, enabling importance sampling changes only the PDF and sampling distr
 
 Next Event Estimation is a technique used in path tracing to reduce noise and improve convergence by explicitly sampling direct illumination from light sources at each bounce. Even with importance sampling, a randomly sampled hemisphere direction may take a long time to hit a light source, especially when lights are small or far away, so, instead of relying only on random hemisphere sampling to eventually hit light sources, we directly sample the contribution from lights at each intersection point.
 
-[NEE COMPARISON RENDERS IMAGE]
+<p align="center">
+<img alt="NEEComparison" src="https://github.com/user-attachments/assets/2fea623f-2fa4-4945-bd09-c5f105f09816" />
+            <br>
+    <em>Importance Sampling - Importance Sampling, NEE, MIS</em>
+    <br>
+</p>
+
 
 In the lecture notes, the direct lighting term is written as an integral over the hemisphere (or equivalently over light surfaces). With NEE, we estimate it by sampling a direction toward a light and using the Monte Carlo estimator:
 
@@ -443,16 +449,17 @@ Vec3 contribution = lightSample.Li.multiply(f).scale(cosI_light * w / lightSampl
 directLight = directLight.add(contribution);
 ```
 
-[MIS COMPARISON RENDERS IMAGE]
-
 #### Clamping
 Scenes that contain glasses and mirrors can cause problems due to their generation of high radiance regions. These high radiance regions can cause "fireflies" in the render, which are bright pixels that stand out from the surrounding area.
 
-[BLENDER GURU FIREFLY IMAGE] (https://www.blenderguru.com/articles/7-ways-get-rid-fireflies)
+<p align="center">
+<img alt="fireflies" src="https://github.com/user-attachments/assets/327800e5-dda6-4aa7-aa45-39a0702b71d7" />
+            <br>
+    <em>Firefly example from blenderguru.com</em>
+    <br>
+</p>
 
-Increasing the sample count can help reduce fireflies (as in almost all of our problems :)), but it also increases render times significantly. To address this, we use clamping, which limits the maximum contribution from any single sample. This helps to reduce variance and fireflies without requiring an more samples.
-
-[CLAMPING COMPARISON RENDERS IMAGE]
+Increasing the sample count can help reduce fireflies (as in almost all of our problems :)), but it also increases render times significantly. To address this, we use clamping, which limits the maximum contribution from any single sample. This helps to reduce variance and fireflies without requiring more samples.
 
 #### A classic bug of every part: the forgotten epsilon
 I forget to add or subtract epsilon so often when calling functions (especially isInShadow) that I can now spot epsilon related bugs instantly :). Instead of manually adding or subtracting epsilons in the parameters, I should handle this directly inside the functions. Below is the bug caused by the forgotten epsilon in this section, along with its fixed version:
@@ -465,7 +472,7 @@ if (isInShadow(scene, shadowOrigin, wi, d - scene.shadowRayEpsilon, intersector,
     return out;
 ```
 
-[BUGGED EPSILON GIF]
+![bugepsilon](https://github.com/user-attachments/assets/50cb8b5d-fc5b-48b2-9ad8-a501239a5a4f)
 
 ### Outputs and Closing Thoughts
 There are some minor differences in killeroo scene and I am suspecting that it is because of a different bug from previous parts because I had these issues in previous killeroo renders as well. As I mentioned in previous parts, I broke some things in Beer's Law implementation while refactoring so there are some differences due to that in cornell_glass_mirror and veach_ajar scene. Other than these, I think my renders are mostly correct.
