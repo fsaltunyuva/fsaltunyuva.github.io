@@ -206,14 +206,17 @@ G = max(0.0f, G);
 </p>
 
 #### Smooth Shading Bug Fix
-After implementing BRDF, I tried killeroo_torrancesparrow scene but I get the following render:
+After implementing BRDF, I tried killeroo_torrancesparrow scene, but I get the following render:
 
-[BUGGED KILLEROO RENDER IMAGE]
+<p align="center">
+    <img alt="buggedkilleroo" src="https://github.com/user-attachments/assets/4104e207-f558-4b62-b473-be67b013fa37" />
+</p>
 
 I was confused at first because I thought my BRDF implementation had some bugs, but after double checking everything, I realized that the problem was also in my HW4 render too. Then I realized that there is a bug in my smooth shading implementation, it was caused by computing barycentric coordinates in world space while using mesh local vertex positions and by indexing per vertex normals with global vertex indices. The problem was fixed by transforming the hit point back into local space before computing barycentric coordinates.
 
-[FIXED KILLEROO RENDER IMAGE]
-
+<p align="center">
+    <img alt="fixedkilleroo" src="https://github.com/user-attachments/assets/2880d6e9-12c5-4c99-82c3-cf3a24bd1f29" />
+</p>
 
 #### Comparison
 
@@ -271,7 +274,9 @@ I will explain path tracing and next event estimation in more detail below in th
 #### Shadow Bug Fix
 After implementing object lights, I tried cornellbox_sphere_light scene but I got the following render:
 
-[BUGGED 2500 IMAGE]
+<p align="center">
+    <img alt="shadowbug" src="https://github.com/user-attachments/assets/335a8157-d903-488f-8586-5f06d3e5ca64" />
+</p>
 
 There is an additional light on the ceiling that should not be there. Same issue was also occured in HW3 where I was trying to implement area lights. The issue was caused by double-sided lighting. My code was using ```fabs``` for the cosine calculation, which caused the light mesh to emit light both downwards (into the room) and upwards (onto the ceiling).
 
@@ -293,19 +298,27 @@ So, this homework part was a great opportunity for me to understand the differen
 
 To describe the idea simply, I will use the example from the video ["How Path Tracing Makes Computer Graphics Look Awesome" by Computerphile](https://www.youtube.com/watch?v=3OKj0SQ_UTw) (they also have videos about ray tracing for anyone interested). As described in the video, let's say that we have a corridor like this:
 
-[VIDEO CORRIDOR IMAGE]
+<p align="center">
+    <img alt="pathtracing1" src="https://github.com/user-attachments/assets/165c21a8-b818-494d-964f-9cfe48dd70d6" />
+</p>
 
 In ray tracing, let's say we shoot a ray as in above, then we cast another ray towards the light source to see if it is visible from the intersection point, and it is occluded by the wall, so we get no contribution from the light source. However, in real life, the light from the light source would bounce off the walls and illuminate the corridor indirectly, as in this Blender render from the video:
 
-[BLENDER CORRIDOR IMAGE]
+<p align="center">
+    <img alt="pathtracing2" src="https://github.com/user-attachments/assets/4919eff6-9ecc-45f0-b3bb-eb580f793efe />
+</p>
 
 To capture these indirect lighting effects, we need to trace additional rays that bounce around the scene, gathering light contributions from multiple bounces. This is where path tracing comes in. In path tracing, instead of just casting a single shadow ray to each light source, we recursively trace rays that bounce off surfaces, simulating the complex interactions of light in the scene.
 
-[PATH TRACING CORRIDOR IMAGE]
+<p align="center">
+    <img alt="pathtracing3" src="https://github.com/user-attachments/assets/d74eae1b-6f21-46bb-925f-5649cbd9a590" />
+</p>
 
 Let's say we shoot five rays from the intersection point, we also calculate their contributions as shown in the image above, then we average these contributions (this is the main idea of Monte Carlo Integration) to get the final color for that pixel (in a real path tracer, we also do the same process for new rays). This way, we can capture both direct illumination from light sources and indirect illumination from light bouncing off other surfaces. And as we get further away from the light source, we can see that the indirect illumination becomes less intense, just like in real life. (Here you can see that light intensity is lowered to 20%)
 
-[PATH TRACING CORRIDOR IMAGE 2]
+<p align="center">
+    <img alt="pathtracing4" src="https://github.com/user-attachments/assets/10dade22-4e19-456a-b780-091486b8d995" />
+</p>
 
 But how to choose where the rays go? We randomly choose rays around the hemisphere above the intersection point, weighted by the BRDF of the surface. This way, we are more likely to sample directions that contribute more light based on the material properties.
 
@@ -332,7 +345,9 @@ continue; // Skip hemisphere sampling for delta materials
 
 For nonspecular materials (diffuse and glossy), the renderer evaluates direct illumination from point lights and then continues the path by sampling a new direction over the hemisphere. The outgoing direction is sampled either uniformly or using cosine-weighted hemisphere sampling. The path throughput is then updated using the standard Monte Carlo estimator formula:
 
-[FORMULA IMAGE]
+<p align="center">
+    <img alt="formula" src="https://github.com/user-attachments/assets/2e4d3be5-36bf-413c-9e26-96aa5c45a7b7" />
+</p>
 
 which corresponds to:
 
@@ -361,7 +376,9 @@ Paths with low expected contribution are terminated early, while surviving paths
 
 In the basic Monte Carlo estimator, we update the path throughput using:
 
-[FORMULA IMAGE]
+<p align="center">
+    <img alt="formula" src="https://github.com/user-attachments/assets/2e4d3be5-36bf-413c-9e26-96aa5c45a7b7" />
+</p>
 
 The main idea behind importance sampling is to choose a sampling distribution that resembles the function being integrated. For diffuse terms, function being integrated contains a cosThetai term, so sampling directions with a cosine-weighted distribution reduces variance compared to uniform hemisphere sampling. In my implementation, outgoing direction is sampled with uniform sampling of the hemisphere 1 / 2π, or cosine-weighted sampling cosTheta / π.
 
@@ -382,7 +399,9 @@ Next Event Estimation is a technique used in path tracing to reduce noise and im
 
 In the lecture notes, the direct lighting term is written as an integral over the hemisphere (or equivalently over light surfaces). With NEE, we estimate it by sampling a direction toward a light and using the Monte Carlo estimator:
 
-[NEE FORMULA IMAGE]
+<p align="center">
+    <img alt="formula3" src="https://github.com/user-attachments/assets/c00443e2-6265-4e6b-9836-ae4e9445f184" />
+</p>
 
 In my code, this is implemented by sampling one emitter (including light spheres and light meshes) and computing:
 
@@ -401,7 +420,9 @@ For the same sampled direction, there may be multiple ways to generate it. MIS c
 
 For example, using the balance heuristic, the light sampled contribution is weighted by:
 
-[EQ 20 IMAGE]
+<p align="center">
+    <img alt="formula3" src="https://github.com/user-attachments/assets/8f68847a-e26f-467d-ada9-6f2d6f1f62a2" />
+</p>
 
 ```cpp
 float pdfBsdf = 0.0f;
