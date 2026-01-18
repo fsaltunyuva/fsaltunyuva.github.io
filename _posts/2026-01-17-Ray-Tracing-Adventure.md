@@ -27,7 +27,7 @@ Up to this point, my ray tracer was able to trace rays correctly and compute int
 A BRDF defines how light is reflected at a surface point, given two directions, the incoming light direction (wi) and the outgoing view direction (wo). More precisely, a BRDF describes how much of the incoming radiance from a given direction is scattered toward another direction. This abstraction is powerful because it separates geometry, lighting, and material behavior into cleanly defined components.
 
 <p align="center">
-    <img alt="brdf-wiki" src="https://github.com/user-attachments/assets/6397a03d-af95-4e2f-9435-8619bf3dd6ff" />
+    <img width="50%" alt="brdf-wiki" src="https://github.com/user-attachments/assets/6397a03d-af95-4e2f-9435-8619bf3dd6ff" />
 </p>
 
 As stated in the homework file the possible BRDF models to implement were:
@@ -162,8 +162,7 @@ instead of the usual ```(1 - kd)``` term. This adjustment accounts for the fact 
 <p align="center">
     <img alt="figure" src="https://github.com/user-attachments/assets/49613b6e-11ca-4a40-8c93-f6f2fc53c700" />
     <br>
-    *Figure 3:* _Configuration for deriving the normalizing factor of the micro-facet
-distribution function from BRDF Summary prepared by Professor Ahmet Oğuz Akyüz._
+    <em>Figure 3: Configuration for deriving the normalizing factor of the micro-facet distribution function from BRDF Summary prepared by Professor Ahmet Oğuz Akyüz.</em>
     </br>
 </p>
 
@@ -188,7 +187,7 @@ float D = ((exponent + 2.0f) / (2.0f * PI)) * pow(nDotWh, exponent);
 4. *Compute the geometry term G(wi, wo).*
 
 <p align="center">
-    <img width="35%" alt="G(wi, wo)" src="https://github.com/user-attachments/assets/66af4f3a-a9ee-44a5-a03c-511d2e1ef227" />
+    <img alt="G(wi, wo)" src="https://github.com/user-attachments/assets/66af4f3a-a9ee-44a5-a03c-511d2e1ef227" />
 </p>
 
 ```cpp
@@ -209,13 +208,13 @@ G = max(0.0f, G);
 After implementing BRDF, I tried killeroo_torrancesparrow scene, but I get the following render:
 
 <p align="center">
-    <img alt="buggedkilleroo" src="https://github.com/user-attachments/assets/4104e207-f558-4b62-b473-be67b013fa37" />
+    <img width="50%" alt="buggedkilleroo" src="https://github.com/user-attachments/assets/4104e207-f558-4b62-b473-be67b013fa37" />
 </p>
 
 I was confused at first because I thought my BRDF implementation had some bugs, but after double checking everything, I realized that the problem was also in my HW4 render too. Then I realized that there is a bug in my smooth shading implementation, it was caused by computing barycentric coordinates in world space while using mesh local vertex positions and by indexing per vertex normals with global vertex indices. The problem was fixed by transforming the hit point back into local space before computing barycentric coordinates.
 
 <p align="center">
-    <img alt="fixedkilleroo" src="https://github.com/user-attachments/assets/2880d6e9-12c5-4c99-82c3-cf3a24bd1f29" />
+    <img width="50%" alt="fixedkilleroo" src="https://github.com/user-attachments/assets/2880d6e9-12c5-4c99-82c3-cf3a24bd1f29" />
 </p>
 
 #### Comparison
@@ -239,7 +238,9 @@ Also, you can see the render times for each BRDF model in the table below:
 ### Object Lights
 Object lights will allow any geometric object to act as a light source by assigning it a radiance value. With this extension, regular scene objects such as spheres or meshes can directly emit light. The only difference than the previous light implementations is that it carries an additional radiance attribute.
 
-[LIGHT SPHERE EXAMPLE IMAGE]
+<p align="center">
+    <img width="50%" alt="fixedkilleroo" src="https://github.com/user-attachments/assets/7b5c232e-694d-403a-8875-b4cf25741704" />
+</p>
 
 For example, for Light Sphere, it means that whenever a ray intersects this sphere, it is also interacting with a light emitting surface. The sphere still participates in intersection tests just like any other object. Same applies to light meshes. Therefore, I modified my Intersector with the new Light Object types. Only difference than their original versions is these additional lines:
 
@@ -271,7 +272,7 @@ If Next Event Estimation (NEE) is disabled we can add the emission directly beca
 
 I will explain path tracing and next event estimation in more detail below in the Path Tracing section.
 
-#### Shadow Bug Fix
+#### Additional Light Fix
 After implementing object lights, I tried cornellbox_sphere_light scene but I got the following render:
 
 <p align="center">
@@ -305,7 +306,7 @@ To describe the idea simply, I will use the example from the video ["How Path Tr
 In ray tracing, let's say we shoot a ray as in above, then we cast another ray towards the light source to see if it is visible from the intersection point, and it is occluded by the wall, so we get no contribution from the light source. However, in real life, the light from the light source would bounce off the walls and illuminate the corridor indirectly, as in this Blender render from the video:
 
 <p align="center">
-    <img alt="pathtracing2" src="https://github.com/user-attachments/assets/4919eff6-9ecc-45f0-b3bb-eb580f793efe />
+    <img alt="pathtracing2" src="https://github.com/user-attachments/assets/4919eff6-9ecc-45f0-b3bb-eb580f793efe" />
 </p>
 
 To capture these indirect lighting effects, we need to trace additional rays that bounce around the scene, gathering light contributions from multiple bounces. This is where path tracing comes in. In path tracing, instead of just casting a single shadow ray to each light source, we recursively trace rays that bounce off surfaces, simulating the complex interactions of light in the scene.
@@ -346,7 +347,7 @@ continue; // Skip hemisphere sampling for delta materials
 For nonspecular materials (diffuse and glossy), the renderer evaluates direct illumination from point lights and then continues the path by sampling a new direction over the hemisphere. The outgoing direction is sampled either uniformly or using cosine-weighted hemisphere sampling. The path throughput is then updated using the standard Monte Carlo estimator formula:
 
 <p align="center">
-    <img alt="formula" src="https://github.com/user-attachments/assets/2e4d3be5-36bf-413c-9e26-96aa5c45a7b7" />
+    <img width="50%" alt="formula" src="https://github.com/user-attachments/assets/2e4d3be5-36bf-413c-9e26-96aa5c45a7b7" />
 </p>
 
 which corresponds to:
@@ -377,7 +378,7 @@ Paths with low expected contribution are terminated early, while surviving paths
 In the basic Monte Carlo estimator, we update the path throughput using:
 
 <p align="center">
-    <img alt="formula" src="https://github.com/user-attachments/assets/2e4d3be5-36bf-413c-9e26-96aa5c45a7b7" />
+    <img width="50%" alt="formula" src="https://github.com/user-attachments/assets/2e4d3be5-36bf-413c-9e26-96aa5c45a7b7" />
 </p>
 
 The main idea behind importance sampling is to choose a sampling distribution that resembles the function being integrated. For diffuse terms, function being integrated contains a cosThetai term, so sampling directions with a cosine-weighted distribution reduces variance compared to uniform hemisphere sampling. In my implementation, outgoing direction is sampled with uniform sampling of the hemisphere 1 / 2π, or cosine-weighted sampling cosTheta / π.
@@ -427,7 +428,7 @@ For the same sampled direction, there may be multiple ways to generate it. MIS c
 For example, using the balance heuristic, the light sampled contribution is weighted by:
 
 <p align="center">
-    <img alt="formula3" src="https://github.com/user-attachments/assets/8f68847a-e26f-467d-ada9-6f2d6f1f62a2" />
+    <img width="50%" alt="formula3" src="https://github.com/user-attachments/assets/8f68847a-e26f-467d-ada9-6f2d6f1f62a2" />
 </p>
 
 ```cpp
@@ -472,7 +473,9 @@ if (isInShadow(scene, shadowOrigin, wi, d - scene.shadowRayEpsilon, intersector,
     return out;
 ```
 
-![bugepsilon](https://github.com/user-attachments/assets/50cb8b5d-fc5b-48b2-9ad8-a501239a5a4f)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/50cb8b5d-fc5b-48b2-9ad8-a501239a5a4f" alt="bugepsilon">
+</p>
 
 ### Outputs and Closing Thoughts
 There are some minor differences in killeroo scene and I am suspecting that it is because of a different bug from previous parts because I had these issues in previous killeroo renders as well. As I mentioned in previous parts, I broke some things in Beer's Law implementation while refactoring so there are some differences due to that in cornell_glass_mirror and veach_ajar scene. Other than these, I think my renders are mostly correct.
