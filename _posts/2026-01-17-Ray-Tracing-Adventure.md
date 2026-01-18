@@ -486,7 +486,7 @@ I still have the same enthusiasm during the rendering of the stanford bunny (and
 
 Although there were some moments like caused me to beg my computer to finish rendering sooner, laughing at my failed renders, or scratching my head over a complete black renders, I truly enjoyed this adventure and I am grateful for the opportunity to learn and experiment with these concepts throughout this course. And of course, I would like to thank to Professor Ahmet Oğuz Akyüz for his guidance and support throughout this _adventure_ and Akif Uslu, Ramazan Tokay, and Akın Aydemir for their contributions to the scene files.
 
-I uploaded .exr and .hdr files to [this folder in repository](https://github.com/fsaltunyuva/fsaltunyuva.github.io/tree/main/images/2025-12-27-Ray-Tracing-Adventure), I used [GIMP](https://www.gimp.org/) to view them but there are other softwares for that purpose.
+I uploaded .exr and .hdr files to [this folder in repository](http://github.com/fsaltunyuva/fsaltunyuva.github.io/tree/main/images/2026-01-17-Ray-Tracing-Adventure), I used [GIMP](https://www.gimp.org/) to view them but there are other softwares for that purpose.
 
 Here are my final renders and their render times:
 
