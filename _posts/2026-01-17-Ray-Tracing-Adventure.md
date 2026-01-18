@@ -137,7 +137,7 @@ case BRDFType::ModifiedBlinnPhong: {
     Vec3 diffuse = kd.scale(INV_PI); // 1 / pi for lambertian
 
     if (normalized) {
-        float c = pow(cosAlphaR(), exponent); // brdf.pdf uses cosAlphaR
+        float c = pow(cosAlphaH(), exponent); // brdf.pdf uses cosAlphaR but I think it is a typo
         specScalar = ((exponent + 8.0f) / (8.0f * PI)) * c; // normalized as in the formula
     }
     else {
@@ -346,7 +346,7 @@ To prevent infinite paths while keeping the estimator unbiased, Russian roulette
 ```cpp
 if (cam.pathTracingOptions.russianRoulette && depth >= cam.minRecursionDepth) {
     float p = max(pathThroughput.x, max(pathThroughput.y, pathThroughput.z));
-    p = min(0.95f, max(0.05f, p));
+    p = min(0.99f, max(0.05f, p));
 
     if (dist01(rng) > p) 
         break;
