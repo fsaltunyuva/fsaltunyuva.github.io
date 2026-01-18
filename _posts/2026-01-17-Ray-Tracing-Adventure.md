@@ -224,16 +224,199 @@ Also, you can see the render times for each BRDF model in the table below:
 | Torrance-Sparrow        | 90.5573         |
 
 ### Object Lights
+Object lights will allow any geometric object to act as a light source by assigning it a radiance value. With this extension, regular scene objects such as spheres or meshes can directly emit light. The only difference than the previous light implementations is that it carries an additional radiance attribute.
 
+[LIGHT SPHERE EXAMPLE IMAGE]
+
+For example, for Light Sphere, it means that whenever a ray intersects this sphere, it is also interacting with a light emitting surface. The sphere still participates in intersection tests just like any other object. Same applies to light meshes. Therefore, I modified my Intersector with the new Light Object types. Only difference than their original versions is these additional lines:
+
+```cpp
+intersectionInfo.isEmissive = true;
+intersectionInfo.emission = lightObject.radiance;
+```
+
+In my ray tracing loop, I immediately return the emission when the closest hit is emissive because light sources contribute directly to the radiance along the ray without further bounces.
+
+```cpp
+if (info.isEmissive) {
+    return info.emission;
+}
+```
+
+But in path tracing loop, I added emission only when it should contribute:
+
+```cpp
+if (info.isEmissive) {
+    if (lastSpecular || !cam.pathTracingOptions.nextEventEstimation) {
+        L = L.add(beta.multiply(info.emission)); // Add emission from light source
+    }
+    break;
+}
+```
+
+If Next Event Estimation (NEE) is disabled we can add the emission directly because we are not sampling lights separately. However, if NEE is enabled, we only add the emission if the last bounce was specular. This prevents double counting light contributions from light sources when we are already sampling them explicitly.
+
+I will explain path tracing and next event estimation in more detail below in the Path Tracing section.
 
 ### Path Tracing
+Here we come to the most satisfying renders of the entire ray tracing adventure. Up to this point, my renderer was able to compute direct illumination correctly using ray tracing and explicit light sampling. However, this approach alone cannot capture important global illumination effects such as indirect lighting or soft interreflections. To address this limitations, we will implement a path tracer.
 
+Before taking this course and computer graphics course, I only heard about path tracing in the game Cyberpunk 2077, and most of the videos were showing how realistic reflections and lighting effects could be achieved with path tracing ([This video by MxBenchmarkPC](https://www.youtube.com/watch?v=7NQqWlYZ2RA) is one of them). However, when I saw these comparisons between ray tracing and path tracing in the game, I thought that, "Wait a minute, isn't ray tracing should be doing all these realistic lighting effects already? Why do we need path tracing then?". Also, there were still some discussions about whether ray tracing should be a thing for video games, with this kind of performance cost, so is there a future for path tracing in games?
+
+So, this homework part was a great opportunity for me to understand the differences between ray tracing and path tracing, the performance costs and benefits of each method, and why path tracing is considered the gold standard for realistic rendering.
+
+To describe the idea simply, I will use the example from the video ["How Path Tracing Makes Computer Graphics Look Awesome" by Computerphile](https://www.youtube.com/watch?v=3OKj0SQ_UTw) (they also have videos about ray tracing for anyone interested). As described in the video, let's say that we have a corridor like this:
+
+[VIDEO CORRIDOR IMAGE]
+
+In ray tracing, let's say we shoot a ray as in above, then we cast another ray towards the light source to see if it is visible from the intersection point, and it is occluded by the wall, so we get no contribution from the light source. However, in real life, the light from the light source would bounce off the walls and illuminate the corridor indirectly, as in this Blender render from the video:
+
+[BLENDER CORRIDOR IMAGE]
+
+To capture these indirect lighting effects, we need to trace additional rays that bounce around the scene, gathering light contributions from multiple bounces. This is where path tracing comes in. In path tracing, instead of just casting a single shadow ray to each light source, we recursively trace rays that bounce off surfaces, simulating the complex interactions of light in the scene.
+
+[PATH TRACING CORRIDOR IMAGE]
+
+Let's say we shoot five rays from the intersection point, we also calculate their contributions as shown in the image above, then we average these contributions (this is the main idea of Monte Carlo Integration) to get the final color for that pixel (in a real path tracer, we also do the same process for new rays). This way, we can capture both direct illumination from light sources and indirect illumination from light bouncing off other surfaces. And as we get further away from the light source, we can see that the indirect illumination becomes less intense, just like in real life. (Here you can see that light intensity is lowered to 20%)
+
+[PATH TRACING CORRIDOR IMAGE 2]
+
+But how to choose where the rays go? We randomly choose rays around the hemisphere above the intersection point, weighted by the BRDF of the surface. This way, we are more likely to sample directions that contribute more light based on the material properties.
+
+To implement path tracing in my ray tracer, I also added tracePath function in addition to the existing traceRay function. It maintains 2 important variables, *pathThroughput* which accumulates BRDF values, cosine terms, and probability densities and *L* the accumulated radiance returned by the path. Each bounce updates pathThroughput and any emmited or directly sampled light contributions are added to L.
+
+Basically, the main loop is an iterative loop that continues until a maximum depth is reached or the path terminates via Russian Roulette. At each iteration, we perform the following steps:
+
+1. Check for emissive hits
+2. Optionally perform Next Event Estimation (NEE)
+3. Sample a new direction
+4. Update the throughput
+
+Before going to details, it is useful to briefly clarify how light sources are sampled in the renderer. Since the same idea already discussed in a previous blog posts, the same sampling strategies are reused here. The only extension in this homework is that light spheres and light meshes are treated as additional area emitters. From the perspective of the path tracer, all light sources are handled uniformly. A single emitter is selected at random, a point is sampled on its surface, and the corresponding probability density is converted from area measure to solid angle measure. The resulting direction, emitted radiance, and PDF are then used by the path tracing estimator.
+
+After a valid surface intersection, material properties are evaluated at the hit point. The implementation reuses the same texture mapping idea as in traceRay, ensuring consistent appearance between ray tracing and path tracing. And the specular materials are handled as delta distributions, meaning they generate a single deterministic outgoing direction but their approach is still the same Mirror materials reflect ray direction, Conductors additionally apply Fresnel reflectance, Dielectrics handle both reflection and refraction based on Fresnel equations. In all of these cases, the path throughput is updated accordingly and the path continues without performing hemisphere sampling:
+
+```cpp
+pathThroughput *= reflectance or Fresnel term;
+rd = reflected or refracted direction;
+lastSpecular = true;
+
+continue; // Skip hemisphere sampling for delta materials
+```
+
+For nonspecular materials (diffuse and glossy), the renderer evaluates direct illumination from point lights and then continues the path by sampling a new direction over the hemisphere. The outgoing direction is sampled either uniformly or using cosine-weighted hemisphere sampling. The path throughput is then updated using the standard Monte Carlo estimator formula:
+
+[FORMULA IMAGE]
+
+which corresponds to:
+
+```cpp
+pathThroughput = pathThroughput.multiply(f).scale(cosI / pdf);
+```
+
+#### Russian Roulette Termination
+To prevent infinite paths while keeping the estimator unbiased, Russian roulette is applied after a minimum depth is reached:
+
+```cpp
+if (cam.pathTracingOptions.russianRoulette && depth >= cam.minRecursionDepth) {
+    float p = max(pathThroughput.x, max(pathThroughput.y, pathThroughput.z));
+    p = min(0.95f, max(0.05f, p));
+
+    if (dist01(rng) > p) 
+        break;
+
+    pathThroughput = pathThroughput.scale(1.0f / p);
+}
+```
+
+Paths with low expected contribution are terminated early, while surviving paths are reweighted to preserve energy.
+
+#### Importance Sampling
+
+In the basic Monte Carlo estimator, we update the path throughput using:
+
+[FORMULA IMAGE]
+
+The main idea behind importance sampling is to choose a sampling distribution that resembles the function being integrated. For diffuse terms, function being integrated contains a cosThetai term, so sampling directions with a cosine-weighted distribution reduces variance compared to uniform hemisphere sampling. In my implementation, outgoing direction is sampled with uniform sampling of the hemisphere 1 / 2π, or cosine-weighted sampling cosTheta / π.
+
+```cpp
+Vec3 wi = sampleHemisphere(hitNormal,
+                            cam.pathTracingOptions.importanceSampling ? EnvSampler::Cosine : EnvSampler::Uniform,
+                            dist01(rng), dist01(rng),
+                            pdf);
+```
+
+In the end, enabling importance sampling changes only the PDF and sampling distribution, but keeps the estimator unbiased.
+
+#### Next Event Estimation (NEE)
+
+Next Event Estimation is a technique used in path tracing to reduce noise and improve convergence by explicitly sampling direct illumination from light sources at each bounce. Even with importance sampling, a randomly sampled hemisphere direction may take a long time to hit a light source, especially when lights are small or far away, so, instead of relying only on random hemisphere sampling to eventually hit light sources, we directly sample the contribution from lights at each intersection point.
+
+[NEE COMPARISON RENDERS IMAGE]
+
+In the lecture notes, the direct lighting term is written as an integral over the hemisphere (or equivalently over light surfaces). With NEE, we estimate it by sampling a direction toward a light and using the Monte Carlo estimator:
+
+[NEE FORMULA IMAGE]
+
+In my code, this is implemented by sampling one emitter (including light spheres and light meshes) and computing:
+
+```cpp
+LightSample lightSample = sampleOneEmitter(...);
+
+Vec3 contribution = lightSample.Li.multiply(f).scale(cosI_light * w / lightSample.pdfW);
+
+L = L.add(pathThroughput.multiply(directLight));
+```
+
+So NEE simply adds an additional direct lighting estimate at each bounce, which helps to capture direct illumination more efficiently.
+
+#### Multiple Importance Sampling (MIS)
+For the same sampled direction, there may be multiple ways to generate it. MIS compares the probability of generating that direction with each method and then gives more weight to the method that sampled it more naturally.
+
+For example, using the balance heuristic, the light sampled contribution is weighted by:
+
+[EQ 20 IMAGE]
+
+```cpp
+float pdfBsdf = 0.0f;
+
+// Determine the PDF of sampling the light direction
+if (cam.pathTracingOptions.importanceSampling)
+    pdfBsdf = cosI_light / (float) M_PI; // Cosine-weighted hemisphere sampling
+else
+    pdfBsdf = 1.0f / (2.0f * (float) M_PI); // Uniform hemisphere sampling
+
+// Calculate MIS weight
+float w = lightSample.isDelta
+                ? 1.0f // Delta lights get full weight
+                : misWeight(lightSample.pdfW, pdfBsdf, cam.pathTracingOptions.mis); // MIS weight
+
+// Final contribution
+Vec3 contribution = lightSample.Li.multiply(f).scale(cosI_light * w / lightSample.pdfW);
+directLight = directLight.add(contribution);
+```
+
+[MIS COMPARISON RENDERS IMAGE]
+
+#### Clamping
+Scenes that contain glasses and mirrors can cause problems due to their generation of high radiance regions. These high radiance regions can cause "fireflies" in the render, which are bright pixels that stand out from the surrounding area.
+
+[BLENDER GURU FIREFLY IMAGE] (https://www.blenderguru.com/articles/7-ways-get-rid-fireflies)
+
+Increasing the sample count can help reduce fireflies (as in almost all of our problems :)), but it also increases render times significantly. To address this, we use clamping, which limits the maximum contribution from any single sample. This helps to reduce variance and fireflies without requiring an more samples.
+
+[CLAMPING COMPARISON RENDERS IMAGE]
 
 ### Outputs and Closing Thoughts
+Even though it is the last homework, there are still so much more interesting topics to explore in ray and path tracing. The reason I call this a ray tracing _adventure_ is that I feel like I have just started to scratch the surface of this field. There are so many more advanced techniques and optimizations that can be implemented to further improve the realism and efficiency of the renderer. Ideas, improvements, and features my friends presented during our term project presentations had really opened my eyes to the vastness of this field. 
+
+I still have the same enthusiasm during the rendering of the stanford bunny (and repeatedly saying "please work, please work" :)) in the first homework part, and I am amazed by how far I have come since then. Before taking this course, all my friends that took this course earlier warned me about the workload of the homeworks, but I could clearly see their excitements when they showed me their blog posts and renders. I finally understood their enthusiasm after experiencing this adventure myself :). Of course there are some parts that I struggled with or not completely clicked with me, but these blogs became a notepad for me to revisit each of these concepts and implementations later on.
+
+Although there were some moments like caused me to beg my computer to finish rendering sooner, laughing at my failed renders, or scratching my head over a complete black renders, I truly enjoyed this adventure and I am grateful for the opportunity to learn and experiment with these concepts throughout this course. And of course, I would like to thank to Professor Ahmet Oğuz Akyüz for his guidance and support throughout this _adventure_ and Akif Uslu, Ramazan Tokay, and Akın Aydemir for their contributions to the scene files.
 
 I uploaded .exr and .hdr files to [this folder in repository](https://github.com/fsaltunyuva/fsaltunyuva.github.io/tree/main/images/2025-12-27-Ray-Tracing-Adventure), I used [GIMP](https://www.gimp.org/) to view them but there are other softwares for that purpose.
 
-As in previous parts, I would like to thank Professor Ahmet Oğuz Akyüz for all the course materials and guidance. Here are my final renders and their render times:
+Here are my final renders and their render times:
 
 | Scene                 | Time (seconds) |
 | --------------------- | -------- |
