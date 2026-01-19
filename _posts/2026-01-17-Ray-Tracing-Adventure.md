@@ -16,18 +16,13 @@ Before I begin, I should mention that this blog and project are part of the [Adv
 ### Bugs from Previous Parts 
 Before starting this part, I decided to optimize my ray tracer because I had been getting progressively slower results after each homework part, and also because I saw in the homework file that the VeachAJar scene could reach rendering times of around 36 hours. While making additions to my code in previous parts, I had been taking notes on unnecessary extra operations I noticed in some places or sections that could be handled more efficiently, but I was afraid to refactor, after all, the unwritten rule of engineering is 'if it ain't broke, don't fix it' :). However, the most suitable time to try these optimizations was before starting this homework because I knew how costly the path tracing process would be, and I was determined to get those beautiful path tracing renders that would crown all the results we achieved since the beginning of the semester in time for the homework deadline. Anyway, as I mentioned, I started first with the codes I had previously written and marked with notes like ```// TODO: Not used?``` and ```// TODO: Slows the process?```. With each change I made, I tested various input files from previous parts to check whether I was getting the same results. Although I managed to reduce my renders from around 15 seconds to 12-13 seconds as a result of these changes, what really sped up my ray tracer were the compiler optimization techniques that I thought I had already implemented and configured correctly. Almost none of the optimization methods that I thought I had configured correctly since practically the first homework were actually working. After realizing this, I first felt sad about the time I had wasted waiting unnecessarily in past parts, but then I was glad that I had at least solved this problem before this homework's renders :) This way, I managed to reduce my rendering times by almost half.
 
-Here you can see some comparisons of render times before and after optimizations:
-
-| Scene                 | Before (seconds) | After (seconds) |
-| --------------------- | ---------------- | --------------- |
-
 ### Bidirectional Reflectance Distribution Function (BRDF)
-Up to this point, my ray tracer was able to trace rays correctly and compute intersections, but the actual appearance of surfaces was still quite limited. Every surface responded to light in a very basic way, without considering the complex interactions between light and material properties. To address this, I implemented a Bidirectional Reflectance Distribution Function (BRDF) system. 
+Up to this point, my ray tracer was able to trace rays correctly and compute intersections, but the actual appearance of surfaces was still limited. Every surface responded to light in a very basic way, without considering the complex interactions between light and material properties. To address this, I implemented a Bidirectional Reflectance Distribution Function (BRDF) system. 
 
 A BRDF defines how light is reflected at a surface point, given two directions, the incoming light direction (wi) and the outgoing view direction (wo). More precisely, a BRDF describes how much of the incoming radiance from a given direction is scattered toward another direction. This abstraction is powerful because it separates geometry, lighting, and material behavior into cleanly defined components.
 
 <p align="center">
-    <img width="50%" alt="brdf-wiki" src="https://github.com/user-attachments/assets/6397a03d-af95-4e2f-9435-8619bf3dd6ff" />
+    <img width="40%" alt="brdf-wiki" src="https://github.com/user-attachments/assets/6397a03d-af95-4e2f-9435-8619bf3dd6ff" />
 </p>
 
 As stated in the homework file the possible BRDF models to implement were:
@@ -41,7 +36,7 @@ and BRDF field in JSON files included the options ```_normalized``` to indicate 
 
 As in previous parts, I implemented BRDF models as common interface because they all input the same parameters (wi, wo, normal) and output the reflectance value. The shading logic does not need to know which BRDF is being used, it simply calls the BRDF’s evaluation function. In this way, making changes to the BRDF models or adding new ones becomes straightforward without affecting other parts of the code.
 
-Before starting the implementation of the BRDF models, I normalized all direction vectors (wi, wo, normal) at the beginning of each BRDF evaluation function to ensure consistent calculations. Then I caculated cosine terms between the surface normal and trhe incoming and outgoing directions, which are essential for determining how much light is reflected based on the angle of incidence and reflection.
+Before starting the implementation of the BRDF models, I normalized all direction vectors (wi, wo, normal) at the beginning of each BRDF evaluation function to ensure consistent calculations (it became muscle memory at this point :)). Then I caculated cosine terms between the surface normal and the incoming and outgoing directions, which are essential for determining how much light is reflected based on the angle of incidence and reflection.
 
 ```cpp
 Vec3 n = nRaw.normalize();
@@ -151,19 +146,22 @@ case BRDFType::ModifiedBlinnPhong: {
 #### Torrance-Sparrow
 The Torrance Sparrow BRDF models surface reflection using a microfacets and is normalized by definition. In this model, the ```Exponent``` parameter corresponds to the p term in the microfacet distribution function, controlling the roughness of the surface.
 
-The ```_kdfresnel``` parameter defines the Fresnel reflectance at normal incidence, When enabled, the diffuse component is scaled by:
-
 <p align="center">
     <img alt="torrance-sparrow" src="https://github.com/user-attachments/assets/76e367e7-9f53-4f37-9c46-9b2b5af786be" />
 </p>
 
-instead of the usual ```(1 - kd)``` term. This adjustment accounts for the fact that some portion of the incoming light is reflected at the surface interface due to Fresnel effects, reducing the amount of light available for diffuse reflection.
+The ```kdfresnel``` parameter defines the Fresnel reflectance at normal incidence. When enabled, the diffuse component is scaled by:
+
+<p align="center">
+    <img width="30%" alt="torrance-sparrow2" src="https://github.com/user-attachments/assets/bf335eed-e2cd-4be8-9088-86d8a11c00d3" />
+</p>
+
+instead of the usual ```kd / π``` term. This adjustment accounts for the fact that some portion of the incoming light is reflected at the surface interface due to Fresnel effects, reducing the amount of light available for diffuse reflection.
 
 <p align="center">
     <img alt="figure" src="https://github.com/user-attachments/assets/49613b6e-11ca-4a40-8c93-f6f2fc53c700" />
     <br>
     <em>Figure 3: Configuration for deriving the normalizing factor of the micro-facet distribution function from BRDF Summary prepared by Professor Ahmet Oğuz Akyüz.</em>
-    </br>
 </p>
 
 I followed the steps outlined in the lecture notes to implement the Torrance-Sparrow BRDF as follows:
@@ -172,40 +170,40 @@ I followed the steps outlined in the lecture notes to implement the Torrance-Spa
 2. *Compute the angle α as wh • n.*
 3. *Compute the probability of this α using D(α) function (Blinn's distrubiton in our case).*
 
-<p align="center">
-    <img width="40%" alt="D(α)" src="https://github.com/user-attachments/assets/50194788-6e5a-4e50-ab40-31ed013d4004" />
-</p>
-
-```cpp
-diffuse = kd.scale(1.0f / PI); // Inverse pi for lambertian
-
-Vec3 wh = wi.add(wo).normalize();
-float nDotWh = clamp01(n.dot(wh));
-float D = ((exponent + 2.0f) / (2.0f * PI)) * pow(nDotWh, exponent);
-```
+    <p align="center">
+        <img width="20%" alt="D(α)" src="https://github.com/user-attachments/assets/50194788-6e5a-4e50-ab40-31ed013d4004" />
+    </p>
+    
+    ```cpp
+    diffuse = kd.scale(1.0f / PI); // Inverse pi for lambertian
+    
+    Vec3 wh = wi.add(wo).normalize();
+    float nDotWh = clamp01(n.dot(wh));
+    float D = ((exponent + 2.0f) / (2.0f * PI)) * pow(nDotWh, exponent);
+    ```
 
 4. *Compute the geometry term G(wi, wo).*
 
-<p align="center">
-    <img width="50%" alt="G(wi, wo)" src="https://github.com/user-attachments/assets/66af4f3a-a9ee-44a5-a03c-511d2e1ef227" />
-</p>
-
-```cpp
-float denomG = max(epsilon, woDotWh); // Prevent division by zero
-float g1 = (2.0f * nDotWh * cosO_clamped) / denomG;
-float g2 = (2.0f * nDotWh * cosI_clamped) / denomG;
-float G = min(1.0f, min(g1, g2));
-G = max(0.0f, G);
-```
+    <p align="center">
+        <img width="80%" alt="G(wi, wo)" src="https://github.com/user-attachments/assets/66af4f3a-a9ee-44a5-a03c-511d2e1ef227" />
+    </p>
+    
+    ```cpp
+    float denomG = max(epsilon, woDotWh); // Prevent division by zero
+    float g1 = (2.0f * nDotWh * cosO_clamped) / denomG;
+    float g2 = (2.0f * nDotWh * cosI_clamped) / denomG;
+    float G = min(1.0f, min(g1, g2));
+    G = max(0.0f, G);
+    ```
 
 5. *Compute the Fresnel reflectance using Shlick's approximation.*
 
-<p align="center">
-    <img width="45%" alt="F" src="https://github.com/user-attachments/assets/6d459bec-e693-463e-87ff-a7bbbae807ae" />
-</p>
+    <p align="center">
+        <img width="45%" alt="F" src="https://github.com/user-attachments/assets/6d459bec-e693-463e-87ff-a7bbbae807ae" />
+    </p>
 
 #### Smooth Shading Bug Fix
-After implementing BRDF, I tried killeroo_torrancesparrow scene, but I get the following render:
+After implementing BRDF, I tried killeroo_torrancesparrow scene, but I get the following render, where there are black artifacts on the object:
 
 <p align="center">
     <img width="50%" alt="buggedkilleroo" src="https://github.com/user-attachments/assets/4104e207-f558-4b62-b473-be67b013fa37" />
@@ -279,9 +277,9 @@ After implementing object lights, I tried cornellbox_sphere_light scene but I go
     <img alt="shadowbug" src="https://github.com/user-attachments/assets/335a8157-d903-488f-8586-5f06d3e5ca64" />
 </p>
 
-There is an additional light on the ceiling that should not be there. Same issue was also occured in HW3 where I was trying to implement area lights. The issue was caused by double-sided lighting. My code was using ```fabs``` for the cosine calculation, which caused the light mesh to emit light both downwards (into the room) and upwards (onto the ceiling).
+There is an additional light on the ceiling that should not be there. Same issue was also occured in HW3 where I was trying to implement area lights. The issue was caused by double sided lighting. My code was using ```fabs``` for the cosine calculation, which caused the light mesh to emit light both downwards (into the room) and upwards (onto the ceiling).
 
-To fix this, I removed the absolute value to make the light source one-sided, ensuring it only emits light in the direction of the normal (downwards):
+To fix this, I removed the absolute value to make the light source one sided, ensuring it only emits light in the direction of the normal (downwards):
 
 ```cpp
 // float cosL = max(0.0f, fabs(nTri.dot(wi.scale(-1.0f))));
@@ -344,7 +342,7 @@ lastSpecular = true;
 continue; // Skip hemisphere sampling for delta materials
 ```
 
-For nonspecular materials (diffuse and glossy), the renderer evaluates direct illumination from point lights and then continues the path by sampling a new direction over the hemisphere. The outgoing direction is sampled either uniformly or using cosine-weighted hemisphere sampling. The path throughput is then updated using the standard Monte Carlo estimator formula:
+For nonspecular materials (diffuse and glossy), the renderer evaluates direct illumination from point lights and then continues the path by sampling a new direction over the hemisphere. The outgoing direction is sampled either uniformly or using cosine weighted hemisphere sampling. The path throughput is then updated using the standard Monte Carlo estimator formula:
 
 <p align="center">
     <img width="50%" alt="formula" src="https://github.com/user-attachments/assets/2e4d3be5-36bf-413c-9e26-96aa5c45a7b7" />
@@ -381,7 +379,7 @@ In the basic Monte Carlo estimator, we update the path throughput using:
     <img width="50%" alt="formula" src="https://github.com/user-attachments/assets/2e4d3be5-36bf-413c-9e26-96aa5c45a7b7" />
 </p>
 
-The main idea behind importance sampling is to choose a sampling distribution that resembles the function being integrated. For diffuse terms, function being integrated contains a cosThetai term, so sampling directions with a cosine-weighted distribution reduces variance compared to uniform hemisphere sampling. In my implementation, outgoing direction is sampled with uniform sampling of the hemisphere 1 / 2π, or cosine-weighted sampling cosTheta / π.
+The main idea behind importance sampling is to choose a sampling distribution that resembles the function being integrated. For diffuse terms, function being integrated contains a cosThetai term, so sampling directions with a cosine weighted distribution reduces variance compared to uniform hemisphere sampling. In my implementation, outgoing direction is sampled with uniform sampling of the hemisphere 1 / 2π, or cosine weighted sampling cosTheta / π.
 
 ```cpp
 Vec3 wi = sampleHemisphere(hitNormal,
@@ -436,7 +434,7 @@ float pdfBsdf = 0.0f;
 
 // Determine the PDF of sampling the light direction
 if (cam.pathTracingOptions.importanceSampling)
-    pdfBsdf = cosI_light / (float) M_PI; // Cosine-weighted hemisphere sampling
+    pdfBsdf = cosI_light / (float) M_PI; // Cosine weighted hemisphere sampling
 else
     pdfBsdf = 1.0f / (2.0f * (float) M_PI); // Uniform hemisphere sampling
 
