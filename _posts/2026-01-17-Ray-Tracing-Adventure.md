@@ -153,7 +153,7 @@ The Torrance Sparrow BRDF models surface reflection using a microfacets and is n
 The ```kdfresnel``` parameter defines the Fresnel reflectance at normal incidence. When enabled, the diffuse component is scaled by:
 
 <p align="center">
-    <img width="30%" alt="torrance-sparrow2" src="https://github.com/user-attachments/assets/bf335eed-e2cd-4be8-9088-86d8a11c00d3" />
+    <img width="5%" alt="torrance-sparrow2" src="https://github.com/user-attachments/assets/bf335eed-e2cd-4be8-9088-86d8a11c00d3" />
 </p>
 
 instead of the usual ```kd / π``` term. This adjustment accounts for the fact that some portion of the incoming light is reflected at the surface interface due to Fresnel effects, reducing the amount of light available for diffuse reflection.
