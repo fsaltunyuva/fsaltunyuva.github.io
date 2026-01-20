@@ -198,7 +198,82 @@ The outer boundary of the blend region is commonly chosen to be several times la
 The peripheral region encompasses all areas beyond the blend region. In this region, the sample size is set to the minimum value to maximize performance savings.
 
 ### Code and Results
+Let's start with static foveated rendering implementation. At first, I implemented the most basic version of foveated rendering with static fovea region and constant sample sizes for each region.
 
+I explained the multisampling logic in [Part 3](https://fsaltunyuva.github.io/ray-tracing/graphics/adventure/2025/11/24/Ray-Tracing-Adventure.html), so I will not go into details here. To start, I modified the sampling logic like this for a fixed regions and sample sizes:
+
+```cpp
+for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+        // Calculate Eccentricity (e) as I explained before in Definitions section
+        float u_center = (x + 0.5f) / width;
+        float v_center = (y + 0.5f) / height;
+
+        float su_center = left + (right - left) * u_center;
+        float sv_center = bottom + (top - bottom) * v_center;
+
+        // Compute pixel position in world space
+        Vec3 P_center = camPos.subtract(w.scale(nearDist))
+                                .add(u_vec.scale(su_center))
+                                .add(v_vec.scale(sv_center));
+
+        // Pixel Direction
+        Vec3 pixelDir = P_center.subtract(camPos).normalize();
+
+        // Dot product of Gaze and Pixel Direction
+        Vec3 gazeNorm = cam.gaze.normalize();
+        float dotVal = max(-1.0f, min(1.0f, gazeNorm.dot(pixelDir)));
+        float angleRad = acos(dotVal);
+        float eccentricity = angleRad * 180.0f / (float) M_PI; // Convert to degrees as explained
+
+        // Determine Sample Count (N)
+        int N_foveated = 1; // Default peripheral
+
+        // Configuration to see the regions clearly
+        float foveaRadius = 20.0f;
+        float blendRadius = 30.0f;
+
+        int maxSamples = cam.numSamples; // 100 in metal_glass_plates.json
+        int blendSamples = 16;
+        int minSamples = 1;
+
+        int flippedY = height - 1 - y;
+
+        if (eccentricity <= foveaRadius) {
+            N_foveated = maxSamples;
+            // DEBUG: RED
+            // hdr[flippedY * width + x] = Vec3(255.0f, 0.0f, 0.0f);
+            // continue;
+        }
+        else if (eccentricity <= blendRadius) {
+            N_foveated = blendSamples;
+            // DEBUG: GREEN
+            // hdr[flippedY * width + x] = Vec3(0.0f, 255.0f, 0.0f);
+            // continue;
+        }
+        else {
+            N_foveated = minSamples;
+            // DEBUG: BLUE
+            // hdr[flippedY * width + x] = Vec3(0.0f, 0.0f, 255.0f);
+            // continue;
+        }
+
+        int N = N_foveated;
+        int S = (int) sqrt((float) N); // S x S grid
+        // ... (rest of the sampling logic)
+    }
+}
+```
+
+When I debugged this with colored regions, I got this result for metal_glass_plates.json scene with 800x800 resolution:
+
+[Static Foveated Rendering Debug Image]
+
+Even though there are some problems in my renderer with attenuation, I wanted to use metal_glass_plates.json because I thought it would be a good scene to see the sample differences in different regions. I also modified the camera position and gaze direction a bit to get a better view for foveated rendering. In the following render, I used 100 samples for fovea region, 16 samples for blend region, and 1 samples for peripheral region. Here is the result compared to normal rendering with 100 samples per pixel:
+
+[Static Foveated Rendering Result Image]
+
+108.196 seconds vs 20.7135 seconds!
 
 ## Great Papers and Articles to Read
 - [Foveated 3D Graphics](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/11/foveated_final15.pdf)
@@ -210,6 +285,8 @@ The peripheral region encompasses all areas beyond the blend region. In this reg
 - [Fooling Around with Foveated Rendering](https://www.peterstefek.me/focused-render.html)
 
 ## Future Work
+Changes on original sample logic (without needing squared number of samples per pixel)
+
 Our peripheral vision changes also by the speed.
 https://media.istockphoto.com/id/1597773385/tr/vekt%C3%B6r/safety-car-driving-rules-and-tips-peripheral-vision-while-driving-vector-illustration.jpg?s=612x612&w=is&k=20&c=2iJJ95UChOUSgmE4nm6aESAXqRIcF62QrcU4baCW3hc=
 
