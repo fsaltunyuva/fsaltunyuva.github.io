@@ -181,6 +181,23 @@ Here is a comparison of the 3 falloff methods I described above:
 
 [Falloff Comparison Image]
 
+I will show the results of these falloff methods in the last section.
+
+### Fovea Radius
+Another important parameter in foveated rendering is the fovea radius, which determines the size of the foveal region. A larger fovea radius will result in a larger area being rendered in high detail, while a smaller fovea radius will result in a smaller area being rendered in high detail.
+
+We can define the fovea radius in degrees of visual angle. Then we can convert this angle to a distance on the screen based on the viewer's distance from the screen (as discussed in Definitions section).
+
+A common value for the fovea radius is around 2 degrees of visual angle [CITE Brian Guenter, Mark Finch, Steven Drucker, Desney Tan, and John Snyder.
+Foveated 3d graphics. ACM Trans. Graph., 31(6):164:1–164:10, November 2012].
+
+### Blend Region Radius
+The outer boundary of the blend region is commonly chosen to be several times larger than the fovea radius. In practice, a value between 6 and 10 degrees of visual angle works well for many applications. A typical and well-balanced choice is around 8 degrees of visual angle.
+
+### Peripheral Region
+The peripheral region encompasses all areas beyond the blend region. In this region, the sample size is set to the minimum value to maximize performance savings.
+
+### Code and Results
 
 ## Future Work
 Our peripheral vision changes also by the speed.
