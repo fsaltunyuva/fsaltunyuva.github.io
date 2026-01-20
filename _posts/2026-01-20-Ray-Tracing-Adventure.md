@@ -143,6 +143,43 @@ In the peripheral visual field, photoreceptor density decreases rapidly, and the
 
 This behavior is illustrated by the widening gap between the detectable without aliasing and detectable but aliased regions in the sample falloff diagram. The linear model effectively balances quality and performance in the central field but tends to overestimate perceptual sensitivity in the far periphery.
 
+#### Mixed Acuity Model
+
+The mixed acuity model is motivated by the fact that different biological bottlenecks dominate visual resolution depending on eccentricity. As shown in here:
+
+[Figure 1.1 from https://3dvar.com/Meng2018Foveated.pdf]
+
+Photoreceptor density (cones/rods) and ganglion cell (RGC) density follow different trends across the retina. In the fovea, ganglion cell density is high and tends to match photoreceptor density, enabling high spatial resolution. However, away from the fovea, ganglion cell density drops much more rapidly, meaning that many photoreceptors effectively map to the same ganglion cell (i.e., spatial pooling increases with eccentricity). This relationship is supported by human retinal topography measurements reported by Curcio et al.
+
+Because of this, a single pure acuity model (only photoreceptors or only cortical/log mapping) may not capture the full picture. Instead, mixed acuity models treat acuity as being limited by the most restrictive stage at each eccentricity.
+
+In reality, when we get close to the fovea, resolution is primarily limited by photoreceptor sampling (cones dominate), so acuity remains high. In the periphery, ganglion cell density becomes the limiting factor due to increasing pooling; even if photoreceptors exist, the neural output bandwidth is reduced, so effective resolution drops faster.
+
+So we can define two eccentricity dependent resolution limits in MAR form:
+
+- Photoreceptor limited MAR: MARphoto(𝑒)
+- Ganglion limited MAR: MARganglion(𝑒)
+
+A conservative mixed model can be expressed by taking the maximum MAR (worst acuity) at each eccentricity (it can be improved further by smooth blending, but I will keep it simple here):
+
+MARmixed(𝑒) = max(MARphoto(𝑒), MARganglion(𝑒))
+
+Then we follow the same reasoning as before to derive sample size:
+
+N(𝑒) = clamp(Nmax * (MARmixed(0) / MARmixed(𝑒))^2, Nmin, Nmax)
+
+Here is how the mixed acuity model looks like with the following assumptions.
+
+- Photoreceptor limited MAR: MARphoto(𝑒) = 0.02 + 0.01𝑒 (Same linear MAR as in linear acuity model)
+
+- Ganglion limited MAR: MARganglion(𝑒) = 0.02 + 0.015 * log(1 + 0.08 * 𝑒) (Steeper linear MAR to reflect faster drop in ganglion cell density)
+
+[Mixed Acuity Model Image]
+
+### Falloff Comparison
+Here is a comparison of the 3 falloff methods I described above:
+
+[Falloff Comparison Image]
 
 
 ## Future Work
@@ -151,3 +188,5 @@ https://media.istockphoto.com/id/1597773385/tr/vekt%C3%B6r/safety-car-driving-ru
 
 As I mentioned, our view area can be divided into more than 3 regions.
 https://en.wikipedia.org/wiki/Peripheral_vision#/media/File:Peripheral_vision.svg
+
+Some geometric falloff methods can also be explored for falloff calculations.
