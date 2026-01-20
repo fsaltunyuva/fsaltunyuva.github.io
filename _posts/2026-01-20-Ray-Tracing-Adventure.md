@@ -53,3 +53,4 @@ In dynamic foveated rendering, the foveal region changes based on the viewer's g
 
 Even though it is not my problem for this term project, dynamic foveated rendering also come with the challenge of latency. If there is a delay between the viewer's gaze direction input from the eye tracker and the rendering process, it can lead to a mismatch between the foveal region and the viewer's actual gaze direction, which can cause discomfort and reduce visual quality, especially in quick eye movements (saccades).
 
+[Dynamic Foveated Rendering Image]
