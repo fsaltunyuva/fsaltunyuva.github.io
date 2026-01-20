@@ -265,7 +265,7 @@ for (int y = 0; y < height; ++y) {
 }
 ```
 
-When I debugged this with colored regions, I got this result for metal_glass_plates.json scene with 800x800 resolution:
+When I debugged this with colored regions (with commented codes), I got this result for metal_glass_plates.json scene with 800x800 resolution:
 
 [Static Foveated Rendering Debug Image]
 
@@ -274,6 +274,132 @@ Even though there are some problems in my renderer with attenuation, I wanted to
 [Static Foveated Rendering Result Image]
 
 108.196 seconds vs 20.7135 seconds!
+
+Now, we can implement the falloff methods I explained before. But I was implemented Stratified Random Sampling in my ray tracer, so I needed to modify the sampling logic a bit to accommodate non-square number of samples per pixel. As we discussed in class, I will use N-Rooks Sampling for this purpose.
+
+```cpp
+// Arrange samples along the diagonal randomly
+vector<float> xCoords(N);
+vector<float> yCoords(N);
+
+for (int i = 0; i < N; ++i) {
+    xCoords[i] = (i + dist(rng)) / (float)N;
+    yCoords[i] = (i + dist(rng)) / (float)N;
+}
+
+// Shuffle their x-coordinates and y-coordinates independently
+shuffle(xCoords.begin(), xCoords.end(), rng);
+shuffle(yCoords.begin(), yCoords.end(), rng);
+
+for (int i = 0; i < N; ++i) {
+    jitterSamples.push_back({xCoords[i], yCoords[i]});
+}
+```
+
+So, we can now implement the falloff methods in the sampling logic. Here is the modified sampling logic with Log Acuity Model:
+
+```cpp
+float e0 = 1.0f; // Reference eccentricity
+
+if (eccentricity <= foveaRadius) {
+    N_foveated = maxSamples;
+}
+else if (eccentricity <= blendRadius) {
+    // N = N_max * (e0 / (e + e0))^2
+    float term = e0 / (eccentricity + e0);
+    float falloff = (float) maxSamples * (term * term);
+
+    N_foveated = max(minSamples, min(maxSamples, (int) falloff));
+}
+else {
+    N_foveated = minSamples;
+}
+```
+
+But when I tested this, I encountered a problem. The standard Log Acuity model assumes the falloff starts immediately from the center ($e=0$). However, in my implementation, I am keeping the Fovea Region at maximum quality up to a certain radius ( $20^\circ$).
+
+If the blend region starts at $20^\circ$ and I feed this value directly into the formula, the function calculates the drop-off as if we are already far away from the center. For example, with $e=20$ and $e_0=1$, the multiplier becomes $(1/21)^2$, which is tiny. This caused the sample count to plummet instantly from maxSamples to minSamples at the fovea boundary, creating a sharp artifact instead of a smooth transition.
+
+[og log acuity model render image]
+
+To fix this, I needed to shift the eccentricity so that the falloff calculation treats the edge of the fovea as its starting point ($0$). I also introduced a local $e_0$ parameter to better control the slope of the falloff within the blend region.
+
+```cpp
+else if (eccentricity <= blendRadius) {
+    // Shift the eccentricity so the falloff curve starts at 0 
+    float shiftedEccentricity = eccentricity - foveaRadius; 
+    
+    // A larger e0 here ensures the drop-off isn't too steep initially
+    float blend_e0 = 10.0f; 
+
+    // N = N_max * (e0 / (shifted_e + e0))^2
+    float term = blend_e0 / (shiftedEccentricity + blend_e0);
+    float falloff = (float) maxSamples * (term * term);
+
+    N_foveated = max(minSamples, min(maxSamples, (int) falloff));
+}
+```
+
+[fixed instant drop commit image]
+
+When I encountered this, I thought that my idea of using these falloff methods only for the Blend Region will not help me to compare different falloff methods properly, and also it is not how these models are intended to be used to. Therefore, I used these falloff methods from the center of the fovea (0 degrees) to the outer edge of the blend region. By doing this, I got more natural looking falloffs and less region transition artifacts.
+
+[falloff from fovea center to blend commit image]
+
+So I continued with this approach and implemented the Linear Acuity Model:
+
+```cpp
+float a = 0.02f; // MAR(0) - Foveal intercept
+float b = 0.04f; // MAR slope
+
+// ...
+else {
+    // MAR(e) = a + b * e
+    float mar_e = a + b * eccentricity;
+
+    // Ratio = MAR(0) / MAR(e) = a / (a + b*e)
+    float ratio = a / mar_e;
+    float falloff = (float)maxSamples * ratio;
+
+    N_foveated = max(minSamples, min(maxSamples, (int) falloff));
+}
+```
+
+[linear acuity model render image]
+
+and finally, I implemented the Mixed Acuity Model:
+
+```cpp
+// ...
+else {
+    // 1. Photoreceptor Limited MAR (Linear)
+    // Formula: 0.02 + 0.01 * e
+    float mar_photo = 0.02f + 0.01f * eccentricity;
+
+    // 2. Ganglion Limited MAR (Logarithmic-like)
+    // Formula: 0.02 + 0.015 * log(1 + 0.08 * e)
+    float mar_ganglion = 0.02f + 0.015f * std::log(1.0f + 0.08f * eccentricity);
+
+    // 3. Mixed MAR (Worst Case / Maximum Angle)
+    float mar_mixed = std::max(mar_photo, mar_ganglion);
+
+    // 4. Calculate Sample Count
+    // Both formulas intersect at e = 0, MAR(0) = 0.02
+    float mar0 = 0.02f;
+
+    float ratio = mar0 / mar_mixed;
+    float falloff = (float)maxSamples * (ratio * ratio);
+
+    N_foveated = std::max(minSamples, std::min(maxSamples, (int)falloff));
+}
+```
+
+[Mixed Acuity Model Render Image]
+
+## Results Comparison
+Due to a lot of parameters are involved in foveated rendering, it is hard to say which falloff method is the best only by looking at one render. But here are the results I got for each falloff method with the parameters below:
+
+
 
 ## Great Papers and Articles to Read
 - [Foveated 3D Graphics](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/11/foveated_final15.pdf)
@@ -285,6 +411,8 @@ Even though there are some problems in my renderer with attenuation, I wanted to
 - [Fooling Around with Foveated Rendering](https://www.peterstefek.me/focused-render.html)
 
 ## Future Work
+Parametreler jsondan verilebilir.
+
 Changes on original sample logic (without needing squared number of samples per pixel)
 
 Our peripheral vision changes also by the speed.
