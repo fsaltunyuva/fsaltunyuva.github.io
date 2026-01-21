@@ -554,8 +554,11 @@ For future work, I can explore the following ideas:
 
 - If the gaze point of the user is given (from json file or the eye tracker), fovea region can be moved based on that point instead of fixed camera gaze direction. By doing this, dynamic foveated rendering can be implemented.
 
-- Our peripheral vision is also affected by the speed of objects in our visual field. For instance, when we are driving a car, when speed increases, our peripheral vision decreases. This can be explored in foveated rendering by adjusting the fovea and blend region sizes based on the speed of the camera or objects in the scene. 
-https://media.istockphoto.com/id/1597773385/tr/vekt%C3%B6r/safety-car-driving-rules-and-tips-peripheral-vision-while-driving-vector-illustration.jpg?s=612x612&w=is&k=20&c=2iJJ95UChOUSgmE4nm6aESAXqRIcF62QrcU4baCW3hc=
+- Our peripheral vision is also affected by the speed of objects in our visual field. For instance, when we are driving a car, when speed increases, our peripheral vision decreases. This can be explored in foveated rendering by adjusting the fovea and blend region sizes based on the speed of the camera or objects in the scene.
+  
+    <p align="center">
+        <img alt="image" src="https://github.com/user-attachments/assets/34ce3029-d970-4c3a-8dbd-a5574f91b97a" />
+    </p>
 
 - As I mentioned, our view area can be divided into more than 3 regions.
 https://en.wikipedia.org/wiki/Peripheral_vision#/media/File:Peripheral_vision.svg
