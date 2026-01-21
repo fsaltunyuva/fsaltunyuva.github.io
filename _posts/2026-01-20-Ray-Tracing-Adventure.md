@@ -110,7 +110,7 @@ Okay, until now, we understood the idea. In short, we will reduce the image qual
 Let's say we have determined 64 as our maximum sample size, and 4 as our minimum sample size. Now, we need to determine how to decrease the sample size from 64 to 4 in the Blend Region. There are several methods to do this, but before that, I should define some terms that will be used in the calculations:
 
 #### Definitions
-* **Eccentricity ($e$):** The distance from the center of the fovea to a given point in the visual field, measured in degrees of visual angle. When eccentricity increases, the sample size should decrease. It can be easily calculated for each pixel using the following formula, where $\vec{d}_{\text{gaze}}$ is the normalized direction vector of the gaze, and $\vec{d}_{\text{pixel}}$ is the ray passing through the pixel. (We simply take the $\arccos$ of the dot product of these two vectors to get the angle between them in radians, then convert it to degrees by multiplying with $180 / \pi$.)
+* **Eccentricity ($e$):** The distance from the center of the fovea to a given point in the visual field, measured in degrees of visual angle. When eccentricity increases, the sample size should decrease. It can be easily calculated for each pixel using the following formula (We simply take the $\arccos$ of the dot product of these two vectors to get the angle between them in radians, then convert it to degrees by multiplying with $180 / \pi$.):
 
   $$e(x, y) = \arccos(\vec{d}_{\text{gaze}} \cdot \vec{d}_{\text{pixel}}) \cdot \frac{180}{\pi}$$
 
@@ -554,12 +554,12 @@ For future work, I can explore the following ideas:
 - Our peripheral vision is also affected by the speed of objects in our visual field. For instance, when we are driving a car, when speed increases, our peripheral vision decreases. This can be explored in foveated rendering by adjusting the fovea and blend region sizes based on the speed of the camera or objects in the scene.
   
     <p align="center">
-        <img width="50%" alt="image" src="https://github.com/user-attachments/assets/34ce3029-d970-4c3a-8dbd-a5574f91b97a" />
+        <img width="40%" alt="image" src="https://github.com/user-attachments/assets/34ce3029-d970-4c3a-8dbd-a5574f91b97a" />
     </p>
 
 - As I mentioned, our view area can be divided into more than 3 regions.
     <p align="center">
-        <img width="30%" alt="image" src="https://github.com/user-attachments/assets/ad4fff6e-943b-4681-83ec-d605de3d3047" />
+        <img width="40%" alt="image" src="https://github.com/user-attachments/assets/ad4fff6e-943b-4681-83ec-d605de3d3047" />
         <br>
         <em>
             <a href="https://en.wikipedia.org/wiki/Peripheral_vision#/">Peripheral Vision from Wikipedia</a>
