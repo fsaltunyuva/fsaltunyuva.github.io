@@ -110,18 +110,17 @@ Okay, until now, we understood the idea. In short, we will reduce the image qual
 Let's say we have determined 64 as our maximum sample size, and 4 as our minimum sample size. Now, we need to determine how to decrease the sample size from 64 to 4 in the Blend Region. There are several methods to do this, but before that, I should define some terms that will be used in the calculations:
 
 #### Definitions
-- *Eccentricity (𝑒)*: The distance from the center of the fovea to a given point in the visual field, measured in degrees of visual angle. When eccentricity increases, the sample size should decrease.
-    It can be easily calculated for each pixel using the following formula where $\vec{d}_{\text{gaze}}$ is the normalized direction vector of the gaze, $\vec{d}_{\text{pixel}}$ is the ray passing through the pixel. (We simply take the $\arccos$ of the dot product of these two vectors to get the angle between them in radians, then convert it to degrees by multiplying with $180 / \pi$.):
+* **Eccentricity ($e$):** The distance from the center of the fovea to a given point in the visual field, measured in degrees of visual angle. When eccentricity increases, the sample size should decrease. It can be easily calculated for each pixel using the following formula:
 
-    $$
-    𝑒(x, y) = \arccos(\vec{d}_{\text{gaze}} \cdot \vec{d}_{\text{pixel}}) \cdot \frac{180}{\pi}
-    $$
+  $$e(x, y) = \arccos(\vec{d}_{\text{gaze}} \cdot \vec{d}_{\text{pixel}}) \cdot \frac{180}{\pi}$$
 
-- *Reference Eccentricity ($e_0$)*: A small constant (in degrees) used to avoid singularities at the fovea center and to control how aggressively the falloff begins.
+  where $\vec{d}_{\text{gaze}}$ is the normalized direction vector of the gaze, and $\vec{d}_{\text{pixel}}$ is the ray passing through the pixel. (We simply take the $\arccos$ of the dot product of these two vectors to get the angle between them in radians, then convert it to degrees by multiplying with $180 / \pi$.)
 
-- *Cortical Magnification (M(𝑒))*: A function that models how much cortical area is allocated to one degree of visual angle at eccentricity 𝑒. We can think this like "How many $mm^2$ of processing does our brains use to process an image located 𝑒 degrees from the center?"
+* **Reference Eccentricity ($e_0$)**: A small constant (in degrees) used to avoid singularities at the fovea center and to control how aggressively the falloff begins.
 
-- *Cutoff eccentricity ($𝑒_c$)*: The angular limit of the central high-detail zone. Beyond this threshold, visual acuity degrades rapidly, rendering simple linear approximations insufficient.
+* **Cortical Magnification (M(𝑒))**: A function that models how much cortical area is allocated to one degree of visual angle at eccentricity 𝑒. We can think this like "How many $mm^2$ of processing does our brains use to process an image located 𝑒 degrees from the center?"
+
+* **Cutoff eccentricity ($𝑒_c$)**: The angular limit of the central high-detail zone. Beyond this threshold, visual acuity degrades rapidly, rendering simple linear approximations insufficient.
 
 #### Log Acuity Model
 This model has been found that the excitation of the cortex can be approximated by a log-polar mapping of the eye’s retinal image [(Meng et al., 2018)](https://3dvar.com/Meng2018Foveated.pdf). This model is proposed by Eric Schwartz in his paper ["Anatomical and Physiological Correlates of Visual Computation from Striate to Infero-Temporal Cortex"](https://ieeexplore.ieee.org/document/6313208) in 1984.
@@ -155,7 +154,7 @@ $$
 So we can use this equation in the Blend Region to determine the sample size for each pixel:
 
 $$
-N(𝑒) = \text{clamp} \left(N_{\max} \cdot \left( \frac{𝑒_0}{𝑒 + 𝑒_0} \right)^2 \right, N_{\min}, N_{\max})
+N(e) = \text{clamp} \left( N_{\max} \cdot \left( \frac{e_0}{e + e_0} \right)^2, N_{\min}, N_{\max} \right)
 $$
 
 As we said earlier, if Nmax = 64, Nmin = 4, and $𝑒_0$ = 1 degree, function will look like this (Python scripts used to generate the plots can be found [here](https://github.com/fsaltunyuva/RayTracer/tree/main/Foveated%20Rendering)):
@@ -202,7 +201,7 @@ The Linear Model fails to capture this distinction. It assumes vision simply get
 The mixed acuity model is motivated by the fact that different biological bottlenecks dominate visual resolution depending on eccentricity. As shown in here:
 
 <p align="center">
-    <img width="40%" =alt="image" src="https://github.com/user-attachments/assets/a1e02fa8-195c-4b07-898d-90dee6627916" />
+    <img width="40%" alt="image" src="https://github.com/user-attachments/assets/a1e02fa8-195c-4b07-898d-90dee6627916" />
 <br>
     <em>
         <a href="https://3dvar.com/Meng2018Foveated.pdf">Figure 1.1 from Foveated Rendering Techniques in Modern Computer Graphics by Xiaoxu Meng</a>
@@ -557,12 +556,12 @@ For future work, I can explore the following ideas:
 - Our peripheral vision is also affected by the speed of objects in our visual field. For instance, when we are driving a car, when speed increases, our peripheral vision decreases. This can be explored in foveated rendering by adjusting the fovea and blend region sizes based on the speed of the camera or objects in the scene.
   
     <p align="center">
-        <img alt="image" src="https://github.com/user-attachments/assets/34ce3029-d970-4c3a-8dbd-a5574f91b97a" />
+        <img width="%50" alt="image" src="https://github.com/user-attachments/assets/34ce3029-d970-4c3a-8dbd-a5574f91b97a" />
     </p>
 
 - As I mentioned, our view area can be divided into more than 3 regions.
     <p align="center">
-        <img alt="image" src="https://github.com/user-attachments/assets/ad4fff6e-943b-4681-83ec-d605de3d3047" />
+        <img width="%30" alt="image" src="https://github.com/user-attachments/assets/ad4fff6e-943b-4681-83ec-d605de3d3047" />
         <br>
         <em>
             <a href="https://en.wikipedia.org/wiki/Peripheral_vision#/">Peripheral Vision from Wikipedia</a>
