@@ -189,7 +189,13 @@ This behavior is illustrated by the widening gap between the detectable without 
 
 The mixed acuity model is motivated by the fact that different biological bottlenecks dominate visual resolution depending on eccentricity. As shown in here:
 
-[Figure 1.1 from https://3dvar.com/Meng2018Foveated.pdf]
+<p align="center">
+    <img alt="image" src="https://github.com/user-attachments/assets/a1e02fa8-195c-4b07-898d-90dee6627916" />
+<br>
+    <em>
+        <a href="https://www.reddit.com/r/oculus/comments/66nfap/made_a_pic_that_shows_how_foveated_rendering/">Figure 1.1 from Foveated Rendering Techniques in Modern Computer Graphics by Xiaoxu Meng</a>
+    </em>
+</p>
 
 Photoreceptor density (cones/rods) and ganglion cell (RGC) density follow different trends across the retina. In the fovea, ganglion cell density is high and tends to match photoreceptor density, enabling high spatial resolution. However, away from the fovea, ganglion cell density drops much more rapidly, meaning that many photoreceptors effectively map to the same ganglion cell (i.e., spatial pooling increases with eccentricity). This relationship is supported by human retinal topography measurements reported by Curcio et al.
 
