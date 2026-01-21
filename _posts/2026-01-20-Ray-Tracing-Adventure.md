@@ -116,7 +116,7 @@ So we can use this equation in the Blend Region to determine the sample size for
 
 N(𝑒) = clamp(Nmin, Nmax, N_max * (e0 / (e + e0))^2).
 
-As we said earlier, if Nmax = 64, Nmin = 4, and e0 = 1 degree, function will look like this (I will also upload the codes I used to create these plots):
+As we said earlier, if Nmax = 64, Nmin = 4, and e0 = 1 degree, function will look like this (Python scripts used to generate the plots can be found [here](https://github.com/fsaltunyuva/RayTracer/tree/main/Foveated%20Rendering)):
 
 [FoveatedRenderingFalloffs.ipynb Image]
 
