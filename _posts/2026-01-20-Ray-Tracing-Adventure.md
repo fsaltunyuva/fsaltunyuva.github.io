@@ -561,7 +561,13 @@ For future work, I can explore the following ideas:
     </p>
 
 - As I mentioned, our view area can be divided into more than 3 regions.
-https://en.wikipedia.org/wiki/Peripheral_vision#/media/File:Peripheral_vision.svg
+    <p align="center">
+        <img alt="image" src="https://github.com/user-attachments/assets/ad4fff6e-943b-4681-83ec-d605de3d3047" />
+        <br>
+        <em>
+            <a href="https://en.wikipedia.org/wiki/Peripheral_vision#/">Peripheral Vision from Wikipedia</a>
+        </em>
+    </p>
 
 - Some geometric falloff methods can also be explored for falloff calculations.
 
