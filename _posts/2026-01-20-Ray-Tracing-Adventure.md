@@ -88,11 +88,11 @@ I think we should start by asking, how can we reduce image quality in peripheral
 
 In my implementation, I will use 3 areas:
 
-1. *Fovea Region*: This is the central area where the viewer is looking. In this region, we will use the maximum sample size to achieve the highest image quality.
+1. **Fovea Region**: This is the central area where the viewer is looking. In this region, we will use the maximum sample size to achieve the highest image quality.
 
-2. *Blend Region*: This is the area surrounding the fovea region. In this region, we will gradually decrease (but how exactly?) the sample size from the maximum to the minimum sample size as we move away from the fovea region.
+2. **Blend Region**: This is the area surrounding the fovea region. In this region, we will gradually decrease (but how exactly?) the sample size from the maximum to the minimum sample size as we move away from the fovea region.
 
-3. *Peripheral Region*: This is the outer area where the viewer is not looking. In this region, we will use the minimum sample size to reduce computational load.
+3. **Peripheral Region**: This is the outer area where the viewer is not looking. In this region, we will use the minimum sample size to reduce computational load.
 
 <p align="center">
     <img width="40%" alt="frarea" src="https://github.com/user-attachments/assets/14e756fa-a10c-4481-b3eb-8c9472539e28" />
@@ -476,16 +476,16 @@ else {
 Due to a lot of parameters are involved in foveated rendering, it is hard to say which falloff method is the best only by looking at one render. Also, there are several purposes of foveated rendering (some want to maximize performance, some want to minimize quality loss, some want to avoid tunnel vision problem, etc.), so it is hard to conclude a method as the best one overall. But I will share my observations and results here.
 
 Used parameters for all methods:
-- *Scene*: metal_glass_plates.json (with modified camera position and gaze direction, I will share the used json)
-- *Fovea Radius*: 20 degrees (Instead of the common 2 degrees, I increased it to see the differences more clearly)
-- *Blend Radius*: 30 degrees
-- *Max Samples*: 100
-- *Min Samples*: 1
-- *Blend Samples*: 16 (only for Static Foveated Rendering)
-- *$e_0$ (Log Acuity Model)*: 5 degrees 
-- *a and b (Linear Acuity Model)*: 0.02 and 0.04 (MAR(0) and slope)
-- *Photoreceptor MAR (Mixed Acuity Model)*: $0.02 + 0.01e$
-- *Ganglion MAR (Mixed Acuity Model)*: $0.02 + 0.015 \cdot \log(1 + 0.08e)$
+- **Scene**: metal_glass_plates.json (with modified camera position and gaze direction, I will share the used json)
+- **Fovea Radius**: 20 degrees (Instead of the common 2 degrees, I increased it to see the differences more clearly)
+- **Blend Radius**: 30 degrees
+- **Max Samples**: 100
+- **Min Samples**: 1
+- **Blend Samples**: 16 (only for Static Foveated Rendering)
+- **$e_0$ (Log Acuity Model)**: 5 degrees 
+- **a and b (Linear Acuity Model)**: 0.02 and 0.04 (MAR(0) and slope)
+- **Photoreceptor MAR (Mixed Acuity Model)**: $0.02 + 0.01e$
+- **Ganglion MAR (Mixed Acuity Model)**: $0.02 + 0.015 \cdot \log(1 + 0.08e)$
 
 Static Foveated Rendering and Log Acuity Model with Fovea-Blend-Peripheral Regions results:
 
