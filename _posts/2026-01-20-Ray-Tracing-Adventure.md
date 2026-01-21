@@ -103,7 +103,7 @@ Let's say we have determined 64 as our maximum sample size, and 4 as our minimum
     𝑒(x, y) = \arccos(\vec{d}_{\text{gaze}} \cdot \vec{d}_{\text{pixel}}) \cdot \frac{180}{\pi}
     $$
     
-    where $\vec{d}_{\text{gaze}}$ is the normalized direction vector of the gaze, $\vec{d}_{\text{pixel}}$ is the ray passing through the pixel. (We simply take the $\arccos$ of the dot product of these two vectors to get the angle between them in radians, then convert it to degrees by multiplying with $180 / \pi$.)
+where $\vec{d}_{\text{gaze}}$ is the normalized direction vector of the gaze, $\vec{d}_{\text{pixel}}$ is the ray passing through the pixel. (We simply take the $\arccos$ of the dot product of these two vectors to get the angle between them in radians, then convert it to degrees by multiplying with $180 / \pi$.)
 
 - Reference Eccentricity ($e_0$): A small constant (in degrees) used to avoid singularities at the fovea center and to control how aggressively the falloff begins.
 
@@ -468,7 +468,7 @@ Used parameters for all methods:
 - Max Samples: 100
 - Min Samples: 1
 - Blend Samples: 16 (only for Static Foveated Rendering)
-- e0 (Log Acuity Model): 5 degrees 
+- $e_0$ (Log Acuity Model): 5 degrees 
 - a and b (Linear Acuity Model): 0.02 and 0.04 (MAR(0) and slope)
 - Photoreceptor MAR (Mixed Acuity Model): $0.02 + 0.01e$
 - Ganglion MAR (Mixed Acuity Model): $0.02 + 0.015 \cdot \log(1 + 0.08e)$
@@ -515,7 +515,7 @@ In Static Foveated Rendering, the transitions between regions are quite noticeab
 
 In all falloff methods, the transitions are much smoother, and there are less noticeable artifacts. In Log Acuity Model, the falloff is quite steep (fovea region has high samples, but it quickly drops to low samples in peripheral region), which can lead more noticeable quality loss when eccentricity increases. In Linear Acuity Model, the falloff is more gradual, which helps to maintain better quality when eccentricity increases. In Mixed Acuity Model, even though it requires biological data and more complex calculations, it provides the best balance between quality and performance due to its consideration of multiple biological bottlenecks.
 
-When I looked at render times of each falloff method, I wondered why Log Acuity Model is taking more time than others, it should be the fastest one due to its steep falloff. But then I realized that it is because of e0 value I used (5 degrees). With this value, in 5 degree angle, I get:
+When I looked at render times of each falloff method, I wondered why Log Acuity Model is taking more time than others, it should be the fastest one due to its steep falloff. But then I realized that it is because of $e_0$ value I used (5 degrees). With this value, in 5 degree angle, I get:
 
 $$
 N(𝑒) = 100 \cdot \left( \frac{5}{5 + 5} \right)^2 = 25 \text{ samples}
@@ -526,10 +526,10 @@ Which in Linear Acuity Model, at 5 degree angle, I get:
 $$
 N(𝑒) = 100 \cdot \left( \frac{0.02}{0.02 + 0.04 \cdot 5} \right)^2 \approx 0.82 \text{ samples}
 $$
-This is also a good example of how parameters can affect the results and performance of foveated rendering. I get 1.50144 seconds with e0 = 2 degrees for Log Acuity Model, which is faster than other falloff methods.
+This is also a good example of how parameters can affect the results and performance of foveated rendering. I get 1.50144 seconds with $e_0$ = 2 degrees for Log Acuity Model, which is faster than other falloff methods.
 
 ## Conclusions and Future Work
-Even though my main goal was to stick to the parameters from the papers I read, I realized that keeping those parameters will not help me to compare the falloff methods properly. So I changed some parameters (like Fovea Radius, e0 value) but I think it cause a chain effect on other parameters so I could not keep everything consistent and as in the papers. But I think I achieved my main goal of implementing foveated rendering in ray tracing and exploring different falloff methods and their approach to the problem.
+Even though my main goal was to stick to the parameters from the papers I read, I realized that keeping those parameters will not help me to compare the falloff methods properly. So I changed some parameters (like Fovea Radius, $e_0$ value) but I think it cause a chain effect on other parameters so I could not keep everything consistent and as in the papers. But I think I achieved my main goal of implementing foveated rendering in ray tracing and exploring different falloff methods and their approach to the problem.
 
 For future work, I can explore the following ideas:
 - Parameters that I used can be inputted by the json files to make it easier to test different configurations.
