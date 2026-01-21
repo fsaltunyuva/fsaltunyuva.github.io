@@ -99,7 +99,9 @@ Let's say we have determined 64 as our maximum sample size, and 4 as our minimum
 - Eccentricity (𝑒): The distance from the center of the fovea to a given point in the visual field, measured in degrees of visual angle. When eccentricity increases, the sample size should decrease.
     It can be easily calculated for each pixel using the following formula:
 
-    𝑒(x, y) = arccos(dgaze DOT dpixel) * 180 / pi
+    $$
+e(x, y) = \arccos(\vec{d}_{\text{gaze}} \cdot \vec{d}_{\text{pixel}}) \cdot \frac{180}{\pi}
+$$
     
     where dgaze is the normalized direction vector of the gaze, dpixel is the ray passing through the pixel. (We simply take the arccos of the dot product of these two vectors to get the angle between them in radians, then convert it to degrees by multiplying with 180 / pi.)
 
