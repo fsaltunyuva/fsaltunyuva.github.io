@@ -14,7 +14,9 @@ Let's start with the question:
 ## What is Foveated Rendering?
 Basically, it is a rendering technique that tries to mimic the human eye's way of perceiving the world. The human eye has a small area called the fovea, which is responsible for sharp central vision. The rest of the visual field is perceived with less detail. 
 
-[Foveated Rendering Image]
+<p align="center">
+    <img alt="fr" src="https://github.com/user-attachments/assets/947efd2c-3900-4941-8cc9-cad47f72f26b" />
+</p>
 
 Foveated rendering takes advantage of this by rendering high detail images only in the area where the viewer is looking (the foveal region) and lower detail images in the peripheral areas. This approach can significantly reduce computational load while maintaining visual quality where it matters most.
 
@@ -23,19 +25,27 @@ It is commonly used in virtual reality (VR) because it can help improve performa
 ## Brief History of Foveated Rendering
 The idea is firstly proposed by Levoy and Whitaker in 1990 in their paper [“Gaze-Directed Rendering”](https://graphics.stanford.edu/papers/gaze-i3d90/gaze-i3d90-searchable.pdf). They were also trying to improve their ray tracing algorithm's performance for volumetric rendering.
 
-[Gaze-Directed Rendering Image]
+<p align="center">
+    <img alt="paper1" src="https://github.com/user-attachments/assets/53b10d71-6eb8-4938-9d4f-f388f6eadaf6" />
+</p>
 
 Then, in 1996, Ohshima et al. published a paper titled ["Gaze-Directed Adaptive Rendering for Interacting with Virtual Space"](https://ieeexplore.ieee.org/document/490517). They tampered the main idea "we do not need do render everything in high detail" a bit further and proposed a method that lowers or increases the level of detail (triangle count) of objects in a scene based on the viewer's gaze direction.
 
-[Gaze-Directed Adaptive Rendering Image]
+<p align="center">
+    <img alt="paper2" src="https://github.com/user-attachments/assets/5e52ea2b-a02d-4d49-8450-d6bd12d9cc23" />
+</p>
 
 Even though, there were some other studies and papers on the topic, idea did not merged with the human visual system directly until 1998, when Geisler and Perry published ["A real-time foveated multiresolution system for low-bandwidth video communication"](https://svi.cps.utexas.edu/spie1998.pdf). They were trying to propose the same method for low-bandwidth video communication, but they directly used the human visual system's characteristics to determine the foveal and peripheral regions this time.
 
-[Real-time foveated multiresolution system Image]
+<p align="center">
+    <img alt="paper3" src="https://github.com/user-attachments/assets/4aace7f0-76b4-4be1-9382-e511aa049eb3" />
+</p>
 
 In 2016, NVIDIA Researchers published a paper titled ["Towards foveated rendering for gaze-tracked virtual reality"](https://cwyman.org/papers/siga16_gazeTrackedFoveatedRendering.pdf). They proposed a method that almost completely solves the tunnel vision problem that is commonly seen in foveated rendering techniques.
 
-[Tunnel Vision Problem Image]
+<p align="center">
+    <img alt="paper4" src="https://github.com/user-attachments/assets/9804b0c2-e7d1-4423-b08c-04f7c660bfd6" />
+</p>
 
 They applied a post process contrast enhancement filter to the peripheral regions to make them more visible and less blurry. This method was a great improvement for foveated rendering in VR and made Foveated Rendering more practical for VR applications.
 
@@ -46,14 +56,18 @@ There are 2 main types of foveated rendering techniques:
 ### Static Foveated Rendering
 In static foveated rendering, the foveal region is fixed and does not change based on the viewer's gaze direction. This method is simpler to implement but can lead to lower performance gain, because to achieve the overall best quality, the foveal region needs to be larger than necessary. Therefore, more pixels need to be rendered in high detail.
 
-[Static Foveated Rendering Image]
+<p align="center">
+    <img alt="staticfr" src="https://github.com/user-attachments/assets/2120cf1f-18a9-48f8-8965-d7e8e2002006" />
+</p>
 
 ### Dynamic Foveated Rendering
 In dynamic foveated rendering, the foveal region changes based on the viewer's gaze direction. This method is more complex to implement, as it requires eye tracking technology to determine where the viewer is looking. However, it can lead to significant performance gains, as only the necessary pixels are rendered in high detail and foveal region can be smaller.
 
 Even though it is not my problem for this term project, dynamic foveated rendering also come with the challenge of latency. If there is a delay between the viewer's gaze direction input from the eye tracker and the rendering process, it can lead to a mismatch between the foveal region and the viewer's actual gaze direction, which can cause discomfort and reduce visual quality, especially in quick eye movements (saccades).
 
-[Dynamic Foveated Rendering Image]
+<p align="center">
+    <img alt="dynamicfr" src="https://github.com/user-attachments/assets/e2a1ee24-4417-424e-9b2c-05e30444096b" />
+</p>
 
 ## Implementation in Ray Tracing
 I think we should start by asking, how can we reduce image quality in peripheral regions in ray tracing to improve performance? There are several other ideas for this, but the most straightforward and common way is to reduce the sample size in peripheral regions. As I described in [Part 3](https://fsaltunyuva.github.io/ray-tracing/graphics/adventure/2025/11/24/Ray-Tracing-Adventure.html), in ray tracing, we usually shoot multiple rays per pixel to achieve anti-aliasing and improve image quality. By reducing the number of rays shot per pixel in peripheral regions, we can significantly reduce the computational load.
@@ -66,7 +80,9 @@ In my implementation, I will use 3 areas:
 
 3. Peripheral Region: This is the outer area where the viewer is not looking. In this region, we will use the minimum sample size to reduce computational load.
 
-[Image I created for presentation]
+<p align="center">
+    <img alt="frarea" src="https://github.com/user-attachments/assets/14e756fa-a10c-4481-b3eb-8c9472539e28" />
+</p>
 
 Of course there are other ways to divide the regions, because the human visual system is continuous, so there are multiple ways to approximate it. But for simplicity and easily differ the falloff methods, I will use 3 regions.
 
@@ -118,7 +134,9 @@ N(𝑒) = clamp(Nmin, Nmax, N_max * (e0 / (e + e0))^2).
 
 As we said earlier, if Nmax = 64, Nmin = 4, and e0 = 1 degree, function will look like this (Python scripts used to generate the plots can be found [here](https://github.com/fsaltunyuva/RayTracer/tree/main/Foveated%20Rendering)):
 
-[FoveatedRenderingFalloffs.ipynb Image]
+<p align="center">
+    <img alt="dynamicfr" src="https://github.com/user-attachments/assets/561132a2-3bc7-4c07-b20e-85ccac19856d" />
+</p>
 
 #### Linear Acuity Model
 Another commonly used model is the linear acuity model. In this model, visual acuity is assumed to decrease approximately linearly with eccentricity within the central visual field. This model matches both anatomical data and is applicable for many low-level vision tasks [CITE Hans Strasburger, Ingo Rentschler, and Martin J¨uttner. Peripheral vision andpattern recognition: a review. Journal of vision, 11(5):13–13, 2011.]
@@ -142,6 +160,10 @@ While this model is well supported by human-subject experimental data (to determ
 In the peripheral visual field, photoreceptor density decreases rapidly, and the visual system becomes increasingly limited by the Nyquist limit of the retinal sampling lattice rather than optical blur alone. As a result, spatial frequencies that are theoretically detectable become aliased, leading to a regime where a linear falloff no longer accurately reflects perceived visual quality.
 
 This behavior is illustrated by the widening gap between the detectable without aliasing and detectable but aliased regions in the sample falloff diagram. The linear model effectively balances quality and performance in the central field but tends to overestimate perceptual sensitivity in the far periphery.
+
+<p align="center">
+    <img alt="dynamicfr" src="https://github.com/user-attachments/assets/67f78b35-cf03-4e6e-b9ac-7c42d565422c" />
+</p>
 
 #### Mixed Acuity Model
 
@@ -174,12 +196,16 @@ Here is how the mixed acuity model looks like with the following assumptions.
 
 - Ganglion limited MAR: MARganglion(𝑒) = 0.02 + 0.015 * log(1 + 0.08 * 𝑒) (Steeper linear MAR to reflect faster drop in ganglion cell density)
 
-[Mixed Acuity Model Image]
+<p align="center">
+    <img alt="dynamicfr" src="https://github.com/user-attachments/assets/73dede9d-f6aa-4c0a-bf60-127f936ab5b4" />
+</p>
 
 ### Falloff Comparison
 Here is a comparison of the 3 falloff methods I described above:
 
-[Falloff Comparison Image]
+<p align="center">
+    <img alt="comparison" src="https://github.com/user-attachments/assets/20df9af1-58be-4f47-9108-b265175a1dd8" />
+</p>
 
 I will show the results of these falloff methods in the last section.
 
@@ -267,15 +293,17 @@ for (int y = 0; y < height; ++y) {
 
 When I debugged this with colored regions (with commented codes), I got this result for metal_glass_plates.json scene with 800x800 resolution:
 
-[Static Foveated Rendering Debug Image]
+<p align="center">
+    <img alt="debug" src="https://github.com/user-attachments/assets/a6a9d93d-a4a6-44e3-8ec4-fc64b7f31fe4" />
+</p>
 
 Even though there are some problems in my renderer with attenuation, I wanted to use metal_glass_plates.json because I thought it would be a good scene to see the sample differences in different regions. I also modified the camera position and gaze direction a bit to get a better view for foveated rendering. In the following render, I used 100 samples for fovea region, 16 samples for blend region, and 1 samples for peripheral region. Here is the result compared to normal rendering with 100 samples per pixel:
 
-[Static Foveated Rendering Result Image]
+<p align="center">
+    <img alt="debug" src="https://github.com/user-attachments/assets/830c7c53-4c2e-4d0a-8a85-67e2d1c67cd6" />
+</p>
 
-108.196 seconds vs 20.7135 seconds!
-
-Now, we can implement the falloff methods I explained before. But I was implemented Stratified Random Sampling in my ray tracer, so I needed to modify the sampling logic a bit to accommodate non-square number of samples per pixel. As we discussed in class, I will use N-Rooks Sampling for this purpose.
+We went from 108.196 seconds to 20.7135 seconds! Now, we can implement the falloff methods I explained before. But I was implemented Stratified Random Sampling in my ray tracer, so I needed to modify the sampling logic a bit to accommodate non-square number of samples per pixel. As we discussed in class, I will use N-Rooks Sampling for this purpose.
 
 ```cpp
 // Arrange samples along the diagonal randomly
@@ -320,7 +348,9 @@ But when I tested this, I encountered a problem. The standard Log Acuity model a
 
 If the blend region starts at $20^\circ$ and I feed this value directly into the formula, the function calculates the drop-off as if we are already far away from the center. For example, with $e=20$ and $e_0=1$, the multiplier becomes $(1/21)^2$, which is tiny. This caused the sample count to plummet instantly from maxSamples to minSamples at the fovea boundary, creating a sharp artifact instead of a smooth transition.
 
-[og log acuity model render image]
+<p align="center">
+    <img alt="debug" src="https://github.com/user-attachments/assets/831ef005-a110-4b95-8c1b-8b453318c80e" />
+</p>
 
 To fix this, I needed to shift the eccentricity so that the falloff calculation treats the edge of the fovea as its starting point ($0$). I also introduced a local $e_0$ parameter to better control the slope of the falloff within the blend region.
 
@@ -340,11 +370,15 @@ else if (eccentricity <= blendRadius) {
 }
 ```
 
-[fixed instant drop commit image]
+<p align="center">
+    <img alt="debug" src="https://github.com/user-attachments/assets/9ed9da93-6ae1-4f48-b584-ce837aa4d247" />
+</p>
 
 When I encountered this, I thought that my idea of using these falloff methods only for the Blend Region will not help me to compare different falloff methods properly, and also it is not how these models are intended to be used to. Therefore, I used these falloff methods from the center of the fovea (0 degrees) to the outer edge of the blend region. By doing this, I got more natural looking falloffs and less region transition artifacts.
 
-[falloff from fovea center to blend commit image]
+<p align="center">
+    <img alt="logacuitycentertoblendedge" src="https://github.com/user-attachments/assets/f35f1c9e-8b4c-4bf0-8eb1-88f525571363" />
+</p>
 
 So I continued with this approach and implemented the Linear Acuity Model:
 
@@ -365,7 +399,9 @@ else {
 }
 ```
 
-[linear acuity model render image]
+<p align="center">
+    <img alt="linearacuitycentertoblendedge" src="https://github.com/user-attachments/assets/a14b293b-479d-439a-982b-4b44762aea66" />
+</p>
 
 and finally, I implemented the Mixed Acuity Model:
 
@@ -394,7 +430,9 @@ else {
 }
 ```
 
-[Mixed Acuity Model Render Image]
+<p align="center">
+    <img alt="mixedacuitycentertoblendedge" src="https://github.com/user-attachments/assets/942bf1a1-be5b-4e2e-b8dc-6e2563034717" />
+</p>
 
 ## Results Comparison
 Due to a lot of parameters are involved in foveated rendering, it is hard to say which falloff method is the best only by looking at one render. Also, there are several purposes of foveated rendering (some want to maximize performance, some want to minimize quality loss, some want to avoid tunnel vision problem, etc.), so it is hard to conclude a method as the best one overall. But I will share my observations and results here.
@@ -413,19 +451,25 @@ Used parameters for all methods:
 
 Static Foveated Rendering and Log Acuity Model with Fovea-Blend-Peripheral Regions results:
 
-[Static Foveated Rendering vs Log Acuity Model Image]
+<p align="center">
+    <img alt="static-logfbr" src="https://github.com/user-attachments/assets/27d1da79-fb1f-4f64-8616-685ab658df1a" />
+</p>
 
-3 falloff methods from center of fovea to edge of blend region results:
+3 falloff methods from the center of the fovea to the edge of the blend region results:
 
-[Falloff Methods Comparison Image]
+<p align="center">
+    <img alt="comparison" src="https://github.com/user-attachments/assets/68e978e2-646e-43f4-a529-38c0ed7e1cfe" />
+</p>
 
 1.5x zoomed in images to see the differences better:
 
-[1.5x Zoomed In Falloff Methods Comparison Image]
+<p align="center">
+    <img alt="15zoom" src="https://github.com/user-attachments/assets/d21b7e4d-e094-4a65-aecc-921aeed2df57" />
+</p>
 
-[Comparison GIF]
+![optimizedcomparisongif](https://github.com/user-attachments/assets/2c5bcc8b-a6f3-461f-bbf8-2fc7cba6b35e)
 
-I also uploaded the renders to here, if you want to see them in full resolution.
+I also uploaded the renders to [here](https://github.com/fsaltunyuva/RayTracer/tree/main/Foveated%20Rendering/Renders%20and%20Input%20File), if you want to see them in full resolution.
 
 Also, you can see the render times for each method here:
 
