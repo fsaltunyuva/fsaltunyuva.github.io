@@ -517,12 +517,15 @@ In all falloff methods, the transitions are much smoother, and there are less no
 
 When I looked at render times of each falloff method, I wondered why Log Acuity Model is taking more time than others, it should be the fastest one due to its steep falloff. But then I realized that it is because of e0 value I used (5 degrees). With this value, in 5 degree angle, I get:
 
-N(e) = 100 * (5 / (5 + 5))^2 = 25 samples
+$$
+N(𝑒) = 100 \cdot \left( \frac{5}{5 + 5} \right)^2 = 25 \text{ samples}
+$$
 
 Which in Linear Acuity Model, at 5 degree angle, I get:
 
-N(e) = 100 * (0.02 / (0.02 + 0.04 * 5)) = 9 samples
-
+$$
+N(𝑒) = 100 \cdot \left( \frac{0.02}{0.02 + 0.04 \cdot 5} \right)^2 \approx 0.82 \text{ samples}
+$$
 This is also a good example of how parameters can affect the results and performance of foveated rendering. I get 1.50144 seconds with e0 = 2 degrees for Log Acuity Model, which is faster than other falloff methods.
 
 ## Conclusions and Future Work
@@ -541,7 +544,8 @@ https://en.wikipedia.org/wiki/Peripheral_vision#/media/File:Peripheral_vision.sv
 
 - Some geometric falloff methods can also be explored for falloff calculations.
 
-- Contrast enhancement from "Towards foveated rendering for gaze-tracked virtual reality"
+- Contrast enhancement from ["Towards foveated rendering for gaze-tracked virtual reality"](https://cwyman.org/papers/siga16_gazeTrackedFoveatedRendering.pdf) can also be implemented to improve the perceived quality in peripheral regions.
+
 ## Great Papers and Articles to Read
 - [Foveated 3D Graphics](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/11/foveated_final15.pdf)
 
@@ -551,4 +555,4 @@ https://en.wikipedia.org/wiki/Peripheral_vision#/media/File:Peripheral_vision.sv
 
 - [Fooling Around with Foveated Rendering](https://www.peterstefek.me/focused-render.html)
 
-- Towards foveated rendering for gaze-tracked virtual reality
+- ["Towards foveated rendering for gaze-tracked virtual reality"](https://cwyman.org/papers/siga16_gazeTrackedFoveatedRendering.pdf)
