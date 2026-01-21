@@ -397,9 +397,81 @@ else {
 [Mixed Acuity Model Render Image]
 
 ## Results Comparison
-Due to a lot of parameters are involved in foveated rendering, it is hard to say which falloff method is the best only by looking at one render. But here are the results I got for each falloff method with the parameters below:
+Due to a lot of parameters are involved in foveated rendering, it is hard to say which falloff method is the best only by looking at one render. Also, there are several purposes of foveated rendering (some want to maximize performance, some want to minimize quality loss, some want to avoid tunnel vision problem, etc.), so it is hard to conclude a method as the best one overall. But I will share my observations and results here.
 
+Used parameters for all methods:
+- Scene: metal_glass_plates.json (with modified camera position and gaze direction, I will share the used json)
+- Fovea Radius: 20 degrees (Instead of the common 2 degrees, I increased it to see the differences more clearly)
+- Blend Radius: 30 degrees
+- Max Samples: 100
+- Min Samples: 1
+- Blend Samples: 16 (only for Static Foveated Rendering)
+- e0 (Log Acuity Model): 5 degrees 
+- a and b (Linear Acuity Model): 0.02 and 0.04 (MAR(0) and slope)
+- Photoreceptor MAR (Mixed Acuity Model): 0.02 + 0.01 * e
+- Ganglion MAR (Mixed Acuity Model): 0.02 + 0.015 * log(1 + 0.08 * e)
 
+Static Foveated Rendering and Log Acuity Model with Fovea-Blend-Peripheral Regions results:
+
+[Static Foveated Rendering vs Log Acuity Model Image]
+
+3 falloff methods from center of fovea to edge of blend region results:
+
+[Falloff Methods Comparison Image]
+
+1.5x zoomed in images to see the differences better:
+
+[1.5x Zoomed In Falloff Methods Comparison Image]
+
+[Comparison GIF]
+
+I also uploaded the renders to here, if you want to see them in full resolution.
+
+Also, you can see the render times for each method here:
+
+| Falloff Method              | Time (seconds) |
+| ----------------------- | --------------- |
+| Static Foveated Rendering    | 19.9914        |
+| Log Acuity Falloff with Fovea-Blend-Peripheral Regions          | 25.6729        |
+| Log Acuity Falloff From Center to Blend Edge    | 2.76325         |
+| Linear Acuity Falloff From Center to Blend Edge          | 1.71995         |
+| Mixed Acuity Falloff From Center to Blend Edge        | 1.56458         |
+| No Foveated Rendering - 100 Sample Size        | 99.8554         |
+
+## Comments
+When I look at the render times, I understood why the Foveated Rendering is popular in VR applications. Even with a simple static foveated rendering implementation, I was able to achieve almost 5x speedup compared to normal rendering with 100 samples per pixel. And with more advanced falloff methods (and fine-tuning the parameters), I could have achieved even better performance.
+
+When I look at the images, I can say that all falloff methods produced acceptable results, but there are some differences in quality and artifacts.
+
+In Static Foveated Rendering, the transitions between regions are quite noticeable, especially at the boundaries. This became a good example for tunnel vision problem, as the peripheral region looks very low quality compared to the fovea region. But it is expected, as we are using constant sample sizes for each region.
+
+In all falloff methods, the transitions are much smoother, and there are less noticeable artifacts. In Log Acuity Model, the falloff is quite steep (fovea region has high samples, but it quickly drops to low samples in peripheral region), which can lead more noticeable quality loss when eccentricity increases. In Linear Acuity Model, the falloff is more gradual, which helps to maintain better quality when eccentricity increases. In Mixed Acuity Model, even though it requires biological data and more complex calculations, it provides the best balance between quality and performance due to its consideration of multiple biological bottlenecks.
+
+When I looked at render times of each falloff method, I wondered why Log Acuity Model is taking more time than others, it should be the fastest one due to its steep falloff. But then I realized that it is because of e0 value I used (5 degrees). With this value, in 5 degree angle, I get:
+
+N(e) = 100 * (5 / (5 + 5))^2 = 25 samples
+
+Which in Linear Acuity Model, at 5 degree angle, I get:
+
+N(e) = 100 * (0.02 / (0.02 + 0.04 * 5)) = 9 samples
+
+This is also a good example of how parameters can affect the results and performance of foveated rendering. I get 1.50144 seconds with e0 = 2 degrees for Log Acuity Model, which is faster than other falloff methods.
+
+## Conclusions and Future Work
+Even though my main goal was to stick to the parameters from the papers I read, I realized that keeping those parameters will not help me to compare the falloff methods properly. So I changed some parameters (like Fovea Radius, e0 value) but I think it cause a chain effect on other parameters so I could not keep everything consistent and as in the papers. But I think I achieved my main goal of implementing foveated rendering in ray tracing and exploring different falloff methods and their approach to the problem.
+
+For future work, I can explore the following ideas:
+- Parameters that I used can be inputted by the json files to make it easier to test different configurations.
+
+- If the gaze point of the user is given (from json file or the eye tracker), fovea region can be moved based on that point instead of fixed camera gaze direction. By doing this, dynamic foveated rendering can be implemented.
+
+- Our peripheral vision is also affected by the speed of objects in our visual field. For instance, when we are driving a car, when speed increases, our peripheral vision decreases. This can be explored in foveated rendering by adjusting the fovea and blend region sizes based on the speed of the camera or objects in the scene. 
+https://media.istockphoto.com/id/1597773385/tr/vekt%C3%B6r/safety-car-driving-rules-and-tips-peripheral-vision-while-driving-vector-illustration.jpg?s=612x612&w=is&k=20&c=2iJJ95UChOUSgmE4nm6aESAXqRIcF62QrcU4baCW3hc=
+
+- As I mentioned, our view area can be divided into more than 3 regions.
+https://en.wikipedia.org/wiki/Peripheral_vision#/media/File:Peripheral_vision.svg
+
+- Some geometric falloff methods can also be explored for falloff calculations.
 
 ## Great Papers and Articles to Read
 - [Foveated 3D Graphics](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/11/foveated_final15.pdf)
@@ -409,16 +481,3 @@ Due to a lot of parameters are involved in foveated rendering, it is hard to say
 - [Foveated Path Tracing with Configurable Sampling and Block-Based Rendering](https://arxiv.org/pdf/2406.07981)
 
 - [Fooling Around with Foveated Rendering](https://www.peterstefek.me/focused-render.html)
-
-## Future Work
-Parametreler jsondan verilebilir.
-
-Changes on original sample logic (without needing squared number of samples per pixel)
-
-Our peripheral vision changes also by the speed.
-https://media.istockphoto.com/id/1597773385/tr/vekt%C3%B6r/safety-car-driving-rules-and-tips-peripheral-vision-while-driving-vector-illustration.jpg?s=612x612&w=is&k=20&c=2iJJ95UChOUSgmE4nm6aESAXqRIcF62QrcU4baCW3hc=
-
-As I mentioned, our view area can be divided into more than 3 regions.
-https://en.wikipedia.org/wiki/Peripheral_vision#/media/File:Peripheral_vision.svg
-
-Some geometric falloff methods can also be explored for falloff calculations.
