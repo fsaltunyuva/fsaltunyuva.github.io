@@ -16,6 +16,10 @@ Basically, it is a rendering technique that tries to mimic the human eye's way o
 
 <p align="center">
     <img alt="fr" src="https://github.com/user-attachments/assets/947efd2c-3900-4941-8cc9-cad47f72f26b" />
+<br>
+    <em>
+        <a href="https://www.reddit.com/r/oculus/comments/66nfap/made_a_pic_that_shows_how_foveated_rendering/">From a Reddit post by f4cepa1m</a>
+    </em>
 </p>
 
 Foveated rendering takes advantage of this by rendering high detail images only in the area where the viewer is looking (the foveal region) and lower detail images in the peripheral areas. This approach can significantly reduce computational load while maintaining visual quality where it matters most.
@@ -26,13 +30,13 @@ It is commonly used in virtual reality (VR) because it can help improve performa
 The idea is firstly proposed by Levoy and Whitaker in 1990 in their paper [“Gaze-Directed Rendering”](https://graphics.stanford.edu/papers/gaze-i3d90/gaze-i3d90-searchable.pdf). They were also trying to improve their ray tracing algorithm's performance for volumetric rendering.
 
 <p align="center">
-    <img alt="paper1" src="https://github.com/user-attachments/assets/53b10d71-6eb8-4938-9d4f-f388f6eadaf6" />
+    <img width="40%" alt="paper1" src="https://github.com/user-attachments/assets/53b10d71-6eb8-4938-9d4f-f388f6eadaf6" />
 </p>
 
 Then, in 1996, Ohshima et al. published a paper titled ["Gaze-Directed Adaptive Rendering for Interacting with Virtual Space"](https://ieeexplore.ieee.org/document/490517). They tampered the main idea "we do not need do render everything in high detail" a bit further and proposed a method that lowers or increases the level of detail (triangle count) of objects in a scene based on the viewer's gaze direction.
 
 <p align="center">
-    <img alt="paper2" src="https://github.com/user-attachments/assets/5e52ea2b-a02d-4d49-8450-d6bd12d9cc23" />
+    <img width="40%" alt="paper2" src="https://github.com/user-attachments/assets/5e52ea2b-a02d-4d49-8450-d6bd12d9cc23" />
 </p>
 
 Even though, there were some other studies and papers on the topic, idea did not merged with the human visual system directly until 1998, when Geisler and Perry published ["A real-time foveated multiresolution system for low-bandwidth video communication"](https://svi.cps.utexas.edu/spie1998.pdf). They were trying to propose the same method for low-bandwidth video communication, but they directly used the human visual system's characteristics to determine the foveal and peripheral regions this time.
@@ -57,7 +61,7 @@ There are 2 main types of foveated rendering techniques:
 In static foveated rendering, the foveal region is fixed and does not change based on the viewer's gaze direction. This method is simpler to implement but can lead to lower performance gain, because to achieve the overall best quality, the foveal region needs to be larger than necessary. Therefore, more pixels need to be rendered in high detail.
 
 <p align="center">
-    <img alt="staticfr" src="https://github.com/user-attachments/assets/2120cf1f-18a9-48f8-8965-d7e8e2002006" />
+    <img width="20%"alt="staticfr" src="https://github.com/user-attachments/assets/2120cf1f-18a9-48f8-8965-d7e8e2002006" />
 </p>
 
 ### Dynamic Foveated Rendering
@@ -66,7 +70,7 @@ In dynamic foveated rendering, the foveal region changes based on the viewer's g
 Even though it is not my problem for this term project, dynamic foveated rendering also come with the challenge of latency. If there is a delay between the viewer's gaze direction input from the eye tracker and the rendering process, it can lead to a mismatch between the foveal region and the viewer's actual gaze direction, which can cause discomfort and reduce visual quality, especially in quick eye movements (saccades).
 
 <p align="center">
-    <img alt="dynamicfr" src="https://github.com/user-attachments/assets/e2a1ee24-4417-424e-9b2c-05e30444096b" />
+    <img width="20%" alt="dynamicfr" src="https://github.com/user-attachments/assets/e2a1ee24-4417-424e-9b2c-05e30444096b" />
 </p>
 
 ## Implementation in Ray Tracing
@@ -81,7 +85,7 @@ In my implementation, I will use 3 areas:
 3. Peripheral Region: This is the outer area where the viewer is not looking. In this region, we will use the minimum sample size to reduce computational load.
 
 <p align="center">
-    <img alt="frarea" src="https://github.com/user-attachments/assets/14e756fa-a10c-4481-b3eb-8c9472539e28" />
+    <img width="40%" alt="frarea" src="https://github.com/user-attachments/assets/14e756fa-a10c-4481-b3eb-8c9472539e28" />
 </p>
 
 Of course there are other ways to divide the regions, because the human visual system is continuous, so there are multiple ways to approximate it. But for simplicity and easily differ the falloff methods, I will use 3 regions.
@@ -294,7 +298,7 @@ for (int y = 0; y < height; ++y) {
 When I debugged this with colored regions (with commented codes), I got this result for metal_glass_plates.json scene with 800x800 resolution:
 
 <p align="center">
-    <img alt="debug" src="https://github.com/user-attachments/assets/a6a9d93d-a4a6-44e3-8ec4-fc64b7f31fe4" />
+    <img width="40%" alt="debug" src="https://github.com/user-attachments/assets/a6a9d93d-a4a6-44e3-8ec4-fc64b7f31fe4" />
 </p>
 
 Even though there are some problems in my renderer with attenuation, I wanted to use metal_glass_plates.json because I thought it would be a good scene to see the sample differences in different regions. I also modified the camera position and gaze direction a bit to get a better view for foveated rendering. In the following render, I used 100 samples for fovea region, 16 samples for blend region, and 1 samples for peripheral region. Here is the result compared to normal rendering with 100 samples per pixel:
@@ -517,6 +521,7 @@ https://en.wikipedia.org/wiki/Peripheral_vision#/media/File:Peripheral_vision.sv
 
 - Some geometric falloff methods can also be explored for falloff calculations.
 
+- Contrast enhancement from "Towards foveated rendering for gaze-tracked virtual reality"
 ## Great Papers and Articles to Read
 - [Foveated 3D Graphics](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/11/foveated_final15.pdf)
 
@@ -525,3 +530,5 @@ https://en.wikipedia.org/wiki/Peripheral_vision#/media/File:Peripheral_vision.sv
 - [Foveated Path Tracing with Configurable Sampling and Block-Based Rendering](https://arxiv.org/pdf/2406.07981)
 
 - [Fooling Around with Foveated Rendering](https://www.peterstefek.me/focused-render.html)
+
+- Towards foveated rendering for gaze-tracked virtual reality
