@@ -61,7 +61,7 @@ There are 2 main types of foveated rendering techniques:
 In static foveated rendering, the foveal region is fixed and does not change based on the viewer's gaze direction. This method is simpler to implement but can lead to lower performance gain, because to achieve the overall best quality, the foveal region needs to be larger than necessary. Therefore, more pixels need to be rendered in high detail.
 
 <p align="center">
-    <img width="50%"alt="staticfr" src="https://github.com/user-attachments/assets/2120cf1f-18a9-48f8-8965-d7e8e2002006" />
+    <img width="50%" alt="staticfr" src="https://github.com/user-attachments/assets/2120cf1f-18a9-48f8-8965-d7e8e2002006" />
 </p>
 
 ### Dynamic Foveated Rendering
@@ -100,10 +100,10 @@ Let's say we have determined 64 as our maximum sample size, and 4 as our minimum
     It can be easily calculated for each pixel using the following formula:
 
     $$
-𝑒(x, y) = \arccos(\vec{d}_{\text{gaze}} \cdot \vec{d}_{\text{pixel}}) \cdot \frac{180}{\pi}
-$$
+    𝑒(x, y) = \arccos(\vec{d}_{\text{gaze}} \cdot \vec{d}_{\text{pixel}}) \cdot \frac{180}{\pi}
+    $$
     
-    where $\vec{d}_{\text{gaze}}$ is the normalized direction vector of the gaze, $\vec{d}_{\text{pixel}}$ is the ray passing through the pixel. (We simply take the arccos of the dot product of these two vectors to get the angle between them in radians, then convert it to degrees by multiplying with 180 / pi.)
+    where $\vec{d}_{\text{gaze}}$ is the normalized direction vector of the gaze, $\vec{d}_{\text{pixel}}$ is the ray passing through the pixel. (We simply take the $\arccos$ of the dot product of these two vectors to get the angle between them in radians, then convert it to degrees by multiplying with $180 / \pi$.)
 
 - Reference Eccentricity ($e_0$): A small constant (in degrees) used to avoid singularities at the fovea center and to control how aggressively the falloff begins.
 
@@ -126,27 +126,27 @@ Near the fovea (small 𝑒), cortical magnification M(𝑒) is large, indicating
 
 Schwartz showed that integrating this magnification function leads to a logarithmic mapping between retinal space and cortical space. In other words, equal distances on the cortex correspond to exponentially increasing distances in the visual field. This is why the model is often referred to as a log-polar or log acuity model.
 
-But how can we use this function to determine the sample size for each pixel in the Blend Region? If visual acuity is proportional to cortical magnification M(e) (as in paper), then the linear resolution should scale with M(e), and the sampling density over an image area should scale with M(e)^2.
+But how can we use this function to determine the sample size for each pixel in the Blend Region? If visual acuity is proportional to cortical magnification M(𝑒) (as in paper), then the linear resolution should scale with M(𝑒), and the sampling density over an image area should scale with $M(𝑒)^2$.
 
 Therefore, we can define the sample size N(𝑒) at eccentricity 𝑒 as:
 
 $$
-N(e) = N_{\max} \cdot \left( \frac{M(e)}{M(0)} \right)^2
+N(𝑒) = N_{\max} \cdot \left( \frac{M(𝑒)}{M(0)} \right)^2
 $$
 
 Substituting the cortical magnification function into this equation gives:
 
 $$
-N(e) = N_{\max} \cdot \left( \frac{e_0}{e + e_0} \right)^2
+N(𝑒) = N_{\max} \cdot \left( \frac{𝑒_0}{𝑒 + 𝑒_0} \right)^2
 $$
 
 So we can use this equation in the Blend Region to determine the sample size for each pixel:
 
 $$
-N(e) = \text{clamp} \left( N_{\min}, N_{\max}, N_{\max} \cdot \left( \frac{e_0}{e + e_0} \right)^2 \right)
+N(𝑒) = \text{clamp} \left( N_{\min}, N_{\max}, N_{\max} \cdot \left( \frac{𝑒_0}{𝑒 + 𝑒_0} \right)^2 \right)
 $$
 
-As we said earlier, if Nmax = 64, Nmin = 4, and e0 = 1 degree, function will look like this (Python scripts used to generate the plots can be found [here](https://github.com/fsaltunyuva/RayTracer/tree/main/Foveated%20Rendering)):
+As we said earlier, if Nmax = 64, Nmin = 4, and $𝑒_0$ = 1 degree, function will look like this (Python scripts used to generate the plots can be found [here](https://github.com/fsaltunyuva/RayTracer/tree/main/Foveated%20Rendering)):
 
 <p align="center">
     <img alt="dynamicfr" src="https://github.com/user-attachments/assets/561132a2-3bc7-4c07-b20e-85ccac19856d" />
@@ -158,7 +158,7 @@ Another commonly used model is the linear acuity model. In this model, visual ac
 The model is based on the concept of Minimum Angle of Resolution (MAR), which represents the smallest angular separation at which two features can be distinguished. Experimental studies on human observers indicate that MAR increases roughly linearly with eccentricity for central vision, leading to the following formulation:
 
 $$
-\text{MAR}(e) = a + be
+\text{MAR}(𝑒) = a + b𝑒
 $$
 
 where a = MAR(0) is the foveal resolution limit, and b controls the rate at which acuity degrades with eccentricity.
@@ -166,13 +166,13 @@ where a = MAR(0) is the foveal resolution limit, and b controls the rate at whic
 By this idea, we assume that the sampling density should be proportional to the amount of resolvable visual detail.
 
 $$
-N(e) = N_{\max} \cdot \left( \frac{\text{MAR}(0)}{\text{MAR}(e)} \right)
+N(𝑒) = N_{\max} \cdot \left( \frac{\text{MAR}(0)}{\text{MAR}(𝑒)} \right)
 $$
 
 Substituting the linear MAR function into this equation gives this calculation for sample size at eccentricity 𝑒:
 
 $$
-N(e) = \text{clamp} \left( N_{\max} \cdot \frac{a}{a + b \cdot e}, S_{\min}, S_{\max} \right)
+N(𝑒) = \text{clamp} \left( N_{\max} \cdot \frac{a}{a + b \cdot 𝑒}, S_{\min}, S_{\max} \right)
 $$
 
 While this model is well supported by human-subject experimental data (to determine a and b values), its validity is largely limited to central vision, typically within an angular radius of approximately 8°. Beyond this region, MAR has been shown to increase more steeply than predicted by a linear model [CITE Foveated 3D graphics. Brian Guenter, Mark Finch, Steven Drucker, Desney Tan, and John Snyder. 2012. ]
@@ -205,20 +205,20 @@ So we can define two eccentricity dependent resolution limits in MAR form:
 A conservative mixed model can be expressed by taking the maximum MAR (worst acuity) at each eccentricity (it can be improved further by smooth blending, but I will keep it simple here):
 
 $$
-\text{MAR}_{\text{mixed}}(e) = \max \left( \text{MAR}_{\text{photo}}(e), \text{MAR}_{\text{ganglion}}(e) \right)
+\text{MAR}_{\text{mixed}}(𝑒) = \max \left( \text{MAR}_{\text{photo}}(𝑒), \text{MAR}_{\text{ganglion}}(𝑒) \right)
 $$
 
 Then we follow the same reasoning as before to derive sample size:
 
 $$
-N(e) = \text{clamp} \left( N_{\max} \cdot \left( \frac{\text{MAR}_{\text{mixed}}(0)}{\text{MAR}_{\text{mixed}}(e)} \right)^2, N_{\min}, N_{\max} \right)
+N(𝑒) = \text{clamp} \left( N_{\max} \cdot \left( \frac{\text{MAR}_{\text{mixed}}(0)}{\text{MAR}_{\text{mixed}}(𝑒)} \right)^2, N_{\min}, N_{\max} \right)
 $$
 
 Here is how the mixed acuity model looks like with the following assumptions.
 
-- Photoreceptor limited MAR: $\text{MAR}_{\text{photo}}(e) = 0.02 + 0.01e$ (Same linear MAR as in linear acuity model)
+- Photoreceptor limited MAR: $\text{MAR}_{\text{photo}}(𝑒) = 0.02 + 0.01𝑒$ (Same linear MAR as in linear acuity model)
 
-- Ganglion limited MAR: $\text{MAR}_{\text{ganglion}}(e) = 0.02 + 0.015 \log(1 + 0.08e)$ (Steeper linear MAR to reflect faster drop in ganglion cell density)
+- Ganglion limited MAR: $\text{MAR}_{\text{ganglion}}(𝑒) = 0.02 + 0.015 \log(1 + 0.08𝑒)$ (Steeper linear MAR to reflect faster drop in ganglion cell density)
     
 <p align="center">
     <img alt="dynamicfr" src="https://github.com/user-attachments/assets/73dede9d-f6aa-4c0a-bf60-127f936ab5b4" />
