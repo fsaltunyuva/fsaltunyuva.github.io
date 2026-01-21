@@ -62,6 +62,11 @@ In static foveated rendering, the foveal region is fixed and does not change bas
 
 <p align="center">
     <img width="50%" alt="staticfr" src="https://github.com/user-attachments/assets/2120cf1f-18a9-48f8-8965-d7e8e2002006" />
+    <br>
+    <em>
+        <a href="https://www.tobii.com/blog/what-is-foveated-rendering"> Figure from Tobii's blog on Foveated Rendering
+        </a>
+    </em>
 </p>
 
 ### Dynamic Foveated Rendering
@@ -71,6 +76,11 @@ Even though it is not my problem for this term project, dynamic foveated renderi
 
 <p align="center">
     <img width="50%" alt="dynamicfr" src="https://github.com/user-attachments/assets/e2a1ee24-4417-424e-9b2c-05e30444096b" />
+    <br>
+    <em>
+        <a href="https://www.tobii.com/blog/what-is-foveated-rendering"> Figure from Tobii's blog on Foveated Rendering
+        </a>
+    </em>
 </p>
 
 ## Implementation in Ray Tracing
@@ -78,14 +88,18 @@ I think we should start by asking, how can we reduce image quality in peripheral
 
 In my implementation, I will use 3 areas:
 
-1. Fovea Region: This is the central area where the viewer is looking. In this region, we will use the maximum sample size to achieve the highest image quality.
+1. *Fovea Region*: This is the central area where the viewer is looking. In this region, we will use the maximum sample size to achieve the highest image quality.
 
-2. Blend Region: This is the area surrounding the fovea region. In this region, we will gradually decrease (but how exactly?) the sample size from the maximum to the minimum sample size as we move away from the fovea region.
+2. *Blend Region*: This is the area surrounding the fovea region. In this region, we will gradually decrease (but how exactly?) the sample size from the maximum to the minimum sample size as we move away from the fovea region.
 
-3. Peripheral Region: This is the outer area where the viewer is not looking. In this region, we will use the minimum sample size to reduce computational load.
+3. *Peripheral Region*: This is the outer area where the viewer is not looking. In this region, we will use the minimum sample size to reduce computational load.
 
 <p align="center">
     <img width="40%" alt="frarea" src="https://github.com/user-attachments/assets/14e756fa-a10c-4481-b3eb-8c9472539e28" />
+    <br>
+    <em>
+        Figure on cornellbox_area to represent the idea.
+    </em>
 </p>
 
 Of course there are other ways to divide the regions, because the human visual system is continuous, so there are multiple ways to approximate it. But for simplicity and easily differ the falloff methods, I will use 3 regions.
@@ -96,23 +110,21 @@ Okay, until now, we understood the idea. In short, we will reduce the image qual
 Let's say we have determined 64 as our maximum sample size, and 4 as our minimum sample size. Now, we need to determine how to decrease the sample size from 64 to 4 in the Blend Region. There are several methods to do this, but before that, I should define some terms that will be used in the calculations:
 
 #### Definitions
-- Eccentricity (𝑒): The distance from the center of the fovea to a given point in the visual field, measured in degrees of visual angle. When eccentricity increases, the sample size should decrease.
-    It can be easily calculated for each pixel using the following formula:
+- *Eccentricity (𝑒)*: The distance from the center of the fovea to a given point in the visual field, measured in degrees of visual angle. When eccentricity increases, the sample size should decrease.
+    It can be easily calculated for each pixel using the following formula where $\vec{d}_{\text{gaze}}$ is the normalized direction vector of the gaze, $\vec{d}_{\text{pixel}}$ is the ray passing through the pixel. (We simply take the $\arccos$ of the dot product of these two vectors to get the angle between them in radians, then convert it to degrees by multiplying with $180 / \pi$.):
 
     $$
     𝑒(x, y) = \arccos(\vec{d}_{\text{gaze}} \cdot \vec{d}_{\text{pixel}}) \cdot \frac{180}{\pi}
     $$
-    
-where $\vec{d}_{\text{gaze}}$ is the normalized direction vector of the gaze, $\vec{d}_{\text{pixel}}$ is the ray passing through the pixel. (We simply take the $\arccos$ of the dot product of these two vectors to get the angle between them in radians, then convert it to degrees by multiplying with $180 / \pi$.)
 
-- Reference Eccentricity ($e_0$): A small constant (in degrees) used to avoid singularities at the fovea center and to control how aggressively the falloff begins.
+- *Reference Eccentricity ($e_0$)*: A small constant (in degrees) used to avoid singularities at the fovea center and to control how aggressively the falloff begins.
 
-- Cortical Magnification (M(𝑒)): A function that models how much cortical area is allocated to one degree of visual angle at eccentricity 𝑒.
+- *Cortical Magnification (M(𝑒))*: A function that models how much cortical area is allocated to one degree of visual angle at eccentricity 𝑒. We can think this like "How many $mm^2$ of processing does our brains use to process an image located 𝑒 degrees from the center?"
 
-- Cutoff eccentricity ($𝑒_c$): The eccentricity up to which a linear approximation is considered reasonable (often treated as a “central vision” range in practical models).
+- *Cutoff eccentricity ($𝑒_c$)*: The angular limit of the central high-detail zone. Beyond this threshold, visual acuity degrades rapidly, rendering simple linear approximations insufficient.
 
 #### Log Acuity Model
-This model has been found that the excitation of the cortex can be approximated by a log-polar mapping of the eye’s retinal image [CITE Meng2018Foveated.pdf]. This model is proposed by Eric Schwartz in his paper ["Anatomical and Physiological Correlates of Visual Computation from Striate to Infero-Temporal Cortex"](https://ieeexplore.ieee.org/document/6313208) in 1984. The calculation model of this method is cheap and fast.
+This model has been found that the excitation of the cortex can be approximated by a log-polar mapping of the eye’s retinal image [(Meng et al., 2018)](https://3dvar.com/Meng2018Foveated.pdf). This model is proposed by Eric Schwartz in his paper ["Anatomical and Physiological Correlates of Visual Computation from Striate to Infero-Temporal Cortex"](https://ieeexplore.ieee.org/document/6313208) in 1984.
 
 The key idea behind the log acuity model is *cortical magnification*. Physiological studies show that a disproportionately large area of the visual cortex is devoted to processing the foveal region, while peripheral regions are represented more compactly. This behavior can be approximated by the following cortical magnification function:
 
@@ -143,7 +155,7 @@ $$
 So we can use this equation in the Blend Region to determine the sample size for each pixel:
 
 $$
-N(𝑒) = \text{clamp} \left( N_{\min}, N_{\max}, N_{\max} \cdot \left( \frac{𝑒_0}{𝑒 + 𝑒_0} \right)^2 \right)
+N(𝑒) = \text{clamp} \left(N_{\max} \cdot \left( \frac{𝑒_0}{𝑒 + 𝑒_0} \right)^2 \right, N_{\min}, N_{\max})
 $$
 
 As we said earlier, if Nmax = 64, Nmin = 4, and $𝑒_0$ = 1 degree, function will look like this (Python scripts used to generate the plots can be found [here](https://github.com/fsaltunyuva/RayTracer/tree/main/Foveated%20Rendering)):
@@ -153,7 +165,7 @@ As we said earlier, if Nmax = 64, Nmin = 4, and $𝑒_0$ = 1 degree, function wi
 </p>
 
 #### Linear Acuity Model
-Another commonly used model is the linear acuity model. In this model, visual acuity is assumed to decrease approximately linearly with eccentricity within the central visual field. This model matches both anatomical data and is applicable for many low-level vision tasks [CITE Hans Strasburger, Ingo Rentschler, and Martin J¨uttner. Peripheral vision andpattern recognition: a review. Journal of vision, 11(5):13–13, 2011.]
+Another commonly used model is the linear acuity model. In this model, visual acuity is assumed to decrease approximately linearly with eccentricity within the central visual field. This model matches both anatomical data and is applicable for many low-level vision tasks [(Strasburger et al., 2011)](https://pubmed.ncbi.nlm.nih.gov/22207654/).
 
 The model is based on the concept of Minimum Angle of Resolution (MAR), which represents the smallest angular separation at which two features can be distinguished. Experimental studies on human observers indicate that MAR increases roughly linearly with eccentricity for central vision, leading to the following formulation:
 
@@ -172,14 +184,14 @@ $$
 Substituting the linear MAR function into this equation gives this calculation for sample size at eccentricity 𝑒:
 
 $$
-N(𝑒) = \text{clamp} \left( N_{\max} \cdot \frac{a}{a + b \cdot 𝑒}, S_{\min}, S_{\max} \right)
+N(𝑒) = \text{clamp} \left( N_{\max} \cdot \frac{a}{a + b \cdot 𝑒}, N_{\min}, N_{\max} \right)
 $$
 
-While this model is well supported by human-subject experimental data (to determine a and b values), its validity is largely limited to central vision, typically within an angular radius of approximately 8°. Beyond this region, MAR has been shown to increase more steeply than predicted by a linear model [CITE Foveated 3D graphics. Brian Guenter, Mark Finch, Steven Drucker, Desney Tan, and John Snyder. 2012. ]
+While this model is well supported by human-subject experimental data (to determine a and b values), its validity is largely limited to central vision, typically within an angular radius of approximately 8°. Beyond this region, MAR has been shown to increase more steeply than predicted by a linear model [(Guenter et al., 2012)](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/11/foveated_final15.pdf).
 
-In the peripheral visual field, photoreceptor density decreases rapidly, and the visual system becomes increasingly limited by the Nyquist limit of the retinal sampling lattice rather than optical blur alone. As a result, spatial frequencies that are theoretically detectable become aliased, leading to a regime where a linear falloff no longer accurately reflects perceived visual quality.
+In the far periphery, the density of light sensors (photoreceptors) in our eyes drops drastically. It is not just that the image gets blurry due to the lens; rather, the 'pixels' of our retina become so sparse that they cannot capture fine details at all. This causes aliasing, where details don't just fade, but become distorted or flickering noises.
 
-This behavior is illustrated by the widening gap between the detectable without aliasing and detectable but aliased regions in the sample falloff diagram. The linear model effectively balances quality and performance in the central field but tends to overestimate perceptual sensitivity in the far periphery.
+The Linear Model fails to capture this distinction. It assumes vision simply gets progressively blurrier (like a camera out of focus) and calculates sample counts based on this assumption. However, because the eye is actually limited by a lack of "pixels" (sensors) in the periphery, the Linear Model overestimates what we can see, wasting samples on details that our brain would perceive as mere noise anyway.
 
 <p align="center">
     <img alt="dynamicfr" src="https://github.com/user-attachments/assets/67f78b35-cf03-4e6e-b9ac-7c42d565422c" />
@@ -190,14 +202,14 @@ This behavior is illustrated by the widening gap between the detectable without 
 The mixed acuity model is motivated by the fact that different biological bottlenecks dominate visual resolution depending on eccentricity. As shown in here:
 
 <p align="center">
-    <img alt="image" src="https://github.com/user-attachments/assets/a1e02fa8-195c-4b07-898d-90dee6627916" />
+    <img width="40%" =alt="image" src="https://github.com/user-attachments/assets/a1e02fa8-195c-4b07-898d-90dee6627916" />
 <br>
     <em>
-        <a href="https://www.reddit.com/r/oculus/comments/66nfap/made_a_pic_that_shows_how_foveated_rendering/">Figure 1.1 from Foveated Rendering Techniques in Modern Computer Graphics by Xiaoxu Meng</a>
+        <a href="https://3dvar.com/Meng2018Foveated.pdf">Figure 1.1 from Foveated Rendering Techniques in Modern Computer Graphics by Xiaoxu Meng</a>
     </em>
 </p>
 
-Photoreceptor density (cones/rods) and ganglion cell (RGC) density follow different trends across the retina. In the fovea, ganglion cell density is high and tends to match photoreceptor density, enabling high spatial resolution. However, away from the fovea, ganglion cell density drops much more rapidly, meaning that many photoreceptors effectively map to the same ganglion cell (i.e., spatial pooling increases with eccentricity). This relationship is supported by human retinal topography measurements reported by Curcio et al.
+Photoreceptor density (cones/rods) and ganglion cell density follow different trends across the retina. In the fovea, ganglion cell density is high and tends to match photoreceptor density, enabling high spatial resolution. However, away from the fovea, ganglion cell density drops much more rapidly, meaning that many photoreceptors effectively map to the same ganglion cell (i.e., spatial pooling increases with eccentricity). This relationship is supported by human retinal topography measurements reported by [Curcio et al., 1990](https://pubmed.ncbi.nlm.nih.gov/2324310/).
 
 Because of this, a single pure acuity model (only photoreceptors or only cortical/log mapping) may not capture the full picture. Instead, mixed acuity models treat acuity as being limited by the most restrictive stage at each eccentricity.
 
@@ -205,8 +217,8 @@ In reality, when we get close to the fovea, resolution is primarily limited by p
 
 So we can define two eccentricity dependent resolution limits in MAR form:
 
-- Photoreceptor limited MAR: MARphoto(𝑒)
-- Ganglion limited MAR: MARganglion(𝑒)
+- *Photoreceptor limited MAR*: $\text{MAR}_{\text{photo}}(e)$
+- *Ganglion limited MAR*: $\text{MAR}_{\text{ganglion}}(e)$
 
 A conservative mixed model can be expressed by taking the maximum MAR (worst acuity) at each eccentricity (it can be improved further by smooth blending, but I will keep it simple here):
 
@@ -244,11 +256,10 @@ Another important parameter in foveated rendering is the fovea radius, which det
 
 We can define the fovea radius in degrees of visual angle. Then we can convert this angle to a distance on the screen based on the viewer's distance from the screen (as discussed in Definitions section).
 
-A common value for the fovea radius is around 2 degrees of visual angle [CITE Brian Guenter, Mark Finch, Steven Drucker, Desney Tan, and John Snyder.
-Foveated 3d graphics. ACM Trans. Graph., 31(6):164:1–164:10, November 2012].
+A common value for the fovea radius is around 2 degrees of visual angle [(Guenter et al., 2012)](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/11/foveated_final15.pdf), but I will use a larger value to better visualize the effects of foveated rendering in my renders.
 
 #### Blend Region Radius
-The outer boundary of the blend region is commonly chosen to be several times larger than the fovea radius. In practice, a value between 6 and 10 degrees of visual angle works well for many applications. A typical and well-balanced choice is around 8 degrees of visual angle.
+The outer boundary of the blend region is commonly chosen to be several times larger than the fovea radius. In practice, a value between 6 and 10 degrees of visual angle works well for many applications. A typical and well balanced choice is around 8 degrees of visual angle. As in the fovea radius, I will use a larger value to better visualize the effects of foveated rendering in my renders.
 
 #### Peripheral Region
 The peripheral region encompasses all areas beyond the blend region. In this region, the sample size is set to the minimum value to maximize performance savings.
@@ -327,13 +338,13 @@ When I debugged this with colored regions (with commented codes), I got this res
     <img width="40%" alt="debug" src="https://github.com/user-attachments/assets/a6a9d93d-a4a6-44e3-8ec4-fc64b7f31fe4" />
 </p>
 
-Even though there are some problems in my renderer with attenuation, I wanted to use metal_glass_plates.json because I thought it would be a good scene to see the sample differences in different regions. I also modified the camera position and gaze direction a bit to get a better view for foveated rendering. In the following render, I used 100 samples for fovea region, 16 samples for blend region, and 1 samples for peripheral region. Here is the result compared to normal rendering with 100 samples per pixel:
+Even though there are some problems in my renderer with attenuation, I wanted to use metal_glass_plates.json because I thought it would be a good scene to see the sample differences in different regions. I also modified the camera position and gaze direction a bit to get a better view for foveated rendering (you can see the modified version [here](https://github.com/fsaltunyuva/RayTracer/blob/main/Foveated%20Rendering/Renders%20and%20Input%20File/metal_glass_plates.json)). In the following render, I used 100 samples for fovea region, 16 samples for blend region, and 1 samples for peripheral region. Here is the result compared to normal rendering with 100 samples per pixel (left: normal, right: foveated):
 
 <p align="center">
     <img alt="debug" src="https://github.com/user-attachments/assets/830c7c53-4c2e-4d0a-8a85-67e2d1c67cd6" />
 </p>
 
-We went from 108.196 seconds to 20.7135 seconds! Now, we can implement the falloff methods I explained before. But I was implemented Stratified Random Sampling in my ray tracer, so I needed to modify the sampling logic a bit to accommodate non-square number of samples per pixel. As we discussed in class, I will use N-Rooks Sampling for this purpose.
+We went from 108.196 seconds to 20.7135 seconds (with tunnel vision artifact of course)! Now, we can implement the falloff methods I explained before. But I was using Stratified Random Sampling in my ray tracer, so I needed to modify the sampling logic a bit to accommodate non-square number of samples per pixel. As we discussed in class, I will use N-Rooks Sampling for this purpose.
 
 ```cpp
 // Arrange samples along the diagonal randomly
@@ -423,7 +434,7 @@ else {
 
     // Ratio = MAR(0) / MAR(e) = a / (a + b*e)
     float ratio = a / mar_e;
-    float falloff = (float)maxSamples * ratio;
+    float falloff = (float) maxSamples * ratio;
 
     N_foveated = max(minSamples, min(maxSamples, (int) falloff));
 }
@@ -442,12 +453,12 @@ else {
     // Formula: 0.02 + 0.01 * e
     float mar_photo = 0.02f + 0.01f * eccentricity;
 
-    // 2. Ganglion Limited MAR (Logarithmic-like)
+    // 2. Ganglion Limited MAR (Logarithmic)
     // Formula: 0.02 + 0.015 * log(1 + 0.08 * e)
-    float mar_ganglion = 0.02f + 0.015f * std::log(1.0f + 0.08f * eccentricity);
+    float mar_ganglion = 0.02f + 0.015f * log(1.0f + 0.08f * eccentricity);
 
     // 3. Mixed MAR (Worst Case / Maximum Angle)
-    float mar_mixed = std::max(mar_photo, mar_ganglion);
+    float mar_mixed = max(mar_photo, mar_ganglion);
 
     // 4. Calculate Sample Count
     // Both formulas intersect at e = 0, MAR(0) = 0.02
@@ -456,7 +467,7 @@ else {
     float ratio = mar0 / mar_mixed;
     float falloff = (float)maxSamples * (ratio * ratio);
 
-    N_foveated = std::max(minSamples, std::min(maxSamples, (int)falloff));
+    N_foveated = :max(minSamples, min(maxSamples, (int) falloff));
 }
 ```
 
@@ -468,16 +479,16 @@ else {
 Due to a lot of parameters are involved in foveated rendering, it is hard to say which falloff method is the best only by looking at one render. Also, there are several purposes of foveated rendering (some want to maximize performance, some want to minimize quality loss, some want to avoid tunnel vision problem, etc.), so it is hard to conclude a method as the best one overall. But I will share my observations and results here.
 
 Used parameters for all methods:
-- Scene: metal_glass_plates.json (with modified camera position and gaze direction, I will share the used json)
-- Fovea Radius: 20 degrees (Instead of the common 2 degrees, I increased it to see the differences more clearly)
-- Blend Radius: 30 degrees
-- Max Samples: 100
-- Min Samples: 1
-- Blend Samples: 16 (only for Static Foveated Rendering)
-- $e_0$ (Log Acuity Model): 5 degrees 
-- a and b (Linear Acuity Model): 0.02 and 0.04 (MAR(0) and slope)
-- Photoreceptor MAR (Mixed Acuity Model): $0.02 + 0.01e$
-- Ganglion MAR (Mixed Acuity Model): $0.02 + 0.015 \cdot \log(1 + 0.08e)$
+- *Scene*: metal_glass_plates.json (with modified camera position and gaze direction, I will share the used json)
+- *Fovea Radius*: 20 degrees (Instead of the common 2 degrees, I increased it to see the differences more clearly)
+- *Blend Radius*: 30 degrees
+- *Max Samples*: 100
+- *Min Samples*: 1
+- *Blend Samples*: 16 (only for Static Foveated Rendering)
+- *$e_0$ (Log Acuity Model)*: 5 degrees 
+- *a and b (Linear Acuity Model)*: 0.02 and 0.04 (MAR(0) and slope)
+- *Photoreceptor MAR (Mixed Acuity Model)*: $0.02 + 0.01e$
+- *Ganglion MAR (Mixed Acuity Model)*: $0.02 + 0.015 \cdot \log(1 + 0.08e)$
 
 Static Foveated Rendering and Log Acuity Model with Fovea-Blend-Peripheral Regions results:
 
@@ -515,7 +526,7 @@ Also, you can see the render times for each method here:
 ## Comments
 When I look at the render times, I understood why the Foveated Rendering is popular in VR applications. Even with a simple static foveated rendering implementation, I was able to achieve almost 5x speedup compared to normal rendering with 100 samples per pixel. And with more advanced falloff methods (and fine-tuning the parameters), I could have achieved even better performance.
 
-When I look at the images, I can say that all falloff methods produced acceptable results, but there are some differences in quality and artifacts.
+When I look at the images, I can say that all falloff methods produced acceptable results, but there are some differences in quality and artifacts. Also, as I mentioned before, these results would be more understandable in a dynamic environment in VR where the gaze point changes frequently.
 
 In Static Foveated Rendering, the transitions between regions are quite noticeable, especially at the boundaries. This became a good example for tunnel vision problem, as the peripheral region looks very low quality compared to the fovea region. But it is expected, as we are using constant sample sizes for each region.
 
@@ -530,8 +541,9 @@ $$
 Which in Linear Acuity Model, at 5 degree angle, I get:
 
 $$
-N(𝑒) = 100 \cdot \left( \frac{0.02}{0.02 + 0.04 \cdot 5} \right)^2 \approx 0.82 \text{ samples}
+N(𝑒) = 100 \cdot \left( \frac{0.02}{0.02 + 0.04 \cdot 5} \right) \approx 9 \text{ samples}
 $$
+
 This is also a good example of how parameters can affect the results and performance of foveated rendering. I get 1.50144 seconds with $e_0$ = 2 degrees for Log Acuity Model, which is faster than other falloff methods.
 
 ## Conclusions and Future Work
@@ -550,15 +562,15 @@ https://en.wikipedia.org/wiki/Peripheral_vision#/media/File:Peripheral_vision.sv
 
 - Some geometric falloff methods can also be explored for falloff calculations.
 
-- Contrast enhancement from ["Towards foveated rendering for gaze-tracked virtual reality"](https://cwyman.org/papers/siga16_gazeTrackedFoveatedRendering.pdf) can also be implemented to improve the perceived quality in peripheral regions.
+- Contrast enhancement from the paper ["Towards foveated rendering for gaze-tracked virtual reality"](https://cwyman.org/papers/siga16_gazeTrackedFoveatedRendering.pdf) can also be implemented to improve the perceived quality in peripheral regions.
 
 ## Great Papers and Articles to Read
-- [Foveated 3D Graphics](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/11/foveated_final15.pdf)
+- [Foveated 3D Graphics (2012) by Guenter, B., Finch, M., Drucker, S., Tan, D., & Snyder, J.](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/11/foveated_final15.pdf)
 
-- [FOVEATED RENDERING TECHNIQUES IN MODERN COMPUTER GRAPHICS](https://3dvar.com/Meng2018Foveated.pdf#page=66&zoom=100,149,346)
+- ["Towards foveated rendering for gaze-tracked virtual reality (2016) by Patney, A., Salvi, M., Kim, J., Kaplanyan, A., Wyman, C., Benty, N., Luebke, D., & Lefohn, A."](https://cwyman.org/papers/siga16_gazeTrackedFoveatedRendering.pdf)
 
-- [Foveated Path Tracing with Configurable Sampling and Block-Based Rendering](https://arxiv.org/pdf/2406.07981)
+- [Foveated Rendering Techniques in Modern Computer Graphics (2018) by Xiaoxu Meng](https://3dvar.com/Meng2018Foveated.pdf#page=66&zoom=100,149,346)
 
-- [Fooling Around with Foveated Rendering](https://www.peterstefek.me/focused-render.html)
+- [Foveated Path Tracing with Configurable Sampling and Block-Based Rendering (2024) by Bipul Mohanto, Sven Kluge, Martin Weier, and Oliver Staadt](https://arxiv.org/pdf/2406.07981)
 
-- ["Towards foveated rendering for gaze-tracked virtual reality"](https://cwyman.org/papers/siga16_gazeTrackedFoveatedRendering.pdf)
+- [Fooling Around with Foveated Rendering by Peter Stefek](https://www.peterstefek.me/focused-render.html)
