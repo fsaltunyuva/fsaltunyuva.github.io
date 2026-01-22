@@ -155,7 +155,7 @@ $$
 N(e) = \text{clamp} \left( N_{\max} \cdot \left( \frac{e_0}{e + e_0} \right)^2, N_{\min}, N_{\max} \right)
 $$
 
-As we said earlier, if Nmax = 64, Nmin = 4, and $𝑒_0$ = 1 degree, function will look like this (Python scripts used to generate the plots can be found [here](https://github.com/fsaltunyuva/RayTracer/tree/main/Foveated%20Rendering)):
+As we said earlier, if Nmax = 64, Nmin = 4, and $𝑒_0$ = 1 degree, function will look like this (Python scripts used to generate the plots can be found [here](https://github.com/fsaltunyuva/RayTracer/tree/main/Foveated%20Rendering/Python%20Codes):
 
 <p align="center">
     <img alt="dynamicfr" src="https://github.com/user-attachments/assets/561132a2-3bc7-4c07-b20e-85ccac19856d" />
@@ -471,6 +471,17 @@ else {
 <p align="center">
     <img alt="mixedacuitycentertoblendedge" src="https://github.com/user-attachments/assets/942bf1a1-be5b-4e2e-b8dc-6e2563034717" />
 </p>
+
+Also, if you want to see the full code or try it yourself, you can find my modified ray tracer with foveated rendering [here](https://github.com/fsaltunyuva/RayTracer/tree/main/Foveated%20Rendering/raytracer). In [main.cpp](https://github.com/fsaltunyuva/RayTracer/blob/main/Foveated%20Rendering/raytracer/src/main.cpp) there are flags to switch between different falloff methods in the ```#pragma region Foveated Rendering``` section:
+
+```cpp
+bool useStaticFoveatedRendering = false;
+bool useLogAcuityFalloffWithRegions = false;
+bool useLogAcuityFalloffFromCenter = false;
+bool useLinearAcuityFalloffFromCenter = false;
+bool useMixedAcuityFalloffFromCenter = false;
+// Set one of these to true to test different methods
+```
 
 ## Results Comparison
 Due to a lot of parameters are involved in foveated rendering, it is hard to say which falloff method is the best only by looking at one render. Also, there are several purposes of foveated rendering (some want to maximize performance, some want to minimize quality loss, some want to avoid tunnel vision problem, etc.), so it is hard to conclude a method as the best one overall. But I will share my observations and results here.
