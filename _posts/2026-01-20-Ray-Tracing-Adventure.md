@@ -573,7 +573,7 @@ For future work, I can explore the following ideas:
 ## Great Papers and Articles to Read
 - [Foveated 3D Graphics (2012) by Guenter, B., Finch, M., Drucker, S., Tan, D., & Snyder, J.](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/11/foveated_final15.pdf)
 
-- ["Towards foveated rendering for gaze-tracked virtual reality (2016) by Patney, A., Salvi, M., Kim, J., Kaplanyan, A., Wyman, C., Benty, N., Luebke, D., & Lefohn, A."](https://cwyman.org/papers/siga16_gazeTrackedFoveatedRendering.pdf)
+- [Towards foveated rendering for gaze-tracked virtual reality (2016) by Patney, A., Salvi, M., Kim, J., Kaplanyan, A., Wyman, C., Benty, N., Luebke, D., & Lefohn, A.](https://cwyman.org/papers/siga16_gazeTrackedFoveatedRendering.pdf)
 
 - [Foveated Rendering Techniques in Modern Computer Graphics (2018) by Xiaoxu Meng](https://3dvar.com/Meng2018Foveated.pdf#page=66&zoom=100,149,346)
 
